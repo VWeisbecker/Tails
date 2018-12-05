@@ -10,13 +10,7 @@ output: html_document
 ```{r, warnings=FALSE}
 library(ape)
 library(geiger)
-library(nlme)
-library(caper)
-library(car)
-library(multcomp)
-library(geomorph)
-library(lmSupport)
-library(ggplot2)
+
 ```
 
 #prepare data and trees
