@@ -53,14 +53,9 @@ rodTree$tip.label=newtips
 rodTree=drop.tip(rodTree, which(duplicated(rodTree$tip.label)))
 
 #find typo positions, fix
-grep("Notomys_mithcellii", rodTree$tip.label)
-rodTree$tip.label[23]="Notomys_mitchellii"
-
-grep("Pseudomys_hermannsburgensis", rodTree$tip.label)
-rodTree$tip.label[4]=c("Pseudomys_hermannburgensis")
-
-grep("Conilurus_pencillatus", rodTree$tip.label)
-rodTree$tip.label[43]=c("Conilurus_penicillatus")
+rodTree$tip.label[grep("Notomys_mithcellii", rodTree$tip.label)]="Notomys_mitchellii"
+rodTree$tip.label[grep("Pseudomys_hermannsburgensis", rodTree$tip.label)]=c("Pseudomys_hermannburgensis")
+rodTree$tip.label[grep("Conilurus_pencillatus", rodTree$tip.label)]=c("Conilurus_penicillatus")
 
 
 

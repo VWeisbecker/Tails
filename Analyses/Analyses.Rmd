@@ -1,0 +1,76 @@
+---
+title: "Analyses"
+author: "Vera Weisbecker and Cruise Speck"
+date: "5 December 2018"
+output: html_document
+---
+
+
+
+## load required packages and processed data
+
+
+
+```{r }
+library(ape)
+library(geiger)
+library(caper)
+library(car)
+library(multcomp)
+library(geomorph)
+library(lmSupport)
+library(ggplot2)
+library(nlme)
+
+load(file="../Data/Processed_Data.rda")
+
+#logarithm transform here
+mars$Tlength_mm=log(mars$Tlength_mm)
+mars$Blength_mm=log(mars$Blength_mm)
+mars$Wt_g=log(mars$Wt_g)
+
+rod$Tlength_mm=log(rod$Tlength_mm)
+rod$Blength_mm=log(rod$Blength_mm)
+rod$Wt_g=log(rod$Wt_g)
+
+```
+
+#PGLS models
+
+```{r}
+
+#Body mass and body length- which is better?
+
+#function for correlation type, explanatory var, model name derived from this var, make a list of the resulting AIC values.
+
+  #marsupials
+  Mars_WeightPagel=gls((Tlength_mm~Wt_g), correlation=corPagel(1,phy=marsTree), data=mars)
+  Mars_WeightBrown=gls((Tlength_mm~Wt_g), correlation=corBrownian(1,phy=marsTree), data=mars)
+  Mars_WeightGrafen=gls((Tlength_mm~Wt_g), correlation=corGrafen(1,phy=marsTree), data=mars)
+
+AICs=c(AIC(Mars_WeightPagel), AIC(Mars_WeightBrown), AIC(Mars_WeightGrafen))
+AICmin=AICs-min(AICs)
+W=exp(-0.5*AICmin)/sum(exp(-0.5*AICmin))
+W#Brownian is best
+  
+  Mars_LengthPagel=gls((Tlength_mm~Blength_mm), correlation=corPagel(1,phy=marsTree), data=mars)
+  Mars_LengthBrown=gls((Tlength_mm~Blength_mm), correlation=corBrownian(1,phy=marsTree), data=mars)
+  Mars_LengthGrafen=gls((Tlength_mm~Blength_mm), correlation=corGrafen(1,phy=marsTree), data=mars)
+  
+AICs=c(AIC(Mars_LengthPagel), AIC(Mars_LengthBrown), AIC(Mars_LengthGrafen))
+AICmin=AICs-min(AICs)
+W=exp(-0.5*AICmin)/sum(exp(-0.5*AICmin))
+W#Brownian is best
+  
+
+  
+
+
+Mars_Length=gls((Tlength_mm~Blength_mm), correlation=corPagel(1,phy=marsTree), data=mars)
+  
+summary(Mars_Weight)
+anova(Mars_Weight)
+
+
+
+```
