@@ -1,0 +1,101 @@
+---
+title: "Tail study"
+author: "Vera Weisbecker and Cruise Speck"
+date: "5 December 2018"
+output: html_document
+---
+
+
+## Load required packages and data
+```{r, warnings=FALSE}
+library(ape)
+library(geiger)
+library(nlme)
+library(caper)
+library(car)
+library(multcomp)
+library(geomorph)
+library(lmSupport)
+library(ggplot2)
+```
+
+#prepare data and trees
+```{r}
+# The data, partition between marsupials and rodents
+Data=read.csv("../Data/SpeckWeisData.csv")
+mars=Data[1:138,]
+rownames(mars)=mars$Species
+rod=Data[139:202,]
+rownames(rod)=rod$Species
+
+#marsupial tree 
+marsTree=read.nexus("../Data/MayCollando_Marsupial_tree.nex")
+
+#The rodent tree needs some processing from the file supplied by the publication 
+
+rodTree_raw=read.nexus("../Data/Smissen_Rowe_2018_Rodent_Tree.nex")
+
+
+#remove catalogue numbers
+rodTree=rodTree_raw
+
+split_tips=list()
+new_tips=list()
+tips_for_processing=rodTree$tip.label; 
+
+for (i in 1:length(tips_for_processing)){
+  
+  split_tips[i]=strsplit(tips_for_processing[i], "_")
+  
+  new_tips[i]=paste (split_tips[[i]][1],split_tips[[i]][2], sep="_" )
+}
+
+newtips=unlist(new_tips)
+
+#replace old tip labels with new ones
+rodTree$tip.label=newtips
+
+#remove duplicate species names from tree
+rodTree=drop.tip(rodTree, which(duplicated(rodTree$tip.label)))
+
+#find typo positions, fix
+grep("Notomys_mithcellii", rodTree$tip.label)
+rodTree$tip.label[23]="Notomys_mitchellii"
+
+grep("Pseudomys_hermannsburgensis", rodTree$tip.label)
+rodTree$tip.label[4]=c("Pseudomys_hermannburgensis")
+
+grep("Conilurus_pencillatus", rodTree$tip.label)
+rodTree$tip.label[43]=c("Conilurus_penicillatus")
+
+
+
+```
+
+# Synchronize trees and species by reducing tree to the data available; this has been checked for typos (fixed above)
+```{r}
+#Marsupials: 138 species left; no data that are not present in tree
+
+namecheck=name.check(marsTree,mars)
+marsTree_synch=drop.tip(marsTree,namecheck$tree_not_data)
+name.check(marsTree_synch,mars)
+
+#Rodents: 
+namecheck=name.check(rodTree, rod)
+rodTree_synch=drop.tip(rodTree,namecheck$tree_not_data)
+#in rodents there are also a few species that are not in the phylogeny, unfortunately:
+rodsynch=rod[-which(rownames(rod) %in% namecheck$data_not_tree), ] 
+name.check(rodTree_synch,rodsynch)
+
+#reverting back to call-able names; NOTE rodFull has to be specified before rod is specified to be rodsynch!
+marsTree<-marsTree_synch
+rodTree<-rodTree_synch
+rodFull<-rod
+rod<-rodsynch
+
+
+
+save(mars, rod, rodFull,marsTree, rodTree, file = "../Data/Processed_Data.rda")
+
+
+```
