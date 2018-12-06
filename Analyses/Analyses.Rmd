@@ -22,6 +22,8 @@ library(lmSupport)
 library(ggplot2)
 library(nlme)
 
+#the "utilities" file contains functions so this analysis page isn't too cluttered
+source("../Analyses/Utilities.r")
 load(file="../Data/Processed_Data.rda")
 
 #logarithm transform here
@@ -35,42 +37,42 @@ rod$Wt_g=log(rod$Wt_g)
 
 ```
 
-#PGLS models
+#comparing body mass and tail lengths and which one explains tail length better
 
 ```{r}
 
 #Body mass and body length- which is better?
 
-#function for correlation type, explanatory var, model name derived from this var, make a list of the resulting AIC values.
+#first, determine which phylogenetic correlation structure and tree fit the data best for both models to be compared:
+Tlength_Blength=find.best.model(Tlength_mm~Blength_mm,marsTree,mars)
+Tlength_Blength$AIC_Weights 
+Tlength_Blength$Model_summaries$corBrownian
 
-  #marsupials
-  Mars_WeightPagel=gls((Tlength_mm~Wt_g), correlation=corPagel(1,phy=marsTree), data=mars)
-  Mars_WeightBrown=gls((Tlength_mm~Wt_g), correlation=corBrownian(1,phy=marsTree), data=mars)
-  Mars_WeightGrafen=gls((Tlength_mm~Wt_g), correlation=corGrafen(1,phy=marsTree), data=mars)
 
-AICs=c(AIC(Mars_WeightPagel), AIC(Mars_WeightBrown), AIC(Mars_WeightGrafen))
-AICmin=AICs-min(AICs)
-W=exp(-0.5*AICmin)/sum(exp(-0.5*AICmin))
-W#Brownian is best
+Tlength_Bwt=find.best.model(Tlength_mm~Wt_g,marsTree,mars)
+Tlength_Bwt$AIC_Weights 
+Tlength_Bwt$Model_summaries$corBrownian
+
+#now, compare the two:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   
-  Mars_LengthPagel=gls((Tlength_mm~Blength_mm), correlation=corPagel(1,phy=marsTree), data=mars)
-  Mars_LengthBrown=gls((Tlength_mm~Blength_mm), correlation=corBrownian(1,phy=marsTree), data=mars)
-  Mars_LengthGrafen=gls((Tlength_mm~Blength_mm), correlation=corGrafen(1,phy=marsTree), data=mars)
-  
-AICs=c(AIC(Mars_LengthPagel), AIC(Mars_LengthBrown), AIC(Mars_LengthGrafen))
-AICmin=AICs-min(AICs)
-W=exp(-0.5*AICmin)/sum(exp(-0.5*AICmin))
-W#Brownian is best
-  
-
-  
-
-
-Mars_Length=gls((Tlength_mm~Blength_mm), correlation=corPagel(1,phy=marsTree), data=mars)
-  
-summary(Mars_Weight)
-anova(Mars_Weight)
-
 
 
 ```
