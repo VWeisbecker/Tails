@@ -34,6 +34,42 @@ load(file="../Data/Processed_Data.rda")
 ```{r}
 #Marsupials:
 
+#collate dataset; add a column for averaged values
+mars_sexes=na.omit(mars[,11:16])
+
+##average the columns, add to mars_sexes; averaging requires un-loggin and re-logging
+  mars_sex_Tl_av<-log10((10^(mars_sexes$Bl_M)+10^(mars_sexes$Bl_F))/2)
+  mars_sex_Bl_av<-log10((10^(mars_sexes$Tl_M)+10^(mars_sexes$Tl_F))/2)
+  mars_sexes<-cbind(mars_sexes,mars_sex_Tl_av,mars_sex_Bl_av )
+
+
+#preparing for testing for sig differences in slope/intercept between male and female datasets; includes putting males/females under each other, turnign into a data frame for column names
+
+Males<-cbind(mars_sexes$Tl_M,mars_sexes$Bl_M,rep(1,length(mars_sexes$Tl_M)))
+Females<-cbind(mars_sexes$Tl_F,mars_sexes$Bl_F,rep(2,length(mars_sexes$Tl_F)))
+Averages<-cbind(mars_sexes$mars_sex_Tl_av, mars_sexes$mars_sex_Bl_av, rep(3,length(mars_sexes$Tl_F)))
+
+Combine=rbind(Males, Females,Averages)
+Combine=as.data.frame(Combine)
+colnames(Combine) <-c("Tl","Bl", "Sex")
+as.factor(Combine$Sex)
+
+#No significantly different slopes between Male and Female datasets, or males vs. females vs averaged
+MaleFemale=summary(lm(Combine$Tl~Combine$Bl*as.factor(Combine$Sex)))
+#Significantly different intercepts between males and females but that is to be expected
+MaleFemale=summary(lm(Tl~Bl+as.factor(Sex), Combine))
+
+
+#Next time: use Tukey to figure out which factor is sig different; bearing in mind that Sex somehow isn't a factor
+MaleFemaleaov=aov(Tl~Bl+as.factor(Sex), Combine)
+TukeyHSD(MaleFemaleaov,which=', data=Combine )
+
+```
+
+
+#the below is messy experimentation and needs cleaning up
+```{r}
+
 #collate dataset for sexes and prune tree to dataset:
 mars_sexes=na.omit(mars[,11:16])
 namecheck=name.check(marsTree,mars_sexes)
