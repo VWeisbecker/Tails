@@ -16,17 +16,47 @@ library(geiger)
 #prepare data and trees
 ```{r}
 # The data, partition between marsupials and rodents
-Data=read.csv("../Data/SpeckWeisData.csv")
-mars=Data[1:138,]
+Data=read.csv("../Data/All_Data.csv")
+
+#log10 transform all numerical data
+
+#extract numerical columns
+numcols=as.data.frame(Data[,2:16])
+
+#turn NAs into 1 so they turn into easily replaceable zeroes without messing with the logging
+numcols[is.na(numcols)]<-1
+
+#log transform
+numcols_log10=log10(numcols)
+
+#replace 0s with NAS again
+numcols_log10[numcols_log10==0]<-NA
+
+#replace original data with logged data. I wish I knew a less pedestrian way of doing this...
+logdata=Data
+logdata[,2:16]=numcols_log10
+
+#partition datasets
+
+mars=logdata[1:138,]
 rownames(mars)=mars$Species
-rod=Data[139:202,]
+#exclude wombats who are tremendous outliers
+grep("Vombatus_ursinus", mars$Species)
+grep("Lasiorhinus_latifrons", mars$Species)
+mars=mars[-(66:67),]
+
+rod=logdata[139:202,]
 rownames(rod)=rod$Species
 
+```
+
+#import and process trees
+
+```{r}
 #marsupial tree 
 marsTree=read.nexus("../Data/MayCollando_Marsupial_tree.nex")
 
 #The rodent tree needs some processing from the file supplied by the publication 
-
 rodTree_raw=read.nexus("../Data/Smissen_Rowe_2018_Rodent_Tree.nex")
 
 
@@ -61,6 +91,7 @@ rodTree$tip.label[grep("Conilurus_pencillatus", rodTree$tip.label)]=c("Conilurus
 
 ```
 
+
 # Synchronize trees and species by reducing tree to the data available; this has been checked for typos (fixed above)
 ```{r}
 #Marsupials: 138 species left; no data that are not present in tree
@@ -88,3 +119,5 @@ save(mars, rod, rodFull,marsTree, rodTree, file = "../Data/Processed_Data.rda")
 
 
 ```
+
+
