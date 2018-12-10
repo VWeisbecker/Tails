@@ -1,0 +1,86 @@
+---
+title: "TestCode"
+author: "Vera Weisbecker"
+date: "8 December 2018"
+output: html_document
+---
+The below summarizes the table according to the values given:
+1) if there is an average value for males and females, use their averages to enter into the final parts
+
+```{r }
+data=read.csv("TableCode_example.csv", header=TRUE)
+
+#make a matrix for all data but also add 3 columns for final Tl, Bl and Wt
+data_processed<-matrix(ncol=(ncol(data)+3), nrow=nrow(data))
+colnames(data_processed)<-c("Tl_mm", "Bl_mm"," Wt_g",colnames(data))
+rownames(data_processed)<-data$Species
+
+# turn into data frame to feed into loop; 
+data_processed=as.data.frame((data_processed))
+
+#if there are male/female ranges, provide their mean; this is clunky but I prefer to have the names written out to reduce human error in assigning column numbers
+for (i in 1:length(data$Species)){
+  
+    #if there min/max values for male and female weights...same for the other ifs
+    if(is.na(data$Wt_min_F[i])==FALSE){
+  
+      data_processed$Wt_Av_F[i]<-mean(c(data$Wt_min_F[i],data$Wt_max_F[i]))
+    }
+    
+    if(is.na(data$Wt_min_M[i])==FALSE){
+  
+      data_processed$Wt_Av_M[i]<-mean(c(data$Wt_min_M[i],data$Wt_max_M[i]))
+      
+    }
+  
+    if(is.na(data$Bl_min_F[i])==FALSE){
+  
+      data_processed$Bl_Av_F[i]<-mean(c(data$Bl_min_F[i],data$Bl_max_F[i]))
+    }
+    
+    if(is.na(data$Bl_min_M[i])==FALSE){
+  
+      data_processed$Bl_Av_M[i]<-mean(c(data$Bl_min_M[i],data$Bl_max_M[i]))
+      
+    }
+  
+    if(is.na(data$Tl_min_F[i])==FALSE){
+  
+      data_processed$Tl_Av_F[i]<-mean(c(data$Tl_min_F[i],data$Tl_max_F[i]))
+    }
+    
+    if(is.na(data$Tl_min_M[i])==FALSE){
+  
+      data_processed$Tl_Av_M[i]<-mean(c(data$Tl_min_M[i],data$Tl_max_M[i]))
+      
+    }
+  
+  # if both males and females have ranges
+  #if there min/max values for male or female weights...same for the other ifs
+    if(is.na(data$Wt_min_F[i])==FALSE | is.na(data$Wt_min_M[i])==FALSE){
+  
+      data_processed$Wt_min[i]<-min(c(data$Wt_min_F[i],data$Wt_max_F[i],data$Wt_min_M[i],data$Wt_max_M[i]))
+      data_processed$Wt_max[i]<-max(c(data$Wt_max_F[i],data$Wt_max_F[i],data$Wt_max_M[i],data$Wt_max_M[i]))
+    }
+  
+    if(is.na(data$Bl_min_F[i])==FALSE | is.na(data$Bl_min_M[i])==FALSE){
+  
+      data_processed$Bl_min[i]<-min(c(data$Bl_min_F[i],data$Bl_max_F[i],data$Bl_min_M[i],data$Bl_max_M[i]))
+      data_processed$Bl_max[i]<-max(c(data$Bl_max_F[i],data$Bl_max_F[i],data$Bl_max_M[i],data$Bl_max_M[i]))
+    }
+  
+    if(is.na(data$Tl_min_F[i])==FALSE | is.na(data$Tl_min_M[i])==FALSE){
+  
+      data_processed$Tl_min[i]<-min(c(data$Tl_min_F[i],data$Tl_max_F[i],data$Tl_min_M[i],data$Tl_max_M[i]))
+      data_processed$Tl_max[i]<-max(c(data$Tl_max_F[i],data$Tl_max_F[i],data$Tl_max_M[i],data$Tl_max_M[i]))
+    }
+    
+    
+}
+
+#which(!is.na(data_processed$Tl_Av_M))
+
+#max (data_processed[i,29:30] )
+#data_processed$Wt_max[51]<-max(c(data$Wt_max_F[51],data$Wt_max_F[51],data$Wt_max_M[51],data$Wt_max_M[51]))
+      
+```
