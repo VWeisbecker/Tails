@@ -1,0 +1,135 @@
+---
+title: "TestCode"
+author: "Vera Weisbecker"
+date: "8 December 2018"
+output: html_document
+---
+#The below summarizes the table according to the values given:
+
+#For missing average male and female values:average the min and max values and enter into m/f average values; 
+
+#For missing min/max values: if available, use the maximal values within both males and females for a species min/max;
+
+#For missing final values: if there is an average value for males and females (regardles of given or derived from within-sex min/maxes), use their averages to enter into the final values; if there is none, use the average min/max 
+
+#if there are min max values for either sex, enter their overall min and max into the min/max columns.
+
+```{r }
+
+#change this to "raw data once it's there"
+data=read.csv("../Data/TableCode_example.csv", header=TRUE)
+
+#make a matrix for all data but also add 3 columns for final Tl, Bl and Wt
+#data_processed<-matrix(ncol=(ncol(data)), nrow=nrow(data))
+#colnames(data_processed)<-c(colnames(data))
+#rownames(data_processed)<-data$Species
+
+# turn into data frame to feed into loop; 
+data_processed<-data
+
+#if there are male/female ranges, provide their mean; this is clunky but I prefer to have the names written out to reduce human error in assigning column numbers
+for (i in 1:length(data$Species)){
+  
+    
+    #if there are min/max values for males and females, average them unless an average is already given; this separates M/F because sometimes ranges are only given for one sex
+    if(is.na(data$Wt_min_F[i])==FALSE & is.na(data$Wt_Av_F[i]==TRUE)){
+  
+      data_processed$Wt_Av_F[i]<-mean(c(data$Wt_min_F[i],data$Wt_max_F[i]))
+    }
+    
+    if(is.na(data$Wt_min_M[i])==FALSE & is.na(data$Wt_Av_M[i]==TRUE)){
+  
+      data_processed$Wt_Av_M[i]<-mean(c(data$Wt_min_M[i],data$Wt_max_M[i]))
+      
+    }
+  
+    if(is.na(data$Bl_min_F[i])==FALSE & is.na(data$Bl_Av_F[i]==TRUE)){
+  
+      data_processed$Bl_Av_F[i]<-mean(c(data$Bl_min_F[i],data$Bl_max_F[i]))
+    }
+    
+    if(is.na(data$Bl_min_M[i])==FALSE & is.na(data$Bl_Av_M[i]==TRUE)){
+  
+      data_processed$Bl_Av_M[i]<-mean(c(data$Bl_min_M[i],data$Bl_max_M[i]))
+      
+    }
+  
+    if(is.na(data$Tl_min_F[i])==FALSE & is.na(data$Tl_Av_F[i]==TRUE)){
+  
+      data_processed$Tl_Av_F[i]<-mean(c(data$Tl_min_F[i],data$Tl_max_F[i]))
+    }
+    
+    if(is.na(data$Tl_min_M[i])==FALSE & is.na(data$Tl_Av_M[i]==TRUE)){
+  
+      data_processed$Tl_Av_M[i]<-mean(c(data$Tl_min_M[i],data$Tl_max_M[i]))
+      
+    }
+ 
+  # if males or females have ranges, enter the max and min for each species in the relevant column; this assumes that overall ranges are never given together with the more informative values by sex 
+
+    if((is.na(data$Wt_min_F[i])==FALSE | is.na(data$Wt_min_M[i])==FALSE)){
+  
+      data_processed$Wt_min[i]<-min(c(data$Wt_min_F[i],data$Wt_max_F[i],data$Wt_min_M[i],data$Wt_max_M[i]))
+      data_processed$Wt_max[i]<-max(c(data$Wt_max_F[i],data$Wt_max_F[i],data$Wt_max_M[i],data$Wt_max_M[i]))
+    }
+  
+    if(is.na(data$Bl_min_F[i])==FALSE | is.na(data$Bl_min_M[i])==FALSE){
+  
+      data_processed$Bl_min[i]<-min(c(data$Bl_min_F[i],data$Bl_max_F[i],data$Bl_min_M[i],data$Bl_max_M[i]))
+      data_processed$Bl_max[i]<-max(c(data$Bl_max_F[i],data$Bl_max_F[i],data$Bl_max_M[i],data$Bl_max_M[i]))
+    }
+  
+    if(is.na(data$Tl_min_F[i])==FALSE | is.na(data$Tl_min_M[i])==FALSE){
+  
+      data_processed$Tl_min[i]<-min(c(data$Tl_min_F[i],data$Tl_max_F[i],data$Tl_min_M[i],data$Tl_max_M[i]))
+      data_processed$Tl_max[i]<-max(c(data$Tl_max_F[i],data$Tl_max_F[i],data$Tl_max_M[i],data$Tl_max_M[i]))
+    }
+    
+}
+
+#now re-process data_processed to fill NAs in the main values, first by averaging male/female values, second (if sex averages are not available) by averaging sex-less min/max values. This overwrites the first pass summary version of data_processed with the second pass summary version
+
+for (i in 1:(nrow(data_processed))){
+  
+   
+      #if there is a male/female average value, use its average as final value (assuming that female ranges also mean that there is a male range)
+      if(is.na(data_processed$Wt_g[i])==TRUE & is.na(data_processed$Wt_Av_F[i])==FALSE){
+  
+      data_processed$Wt_g[i]<-mean(c(data_processed$Wt_Av_F[i], data_processed$Wt_Av_M[i]))
+      }
+  
+      if(is.na(data_processed$Bl_mm[i])==TRUE & is.na(data_processed$Bl_Av_F[i])==FALSE){
+  
+      data_processed$Bl_mm[i]<-mean(c(data_processed$Bl_Av_F[i], data_processed$Bl_Av_M[i]))
+      }
+    
+      if(is.na(data_processed$Tl_mm[i])==TRUE & is.na(data_processed$Tl_Av_F[i])==FALSE){
+  
+      data_processed$Tl_mm[i]<-mean(c(data_processed$Tl_Av_F[i], data_processed$Tl_Av_M[i]))
+      }
+  
+  
+      #if there are no male/female average values (regardles of newly created above or originally in the book; i.e. the male and female), average the ranges
+      if(is.na(data_processed$Wt_g[i])==TRUE & is.na(data_processed$Wt_Av_F[i])==TRUE){
+  
+      data_processed$Wt_g[i]<-mean(c(data_processed$Wt_max[i], data_processed$Wt_min[i]))
+      }
+  
+      if(is.na(data_processed$Bl_mm[i])==TRUE & is.na(data_processed$Bl_Av_F[i])==TRUE){
+  
+      data_processed$Bl_mm[i]<-mean(c(data_processed$Bl_max[i], data_processed$Bl_min[i]))
+      }
+    
+      if(is.na(data_processed$Tl_mm[i])==TRUE & is.na(data_processed$Tl_Av_F[i])==TRUE){
+  
+      data_processed$Tl_mm[i]<-mean(c(data_processed$Tl_max[i], data_processed$Tl_min[i]))
+      }  
+}
+
+write.csv(data_processed, file="../Data/Full_dataset.csv")
+#these are just a few test rows with different scenarios
+data_processed[50:64,]
+data[50:64,]
+
+      
+```
