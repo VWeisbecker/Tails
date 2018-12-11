@@ -17,7 +17,7 @@ output: html_document
 ```{r }
 
 #change this to "raw data once it's there"
-data=read.csv("../Data/TableCode_example.csv", header=TRUE)
+data=read.csv("../Data/raw_data.csv", header=TRUE)
 
 #make a matrix for all data but also add 3 columns for final Tl, Bl and Wt
 #data_processed<-matrix(ncol=(ncol(data)), nrow=nrow(data))
