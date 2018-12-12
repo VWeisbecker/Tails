@@ -126,10 +126,8 @@ for (i in 1:(nrow(data_processed))){
       }  
 }
 
+
 write.csv(data_processed, file="../Data/Full_dataset.csv")
-#these are just a few test rows with different scenarios
-data_processed[50:64,]
-data[50:64,]
 
       
 ```
