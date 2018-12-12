@@ -34,20 +34,12 @@ load(file="../Data/Processed_Data.rda")
 ```{r}
 #Marsupials:
 
-#collate dataset; add a column for averaged values
-mars_sexes=na.omit(mars[,11:16])
-
-##average the columns, add to mars_sexes; averaging requires un-loggin and re-logging
-  mars_sex_Tl_av<-log10((10^(mars_sexes$Bl_M)+10^(mars_sexes$Bl_F))/2)
-  mars_sex_Bl_av<-log10((10^(mars_sexes$Tl_M)+10^(mars_sexes$Tl_F))/2)
-  mars_sexes<-cbind(mars_sexes,mars_sex_Tl_av,mars_sex_Bl_av )
-
 
 #preparing for testing for sig differences in slope/intercept between male and female datasets; includes putting males/females under each other, turnign into a data frame for column names
 
-Males<-cbind(mars_sexes$Tl_M,mars_sexes$Bl_M,rep(1,length(mars_sexes$Tl_M)))
-Females<-cbind(mars_sexes$Tl_F,mars_sexes$Bl_F,rep(2,length(mars_sexes$Tl_F)))
-Averages<-cbind(mars_sexes$mars_sex_Tl_av, mars_sexes$mars_sex_Bl_av, rep(3,length(mars_sexes$Tl_F)))
+Males<-cbind(mars$Tl_Av_M,mars$Bl_Av_M,rep(1,length(mars$Tl_Av_M)))
+Females<-cbind(mars$Tl_Av_F,mars$Bl_Av_F,rep(2,length(mars$Tl_Av_F)))
+Averages<-cbind(mars$Tl_mm, mars$Bl_mm, rep(3,length(mars$Bl_mm)))
 
 Combine=rbind(Males, Females,Averages)
 Combine=as.data.frame(Combine)
