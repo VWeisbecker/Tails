@@ -16,12 +16,12 @@ library(geiger)
 #prepare data and trees
 ```{r}
 # The data, partition between marsupials and rodents
-Data=read.csv("../Data/All_Data.csv")
+Data=read.csv("../Data/Full_dataset.csv")
 
 #log10 transform all numerical data
 
 #extract numerical columns
-numcols=as.data.frame(Data[,2:16])
+numcols=as.data.frame(Data[,2:34])
 
 #turn NAs into 1 so they turn into easily replaceable zeroes without messing with the logging
 numcols[is.na(numcols)]<-1
@@ -34,9 +34,9 @@ numcols_log10[numcols_log10==0]<-NA
 
 #replace original data with logged data. I wish I knew a less pedestrian way of doing this...
 logdata=Data
-logdata[,2:16]=numcols_log10
+logdata[,2:ncol(Data)]=numcols_log10
 
-#partition datasets
+#partition datasets; this cannot be automated easily so need to check for accuracy by looking at dataset
 
 mars=logdata[1:138,]
 rownames(mars)=mars$Species
@@ -45,7 +45,7 @@ grep("Vombatus_ursinus", mars$Species)
 grep("Lasiorhinus_latifrons", mars$Species)
 mars=mars[-(66:67),]
 
-rod=logdata[139:202,]
+rod=logdata[144:207,]
 rownames(rod)=rod$Species
 
 ```
@@ -84,7 +84,6 @@ rodTree=drop.tip(rodTree, which(duplicated(rodTree$tip.label)))
 
 #find typo positions, fix
 rodTree$tip.label[grep("Notomys_mithcellii", rodTree$tip.label)]="Notomys_mitchellii"
-rodTree$tip.label[grep("Pseudomys_hermannsburgensis", rodTree$tip.label)]=c("Pseudomys_hermannburgensis")
 rodTree$tip.label[grep("Conilurus_pencillatus", rodTree$tip.label)]=c("Conilurus_penicillatus")
 
 
