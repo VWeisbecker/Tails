@@ -40,12 +40,12 @@ Sminthopsis_butleri,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Terrestrial,Arid,Dasyuromor
 Sminthopsis_dolichura,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Terrestrial,Arid,Dasyuromorph
 Sminthopsis_leucopus,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Terrestrial,Forest_shrub,Dasyuromorph
 Phascogale_tapoatafa,,,,,,,,,,,,,,,,160,261,148,223,175,234,160,226,175,311,106,212,199,181,207,194,231,156,Arboreal,Forest_shrub,Dasyuromorph
-Phascogale_pirata,,,,,,,,,,,,,,,,209,210,150,188,200,208,180,192,,,108,150,,,,,234,,Arboreal,,Dasyuromorph
+Phascogale_pirata,,,,,,,,,,,,,,,,209,210,150,188,200,208,180,192,,,108,150,,,,,234,,Arboreal,NA,Dasyuromorph
 Phascogale_calura,,,,,,,,,,,,,,,,105,122,93,105,134,145,119,144,39,68,38,48,113,101,141,132,60,43,Arboreal,Forest_shrub,Dasyuromorph
-Antechnius_adustus,,,,,,,,,,,,,,,,98,125,89,109,91,103,72,101,28,42,18,35,115,98,98,90,33,24,,,Dasyuromorph
+Antechnius_adustus,,,,,,,,,,,,,,,,98,125,89,109,91,103,72,101,28,42,18,35,115,98,98,90,33,24,NA,NA,Dasyuromorph
 Antechinus_minimus,,,,,,,,,,,,,,,,103,140,98,117,65,100,67,85,50,129,36,68,120,110,80,75,87,48.5,Terrestrial,Forest_shrub,Dasyuromorph
-Antechinus_mysticus,,,,,,,,,,,,,,,,93,117,80,114,87,117,79,96,32,46,18,34,107,93,99,86,37,24,,,Dasyuromorph
-Antechnius_subtropicus,,,,,,,,,,,,,,,,95,130,95,110,89,105,81,95,18,61,16,32,115,100,95,89,40.8,25.3,,,Dasyuromorph
+Antechinus_mysticus,,,,,,,,,,,,,,,,93,117,80,114,87,117,79,96,32,46,18,34,107,93,99,86,37,24,NA,NA,Dasyuromorph
+Antechnius_subtropicus,,,,,,,,,,,,,,,,95,130,95,110,89,105,81,95,18,61,16,32,115,100,95,89,40.8,25.3,NA,NA,Dasyuromorph
 Antechinus_swainsonii,,,,,,,,,,,,,,,,103,188,89,140,80,121,75,100,43,178,37,100,128,116,107,92,65,41,Terrestrial,Rainforest,Dasyuromorph
 Antechinus_godmani,,,,,,,,,,,,,,,,110,156,117,130,99,143,92,112,48,123,42,78,139,124,120,103,87,56,Scansorial,Rainforest,Dasyuromorph
 Antechinus_stuartii,,,,,,,,,,,,,,,,81,141,73,116,70,124,65,116,29,71,17,40,106,94,94,85,35,20,Terrestrial,Forest_shrub,Dasyuromorph
@@ -56,7 +56,7 @@ Antechinus_leo,,,,,,,,,,,,,,,,142,160,109,136,127,140,81,125,67,124,32,74,150,12
 Dasyuroides_byrnei,,,,,,,,,,,,,,,,140,180,135,160,110,160,110,160,85,175,70,140,150,165,,,,,Terrestrial,Arid,Dasyuromorph
 Pseudantechinus_bilarni,,,,,,,,,,,,,,,,90,115,90,115,90,125,90,120,20,40,15,35,,,,,,,Terrestrial,Rocky,Dasyuromorph
 Pseudantechinus_ningbing,,,,,,,,,,,,,,,,90,100,80,90,80,90,75,90,20,25,15,20,,,,,,,Terrestrial,Rocky,Dasyuromorph
-Dasycercus_blythi,,,,,,,,,,,,,,,,135,165,120,140,75,100,60,90,75,110,60,90,,,,,,,,,Dasyuromorph
+Dasycercus_blythi,,,,,,,,,,,,,,,,135,165,120,140,75,100,60,90,75,110,60,90,,,,,,,NA,NA,Dasyuromorph
 Dasycercus_cristicauda,,,,,,,,,,,,,,,,130,230,120,170,80,125,80,110,110,185,65,120,,,,,,,Terrestrial,Arid,Dasyuromorph
 Pseudantechinus_woolleyae,,,,,,,,,,,,,,,,107,108,100,108,75,75,75,85,35,50,30,45,,,,,,,Terrestrial,Rocky,Dasyuromorph
 Pseudantechinus_roryi,,,,,,,,,,,,,,,,82,90,77,90,66,88,66,88,19,32,17,26,85,83,75,75,25,22,Terrestrial,Rocky,Dasyuromorph

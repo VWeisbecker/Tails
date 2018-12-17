@@ -49,9 +49,11 @@ rod=logdata[144:207,]
 rownames(rod)=rod$Species
 
 #deleting all entries that have NAs in their main data and locomotor use, assuming if they have Tl they also have the others
-mars=mars[-which(is.na( mars$Tl_mm) & is.na(mars$Locomotor_use)),]
+mars=mars[-which(is.na( mars$Tl_mm)) ,]
+mars=mars[-which(is.na(mars$Locomotor_use)),]
 
 rod=rod[-which(is.na(rod$Tl_mm) & is.na(rod$Locomotor_use)),]
+rod=rod[-which(is.na(rod$Locomotor_use)),]
 
 
 ```
@@ -143,6 +145,7 @@ murine_tree=drop.tip(rodTree_synch, name.check(rodTree_synch,murine_data)$tree_n
 #Processing data for partitions with m/f data available (assuming if m present, f is also present)
 ```{r}
 mf_mars=mars_synch[which(mars_synch$Tl_Av_F !="NA"),]
+#this will give an error if name.check is OK - or at least I only encountered this error if this was the case
 mf_marstree=drop.tip(marsTree_synch, name.check(marsTree_synch,mf_mars)$tree_not_data )
 
 mf_rod=rod_synch[which(rod_synch$Tl_Av_F !="NA"),]
