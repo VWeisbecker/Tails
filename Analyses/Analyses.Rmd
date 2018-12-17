@@ -105,7 +105,7 @@ load(file = "../Data/Processed_Data_for_Pgls.rda")
 #Marsupials
     
   ##Tail vs body LENGTH
-    TB=find.best.model(Tl~Bl*Locomotor_use,marsTree,mars);TB$AIC_Weights
+    TB=find.best.model(Tl_mm~Bl_mm*Locomotor_use,marsTree,mars);TB$AIC_Weights
      
     ###look at the model summary of the most likely model, e.g. 
     TB$Model_summaries$corBrownian$tTable
@@ -118,7 +118,7 @@ load(file = "../Data/Processed_Data_for_Pgls.rda")
     TB$Model_summaries$corBrownian$tTable
   
   ##Tail vs body WEIGHT
-    TW=find.best.model(Tl~Wt*Locomotor_use,marsTree,mars);TW$AIC_Weights
+    TW=find.best.model(Tl_mm~Wt_g*Locomotor_use,marsTree,mars);TW$AIC_Weights
      
     ###look at the model summary of the most likely model, e.g. 
     TW$Model_summaries$corBrownian$tTable
@@ -134,7 +134,7 @@ load(file = "../Data/Processed_Data_for_Pgls.rda")
 #Rodents
     
   ##Tail vs body LENGTH
-    TB=find.best.model(Tl~Bl*Locomotor_use,rodTree,rod);TB$AIC_Weights
+    TB=find.best.model(Tl_mm~Bl*Locomotor_use,rodTree,rod);TB$AIC_Weights
     TB$Model_summaries$corBrownian$tTable
       
     ###using the smaller, m/f specific datasets
@@ -145,7 +145,7 @@ load(file = "../Data/Processed_Data_for_Pgls.rda")
     TB$Model_summaries$corBrownian$tTable
       
   ##Tail vs body WEIGHT
-    TW=find.best.model(Tl~Wt*Locomotor_use,rodTree,rod);TW$AIC_Weights
+    TW=find.best.model(Tl_mm~Wt_g*Locomotor_use,rodTree,rod);TW$AIC_Weights
      
     ###look at the model summary of the most likely model, e.g. 
     TW$Model_summaries$corBrownian$tTable
