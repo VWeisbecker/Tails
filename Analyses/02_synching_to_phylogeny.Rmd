@@ -133,6 +133,17 @@ murine_tree=drop.tip(rodTree_synch, name.check(rodTree_synch,murine_data)$tree_n
 
 ```
 
+#Processing data for partitions with m/f data available
+```{r}
+mf_mars=mars_synch[which(mars_synch$Tl_Av_F !="NA"),]
+mf_marstree=drop.tip(marsTree_synch, name.check(marsTree_synch,mf_mars)$tree_not_data )
+
+mf_rod=rod_synch[which(rod_synch$Tl_Av_F !="NA"),]
+mf_rodtree=drop.tip(rodTree_synch, name.check(rodTree_synch,mf_rod)$tree_not_data )
+
+```
+
+
 #Packaging all outputs for analysis
 
 ```{r}
@@ -145,6 +156,6 @@ mars<-mars_synch
 marsTree<-marsTree_synch
 rodTree<-rodTree_synch
 
-save(marsFull,rodFull,mars,rod,marsTree, rodTree, dasy_data, dasy_tree,peram_data, peram_tree,dip_data,dip_tree,murine_data,murine_tree, file = "../Data/Processed_Data_for_Pgls.rda")
+save(marsFull,rodFull,mars,rod,marsTree, rodTree, dasy_data, dasy_tree,peram_data, peram_tree,dip_data,dip_tree,murine_data,murine_tree, mf_mars, mf_rod,mf_marstree, mf_rodtree, file = "../Data/Processed_Data_for_Pgls.rda")
 
 ```
