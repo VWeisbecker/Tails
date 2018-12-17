@@ -21,7 +21,7 @@ Data=read.csv("../Data/Full_dataset.csv")
 #log10 transform all numerical data
 
 #extract numerical columns
-numcols=as.data.frame(Data[,2:34])
+numcols=as.data.frame(Data[,2:28])
 
 #turn NAs into 1 so they turn into easily replaceable zeroes without messing with the logging
 numcols[is.na(numcols)]<-1
