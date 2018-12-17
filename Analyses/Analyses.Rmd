@@ -25,7 +25,7 @@ library(nlme)
 #the "utilities" file contains functions so this analysis page isn't too cluttered
 source("../Analyses/Utilities.r")
 load(file = "../Data/Processed_Data_for_Pgls.rda")
-full_dataset=read.csv(file="../Data/Full_dataset.csv")
+
 
 
 ```
@@ -35,27 +35,66 @@ full_dataset=read.csv(file="../Data/Full_dataset.csv")
 ```{r}
 #Marsupials:
 
+  ##Re-arrange datasets to put males, femals and averages under each other, turning into a data frame for column names
+  
+  Males<-cbind(marsFull$Tl_Av_M,marsFull$Bl_Av_M,marsFull$Wt_Av_M, marsFull$Locomotor_use,rep(1,length(marsFull$Tl_Av_M)))
+  Females<-cbind(marsFull$Tl_Av_F,marsFull$Bl_Av_F,marsFull$Wt_Av_F,marsFull$Locomotor_use, rep(2,length(marsFull$Tl_Av_F)))
+  Averages<-cbind(marsFull$Tl_mm, marsFull$Bl_mm,marsFull$Wt_g, marsFull$Locomotor_use,rep(3,length(marsFull$Bl_mm)))
+  
+  Combine=rbind(Males, Females,Averages)
+  Combine=as.data.frame(Combine)
+  colnames(Combine) <-c("Tl","Bl","Wt","Locomotor_use","Sex")
+  Combine$Sex<-as.factor(Combine$Sex)
+  Combine$Locomotor_use<-as.factor(Combine$Locomotor_use)
+  
+  ##Are there differences in slope of Tail length and body LENGTH according to locomotor use, sex, or averages between sexes?
+  Sex_locomotion=summary(lm(Combine$Tl~Combine$Bl*Combine$Sex*Combine$Locomotor_use))
+  Sex_locomotion=aov (Combine$Tl~Combine$Bl*Combine$Sex*Combine$Locomotor_use)
+  
+  ##If significant interactions, use
+  testInteractions(Sex_locomotion)
+  #if not, re-run without interactions; if any intercept is significant, run something like the below
+  TukeyHSD(MaleFemaleaov,which='Sex', data=Combine )
+  
+  ##Are there differences in slope of Tail length and body WEIGHT according to locomotor use, sex, or averages between sexes?
+  Sex_locomotion=summary(lm(Combine$Tl~Combine$Wt *Combine$Sex*Combine$Locomotor_use))
+  Sex_locomotion=aov (Combine$Tl~Combine$Wt*Combine$Sex*Combine$Locomotor_use)
+  
+  ##If significant interactions, use
+  testInteractions(Sex_locomotion)
+  #if not, re-run without interactions; if any intercept is significant, run something like the below
+  TukeyHSD(MaleFemaleaov,which='Sex', data=Combine )
 
-#preparing for testing for sig differences in slope/intercept between male and female datasets; includes putting males/females under each other, turning into a data frame for column names
+#Rodents:
 
-Males<-cbind(mars$Tl_Av_M,mars$Bl_Av_M,rep(1,length(mars$Tl_Av_M)))
-Females<-cbind(mars$Tl_Av_F,mars$Bl_Av_F,rep(2,length(mars$Tl_Av_F)))
-Averages<-cbind(mars$Tl_mm, mars$Bl_mm, rep(3,length(mars$Bl_mm)))
+  Males<-cbind(rodFull$Tl_Av_M,rodFull$Bl_Av_M,rodFull$Wt_Av_M, rodFull$Locomotor_use,rep(1,length(rodFull$Tl_Av_M)))
+  Females<-cbind(rodFull$Tl_Av_F,rodFull$Bl_Av_F,rodFull$Wt_Av_F,rodFull$Locomotor_use, rep(2,length(rodFull$Tl_Av_F)))
+  Averages<-cbind(rodFull$Tl_mm, rodFull$Bl_mm,rodFull$Wt_g, rodFull$Locomotor_use,rep(3,length(rodFull$Bl_mm)))
+  
+  Combine=rbind(Males, Females,Averages)
+  Combine=as.data.frame(Combine)
+  colnames(Combine) <-c("Tl","Bl","Wt","Locomotor_use","Sex")
+  Combine$Sex<-as.factor(Combine$Sex)
+  Combine$Locomotor_use<-as.factor(Combine$Locomotor_use)
+  
+  #Are there differences in slope of Tail length and body LENGTH according to locomotor use, sex, or averages between sexes?
+  Sex_locomotion=summary(lm(Combine$Tl~Combine$Bl*Combine$Sex*Combine$Locomotor_use))
+  Sex_locomotion=aov (Combine$Tl~Combine$Bl*Combine$Sex*Combine$Locomotor_use)
+  
+  #If significant interactions, use
+  testInteractions(Sex_locomotion)
+  #if not, re-run without interactions; if any intercept is significant, run something like the below
+  TukeyHSD(MaleFemaleaov,which='Sex', data=Combine )
+  
+  #Are there differences in slope of Tail length and body WEIGHT according to locomotor use, sex, or averages between sexes?
+  Sex_locomotion=summary(lm(Combine$Tl~Combine$Wt *Combine$Sex*Combine$Locomotor_use))
+  Sex_locomotion=aov (Combine$Tl~Combine$Wt*Combine$Sex*Combine$Locomotor_use)
+  
+  #If significant interactions, use
+  testInteractions(Sex_locomotion)
+  #if not, re-run without interactions; if any intercept is significant, run something like the below
+  TukeyHSD(MaleFemaleaov,which='Sex', data=Combine )
 
-Combine=rbind(Males, Females,Averages)
-Combine=as.data.frame(Combine)
-colnames(Combine) <-c("Tl","Bl", "Sex")
-as.factor(Combine$Sex)
-
-#No significantly different slopes between Male and Female datasets, or males vs. females vs averaged
-MaleFemale=summary(lm(Combine$Tl~Combine$Bl*as.factor(Combine$Sex)))
-#Significantly different intercepts between males and females but that is to be expected
-MaleFemale=summary(lm(Tl~Bl+as.factor(Sex), Combine))
-
-
-#Next time: use Tukey to figure out which factor is sig different; bearing in mind that Sex somehow isn't a factor
-MaleFemaleaov=aov(Tl~Bl+as.factor(Sex), Combine)
-TukeyHSD(MaleFemaleaov,which=', data=Combine )
 
 ```
 
@@ -63,11 +102,6 @@ TukeyHSD(MaleFemaleaov,which=', data=Combine )
 #the below is messy experimentation and needs cleaning up
 ```{r}
 
-#collate dataset for sexes and prune tree to dataset:
-mars_sexes=na.omit(mars[,11:16])
-namecheck=name.check(marsTree,mars_sexes)
-marsTree_sexes=drop.tip(marsTree,namecheck$tree_not_data)
-name.check(marsTree_sexes,mars_sexes)
 
 # do males and females display similar body/tail length scaling patterns? 
 
