@@ -98,87 +98,75 @@ load(file = "../Data/Processed_Data_for_Pgls.rda")
 
 ```
 
+# Do Tail lengths scale differently compared to body lengths/weights in species with different locomotor modes?
 
-#the below is messy experimentation and needs cleaning up
 ```{r}
 
-
-# do males and females display similar body/tail length scaling patterns? 
-
-  ##find best model
-  TB_males=find.best.model(Tl_M~Bl_M,marsTree_sexes,mars_sexes);TB_males$AIC_Weights
-  TB_females=find.best.model(Tl_F~Bl_F,marsTree_sexes,mars_sexes);TB_females$AIC_Weights
-
-  ##compare statistics; these are near-identical
-  TB_males$Model_summaries$corBrownian$tTable
-  TB_females$Model_summaries$corBrownian$tTable
-
-  ##now compare to joint averaged dataset
-  Tlength_Blength=find.best.model(Tlength_mm~Blength_mm,marsTree,mars)
-  Tlength_Blength$AIC_Weights 
-  Tlength_Blength$Model_summaries$corBrownian$tTable
-
-#the slope between separate sexes and averages is very different; is this because there are fewer species in the averaged dataset?
-
-  ##average the columns, add to mars_sexes; averaging requires un-loggin and re-logging
-  mars_sex_Tl_av<-log10((10^(mars_sexes$Bl_M)+10^(mars_sexes$Bl_F))/2)
-  mars_sex_Bl_av<-log10((10^(mars_sexes$Tl_M)+10^(mars_sexes$Tl_F))/2)
-  mars_sex_av<-cbind(mars_sexes,mars_sex_Tl_av,mars_sex_Bl_av )
-
-  TB_averaged=find.best.model(mars_sex_Tl_av~mars_sex_Bl_av,marsTree_sexes,mars_sex_av);TB_averaged$AIC_Weights
-
-  TB_averaged$Model_summaries$corBrownian
+#Marsupials
+    
+  ##Tail vs body LENGTH
+    TB=find.best.model(Tl~Bl*Locomotor_use,marsTree,mars);TB$AIC_Weights
+     
+    ###look at the model summary of the most likely model, e.g. 
+    TB$Model_summaries$corBrownian$tTable
+      
+    ###using the smaller, m/f specific datasets
+    TB=find.best.model(Tl_Av_F ~Bl_Av_F*Locomotor_use,marsTree, mf_mars);TB$AIC_Weights
+    TB$Model_summaries$corBrownian$tTable
+      
+    TB=find.best.model(Tl_Av_M~Wt_Av_M*Locomotor_use,marsTree,mf_mars);TB$AIC_Weights
+    TB$Model_summaries$corBrownian$tTable
   
-# or is the higher slope an artifact of better phylogenetic coverage?
-  summary(lm(Tlength_mm~Blength_mm,data=mars))
-  summary(lm(Tl_M~Bl_M, data=mars_sex_av))
-  summary(lm(Tl_F~Bl_F, data=mars_sex_av))
-  summary(lm(mars_sex_Tl_av~mars_sex_Bl_av,data=mars_sex_av))
-  summary(lm(mars$Tl_max~mars$Bl_max))
+  ##Tail vs body WEIGHT
+    TW=find.best.model(Tl~Wt*Locomotor_use,marsTree,mars);TW$AIC_Weights
+     
+    ###look at the model summary of the most likely model, e.g. 
+    TW$Model_summaries$corBrownian$tTable
+      
+    ###using the smaller, m/f specific datasets
+    TW=find.best.model(Tl_Av_F ~Wt_Av_F*Locomotor_use,marsTree, mf_mars);TW$AIC_Weights
+    TW$Model_summaries$corBrownian$tTable
+      
+    TW=find.best.model(Tl_Av_M~Wt_Av_M*Locomotor_use,marsTree,mf_mars);TW$AIC_Weights
+    TW$Model_summaries$corBrownian$tTable
+  
+    
+#Rodents
+    
+  ##Tail vs body LENGTH
+    TB=find.best.model(Tl~Bl*Locomotor_use,rodTree,rod);TB$AIC_Weights
+    TB$Model_summaries$corBrownian$tTable
+      
+    ###using the smaller, m/f specific datasets
+    TB=find.best.model(Tl_Av_F ~Bl_Av_F*Locomotor_use,rodTree, mf_rod);TB$AIC_Weights
+    TB$Model_summaries$corBrownian$tTable
+      
+    TB=find.best.model(Tl_Av_M~Wt_Av_M*Locomotor_use,rodTree,mf_rod);TB$AIC_Weights
+    TB$Model_summaries$corBrownian$tTable
+      
+  ##Tail vs body WEIGHT
+    TW=find.best.model(Tl~Wt*Locomotor_use,rodTree,rod);TW$AIC_Weights
+     
+    ###look at the model summary of the most likely model, e.g. 
+    TW$Model_summaries$corBrownian$tTable
+      
+    ###using the smaller, m/f specific datasets
+    TW=find.best.model(Tl_Av_F ~Wt_Av_F*Locomotor_use,rodTree, mf_rod);TW$AIC_Weights
+    TW$Model_summaries$corBrownian$tTable
+      
+    TW=find.best.model(Tl_Av_M~Wt_Av_M*Locomotor_use,rodTree,mf_rod);TW$AIC_Weights
+    TW$Model_summaries$corBrownian$tTable
+   
+```
+
+#Plotting bits
+
+```{r}
   
 #plot male-only, female-only, and averaged datasets together
 
 plot(mars_sexes$Bl_M,mars_sexes$Tl_M, col="red", pch=19);points(mars_sexes$Bl_F,mars_sexes$Tl_F, col="blue", pch=19);points(mars$Blength_mm,mars$Tlength_mm, col="green", pch=19);points(mars$Tl_max~mars$Bl_max, col="pink", pch=19);abline(lm(mars_sexes$Tl_M~mars_sexes$Bl_M), col="red");abline(lm(mars_sexes$Tl_F~mars_sexes$Bl_F), col="blue"); abline(lm(mars$Tlength_mm~mars$Blength_mm), col="green"); abline(lm(mars$Tl_max~mars$Bl_max), col="pink")
 
 
-#using maximum tail length
-
-  TB_max=find.best.model(Tl_max~Bl_max,marsTree,mars); TB_max$AIC_Weights
-  TB_max$Model_summaries$corBrownian
 ```
 
-#starting on locomotion analysis
-
-```{r}
-###but also there must be different scaling patterns according to kangaroo or not
-
-  Roos=find.best.model(Tlength_mm~Blength_mm:Locomotor_mode, marsTree,mars); Roos$AIC_Weights
-  
-  Roos$Model_summaries$corBrownian
-
-```
-
-
-#comparing body mass and tail lengths and which one explains tail length better
-
-```{r}
-
-#Body mass and body length- which is better?
-
-#first, determine which phylogenetic correlation structure and tree fit the data best for both models to be compared:
-Tlength_Blength=find.best.model(Tlength_mm~Blength_mm,marsTree,mars)
-Tlength_Blength$AIC_Weights 
-Tlength_Blength$Model_summaries$corBrownian
-
-
-Tlength_Bwt=find.best.model(Tlength_mm~Wt_g,marsTree,mars)
-Tlength_Bwt$AIC_Weights 
-Tlength_Bwt$Model_summaries$corBrownian
-
-#now, compare the two:
-
-
-  
-
-
-```
