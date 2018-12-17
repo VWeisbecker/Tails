@@ -32,15 +32,15 @@ numcols_log10=log10(numcols)
 #replace 0s with NAS again
 numcols_log10[numcols_log10==0]<-NA
 
-#replace original data with logged data. I wish I knew a less pedestrian way of doing this...
+#replace original data with logged data. +1 because 2:34 is 33. I wish I knew a less pedestrian way of doing this...
 logdata=Data
-logdata[,2:ncol(Data)]=numcols_log10
+logdata[,2:(ncol(numcols)+1)]=numcols_log10
 
 #partition datasets; this cannot be automated easily so need to check for accuracy by looking at dataset
 
 mars=logdata[1:138,]
 rownames(mars)=mars$Species
-#exclude wombats who are tremendous outliers
+#exclude wombats who are outliers
 grep("Vombatus_ursinus", mars$Species)
 grep("Lasiorhinus_latifrons", mars$Species)
 mars=mars[-(66:67),]
@@ -91,32 +91,60 @@ rodTree$tip.label[grep("Conilurus_pencillatus", rodTree$tip.label)]=c("Conilurus
 ```
 
 
-# Synchronize trees and species by reducing tree to the data available; this has been checked for typos (fixed above)
+# Synchronize trees and species by reducing tree to the data available; this has been checked for typos taht cause non-matches (fixed above in the code containing grep). The below culls species that are not in the tree from the data, and species that are not in the data from the tree.
 ```{r}
 #Marsupials: 138 species left; no data that are not present in tree
 
 namecheck=name.check(marsTree,mars)
 marsTree_synch=drop.tip(marsTree,namecheck$tree_not_data)
-name.check(marsTree_synch,mars)
+mars_synch= mars[-which(rownames(mars) %in% namecheck$data_not_tree),]
+name.check(marsTree_synch,mars_synch)
 
 #Rodents: 
 namecheck=name.check(rodTree, rod)
 rodTree_synch=drop.tip(rodTree,namecheck$tree_not_data)
 #in rodents there are also a few species that are not in the phylogeny, unfortunately:
-rodsynch=rod[-which(rownames(rod) %in% namecheck$data_not_tree), ] 
-name.check(rodTree_synch,rodsynch)
+rod_synch=rod[-which(rownames(rod) %in% namecheck$data_not_tree), ] 
+name.check(rodTree_synch,rod_synch)
 
-#reverting back to call-able names; NOTE rodFull has to be specified before rod is specified to be rodsynch!
-marsTree<-marsTree_synch
-rodTree<-rodTree_synch
-rodFull<-rod
-rod<-rodsynch
+```
+#process trees for the major marsupial orders as well
 
 
+```{r}
 
-save(mars, rod, rodFull,marsTree, rodTree, file = "../Data/Processed_Data.rda")
+#Dasyuromorphs
+dasy_data=mars[which(mars_synch$Order =="Dasyuromorph"),]
+dasy_tree=drop.tip(marsTree_synch, name.check(marsTree_synch,dasy_data)$tree_not_data )
 
+#Peramelemorphs
+peram_data=mars[which(mars_synch$Order =="Peramelemorph"),]
+peram_tree=drop.tip(marsTree_synch, name.check(marsTree_synch,peram_data)$tree_not_data )
+
+#Diprotodontia
+dip_data=mars[which(mars_synch$Order =="Diprotodontian"),]
+dip_tree=drop.tip(marsTree_synch, name.check(marsTree_synch,dip_data)$tree_not_data )
+
+#Murines
+murine_data=rod[which(rod$Order =="Murine"),]
+murine_tree=drop.tip(rodTree_synch, name.check(rodTree_synch,murine_data)$tree_not_data) 
+
+#not sufficient resolution for Rattus
 
 ```
 
+#Packaging all outputs for analysis
 
+```{r}
+
+#putting all outputs and the initial input ("Full" datasets) into one RDA 
+rodFull<-rod
+marsFull<-mars
+rod<-rod_synch
+mars<-mars_synch
+marsTree<-marsTree_synch
+rodTree<-rodTree_synch
+
+save(marsFull,rodFull,mars,rod,marsTree, rodTree, dasy_data, dasy_tree,peram_data, peram_tree,dip_data,dip_tree,murine_data,murine_tree, file = "../Data/Processed_Data_for_Pgls.rda")
+
+```

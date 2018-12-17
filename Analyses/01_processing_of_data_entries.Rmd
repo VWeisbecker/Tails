@@ -10,9 +10,11 @@ output: html_document
 
 #For missing min/max values: if available, use the maximal values within both males and females for a species min/max;
 
-#For missing final values: if there is an average value for males and females (regardles of given or derived from within-sex min/maxes), use their averages to enter into the final values; if there is none, use the average min/max 
+#For missing overall average values: if there is an average value for males and females (regardles of given or derived from within-sex min/maxes), use their averages to enter into the final values; if there is none, use the average of min/max 
 
 #if there are min max values for either sex, enter their overall min and max into the min/max columns.
+
+#Note that this chunk returns an error if run on an empty environment (but not upon running again) in Rstudio but it does not affect the output; it's some kind of internal name conflict but the output is 100% correct
 
 ```{r }
 
@@ -87,7 +89,7 @@ for (i in 1:length(data$Species)){
     
 }
 
-#now re-process data_processed to fill NAs in the main values, first by averaging male/female values, second (if sex averages are not available) by averaging sex-less min/max values. This overwrites the first pass summary version of data_processed with the second pass summary version
+#now re-process data_processed to fill NAs in the main values, first by av eraging male/female values, second (if sex averages are not available) by averaging sex-less min/max values. This overwrites the first pass summary version of data_processed with the second pass summary version
 
 for (i in 1:(nrow(data_processed))){
   
@@ -126,8 +128,7 @@ for (i in 1:(nrow(data_processed))){
       }  
 }
 
+#Write the csv; row.names need to be FALSE because otherwise it saves with an extra column of numbers
+write.csv(data_processed, file="../Data/Full_dataset.csv", row.names=FALSE)
 
-write.csv(data_processed, file="../Data/Full_dataset.csv")
-
-      
 ```

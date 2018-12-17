@@ -24,7 +24,8 @@ library(nlme)
 
 #the "utilities" file contains functions so this analysis page isn't too cluttered
 source("../Analyses/Utilities.r")
-load(file="../Data/Processed_Data.rda")
+load(file = "../Data/Processed_Data_for_Pgls.rda")
+full_dataset=read.csv(file="../Data/Full_dataset.csv")
 
 
 ```
@@ -35,7 +36,7 @@ load(file="../Data/Processed_Data.rda")
 #Marsupials:
 
 
-#preparing for testing for sig differences in slope/intercept between male and female datasets; includes putting males/females under each other, turnign into a data frame for column names
+#preparing for testing for sig differences in slope/intercept between male and female datasets; includes putting males/females under each other, turning into a data frame for column names
 
 Males<-cbind(mars$Tl_Av_M,mars$Bl_Av_M,rep(1,length(mars$Tl_Av_M)))
 Females<-cbind(mars$Tl_Av_F,mars$Bl_Av_F,rep(2,length(mars$Tl_Av_F)))
