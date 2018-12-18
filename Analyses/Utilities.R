@@ -3,7 +3,7 @@
 #@param variable_stack: input vector of the variables to be compared "stacked" on top of each other
 #@param number_of_variables: number of variables
 
-VarDist.test<-function(variable_stack, number_of_ratios){
+MinMaxtest<-function(variable_stack, number_of_ratios){
   # stack the three ratios underneath each other, add a factor for the ANOVA
   
   
@@ -47,27 +47,35 @@ VarDist.test<-function(variable_stack, number_of_ratios){
 #output is output$AIC, then use the name for the highest weighted model to find output$model_summaries$bestmodel
   
 AIC=list()
-summary_names=c("corPagel","corBrownian", "corGrafen","corPagel_GrafScale","corBrownian_GrafScale", "corGrafen_GrafScale" )
+summary_names=c("Pagel","Brownian", "Grafen","Pagel_GrafScale","Brownian_GrafScale", "Grafen_GrafScale" )
 
 find.best.model<-function(formula, Tree, taildata) {
   
-    Pagel=summary (gls(formula, correlation=corPagel(1,phy=Tree), data=taildata))
-    Brownian=summary (gls(formula, correlation=corBrownian(1,phy=Tree), data=taildata))
-    Grafen=summary (gls(formula, correlation=corGrafen(1,phy=Tree), data=taildata))
-    Pagel_GrafScale=summary (gls(formula, correlation=corPagel(1,phy=compute.brlen(Tree)), data=taildata))
-    Brownian_GrafScale=summary (gls(formula, correlation=corBrownian(1,phy=compute.brlen(Tree)), data=taildata))
+    Pagel= (gls(formula, correlation=corPagel(1,phy=Tree), data=taildata))
+    Brownian= (gls(formula, correlation=corBrownian(1,phy=Tree), data=taildata))
+    Grafen= (gls(formula, correlation=corGrafen(1,phy=Tree), data=taildata))
+    Pagel_GrafScale= (gls(formula, correlation=corPagel(1,phy=compute.brlen(Tree)), data=taildata))
+    Brownian_GrafScale= (gls(formula, correlation=corBrownian(1,phy=compute.brlen(Tree)), data=taildata))
+    Grafen_GrafScale= (gls(formula, correlation=corGrafen(1,phy=compute.brlen(Tree)), data=taildata))
+    
+    PagelSum=summary (gls(formula, correlation=corPagel(1,phy=Tree), data=taildata))
+    BrownianSum=summary (gls(formula, correlation=corBrownian(1,phy=Tree), data=taildata))
+    GrafenSum=summary (gls(formula, correlation=corGrafen(1,phy=Tree), data=taildata))
+    Pagel_GrafScaleSum=summary (gls(formula, correlation=corPagel(1,phy=compute.brlen(Tree)), data=taildata))
+    Brownian_GrafScaleSum=summary (gls(formula, correlation=corBrownian(1,phy=compute.brlen(Tree)), data=taildata))
+    Grafen_GrafScaleSum=summary (gls(formula, correlation=corGrafen(1,phy=compute.brlen(Tree)), data=taildata))
   
-    Grafen_GrafScale=summary (gls(formula, correlation=corGrafen(1,phy=compute.brlen(Tree)), data=taildata))
-  
-    #list models, give names  
-    models=list(Pagel, Brownian,Grafen, Pagel_GrafScale,Brownian_GrafScale,Grafen_GrafScale)
+    #list model summaries, give names  
+    models<-list(Pagel, Brownian,Grafen, Pagel_GrafScale,Brownian_GrafScale,Grafen_GrafScale)
     names(models)<-as.vector(summary_names)
-  
+    
+    summaries<-list(PagelSum, BrownianSum,GrafenSum, Pagel_GrafScaleSum, Brownian_GrafScaleSum,Grafen_GrafScaleSum)  
+    names(summaries)<-as.vector(summary_names)
     #determine AICs
     AIC=list()
   
-    for (i in 1:length(names(models))){
-    AIC[[i]]=models[[i]]$AIC
+    for (i in 1:length(names(summaries))){
+    AIC[[i]]=summaries[[i]]$AIC
     }
   
   #name AICs with correct correlation structures
@@ -79,8 +87,8 @@ find.best.model<-function(formula, Tree, taildata) {
   W=exp(-0.5*AICmin)/sum(exp(-0.5*AICmin))
   
   #prepare output of most likely model and searchable relevant summary
-  all_info=(list(W,models))
-  names(all_info)=c("AIC_Weights", "Model_summaries")
+  all_info=(list(W,models,summaries))
+  names(all_info)=c("AIC_Weights", "Models", "Model_summaries")
   
   #"return" is required to get the  out of the function
   return(all_info)
