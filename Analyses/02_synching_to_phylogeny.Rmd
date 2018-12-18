@@ -38,15 +38,15 @@ logdata[,2:(ncol(numcols)+1)]=numcols_log10
 
 #partition datasets; this cannot be automated easily so need to check for accuracy by looking at dataset
 
-mars=logdata[1:138,]
+mars=logdata[1:146,]
 rownames(mars)=mars$Species
 #exclude wombats who are outliers using grep (which returns the number of the row that has the species name)
 mars=mars[-((grep("Vombatus_ursinus", mars$Species)):(grep("Lasiorhinus_latifrons", mars$Species))),]
 
-rod=logdata[144:207,]
+rod=logdata[147:207,]
 rownames(rod)=rod$Species
 
-#deleting all entries that have NAs in their main data and locomotor use, assuming if they have Tl they also have the others
+#deleting all entries that have NAs in their main data and locomotor use; this means some species don't have weight data
 mars=mars[-which(is.na( mars$Tl_mm)) ,]
 mars=mars[-which(is.na(mars$Locomotor_use)),]
 
