@@ -33,7 +33,7 @@ data_processed<-data
 for (i in 1:length(data$Species)){
   
     
-    #if there are min/max values for males and females, average them unless an average is already given; this separates M/F because sometimes ranges are only given for one sex
+    #if there are min/max values for males and females, average them unless an average is already given; this code here separates M/F because sometimes ranges are only given for one sex
     if(is.na(data$Wt_min_F[i])==FALSE & is.na(data$Wt_Av_F[i]==TRUE)){
   
       data_processed$Wt_Av_F[i]<-mean(c(data$Wt_min_F[i],data$Wt_max_F[i]))
