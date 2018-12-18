@@ -14,6 +14,7 @@ output: html_document
 ```{r }
 library(ape)
 library(geiger)
+library(phytools)
 library(caper)
 library(car)
 library(multcomp)
@@ -22,6 +23,7 @@ library(lmSupport)
 library(ggplot2)
 library(nlme)
 library(dplyr)
+library(RColorBrewer)
 
 #the "utilities" file contains functions so this analysis page isn't too cluttered
 source("../Analyses/Utilities.r")
@@ -31,10 +33,10 @@ load(file = "../Data/Processed_Data_for_Pgls.rda")
 
 ```
 
-#Is it appropriate to correlate body mass with tail/body length, given the large weight ranges? Testing the hypothesis that within-species body weight maxima are greater relative to body weight minima, compared to the same ratio in within-species body or tail lengths) - for those species where ranges are available, body mass ranges are substantially greater
+#Is it appropriate to correlate body mass with tail/body length, given the large weight ranges? Testing the hypothesis that within-species body weight maxima are greater relative to body weight minima(i.e. the range is relatively wider), compared to the same ratio in within-species body or tail lengths) - for those species where ranges are available, body mass ranges are substantially greater
 
 ```{r}
-#this needs to be unlogged
+#return the min/max values to their un-logged form
 ratio_Tl=c(10^(marsFull$Tl_max)/10^(marsFull$Tl_min))
 ratio_Bl=c(10^(marsFull$Bl_max)/10^(marsFull$Bl_min))
 ratio_Wt=c(10^(marsFull$Wt_max)/10^(marsFull$Wt_min))
@@ -42,18 +44,25 @@ ratio_Wt=c(10^(marsFull$Wt_max)/10^(marsFull$Wt_min))
 #Visualizing means of the ratios 
 boxplot(ratio_Tl, ratio_Bl,ratio_Wt)
 
-# stack the three ratios underneath each other, add a factor for the ANOVA
 ratios=c(ratio_Tl, ratio_Bl, ratio_Wt)
 
-ratios1=as.data.frame(cbind(ratios, rep(1:3,each=length(ratio_Tl))))
-colnames(ratios1)=c("ratios","Factor")
-as.factor(ratios1$Factor)
+#The VarDist.test code is in utilities. It runs a Kruskal-Wallis test and then a pairwise wilcoxon test on the ratios
+VarDist.test(ratios,3)
 
-#run nonparametric comparison of means
-kruskal.test(ratios~as.factor(Factor), data=ratios1 )
+boxplot(ratio_Tl, ratio_Bl,ratio_Wt)
 
-#since this is significant, run pairwise wilcoxon test with bonferroni holmes adjustment for multiple comparisons; this is a paired test so it explicitly compares data points from within each species
-pairwise.wilcox.test(ratios1$ratios, ratios1$Factor, paired=TRUE, p.adjust.method = "BH")
+#This is not mainly because of the extreme ranges in bandicoots!
+
+ratio_Tl_Band<-ratio_Tl[ - (grep("Macrotis_leucura", marsFull$Species):grep("Echymipera_rufescens", mars$Species))]
+ratio_Bl_Band<-ratio_Bl[ - (grep("Macrotis_leucura", marsFull$Species):grep("Echymipera_rufescens", mars$Species))]
+ratio_Wt_Band<-ratio_Wt[ - (grep("Macrotis_leucura", marsFull$Species):grep("Echymipera_rufescens", mars$Species))]
+
+ratiosBand=c(ratio_Tl_Band, ratio_Bl_Band, ratio_Wt_Band)
+VarDist.test(ratiosBand,3)
+
+par(mfrow=c(1,2))
+boxplot(ratio_Tl, ratio_Bl,ratio_Wt, xlab="ratios with bandicoots")
+boxplot(ratio_Tl_Band, ratio_Bl_Band,ratio_Wt_Band, xlab="ratios without bandicoots")
 
 
 ```
@@ -126,7 +135,7 @@ pairwise.wilcox.test(ratios1$ratios, ratios1$Factor, paired=TRUE, p.adjust.metho
 
 ```
 
-# Do Tail lengths scale differently compared to body lengths/weights in species with different locomotor modes?
+# Do Tail lengths scale differently compared to body lengths/weights in species with different locomotor modes? Fill in as the data are there
 
 ```{r}
 
@@ -138,31 +147,38 @@ pairwise.wilcox.test(ratios1$ratios, ratios1$Factor, paired=TRUE, p.adjust.metho
     ###look at the model summary of the most likely model, e.g. 
     TB$Model_summaries$corBrownian$tTable
       
-   
     ###if the interactions are not significant (i.e. slopes are not sig. different), drop them    
     TB_no_inter=find.best.model(Tl_mm~Bl_mm+Locomotor_use,marsTree,mars);TB$AIC_Weights
     TB_no_inter$Model_summaries$corBrownian$tTable
     anova(TB_no_inter$Model_summaries$corBrownian, type="marginal")
+   
+     #or use phytools - not sure how to deal with the label warnings
+    Locomotor_use=c(mars$Locomotor_use)
+    names(Locomotor_use)<-names(mars$Species)
+    phylANOVA(marsTree,Locomotor_use,mars$Tl_mm)
     
-     ###using the smaller, m/f specific datasets
-    TB=find.best.model(Tl_Av_F ~Bl_Av_F*Locomotor_use,marsTree, mf_mars);TB$AIC_Weights
-    TB$Model_summaries$corBrownian$tTable
-      
-    TB=find.best.model(Tl_Av_M~Wt_Av_M*Locomotor_use,marsTree,mf_mars);TB$AIC_Weights
-    TB$Model_summaries$corBrownian$tTable
-  
+     ###using the smaller, m/f specific datasets note THIS NEEDS LARGE NUMBERS OF DATA SO DOES NOT ALWAYS DO INTERACTIONS
+    TBF=find.best.model(Tl_Av_F ~Bl_Av_F+Locomotor_use,mf_marstree, mf_mars);TB$AIC_Weights
+    anova(TBF$Model_summaries$corPagel, type="marginal")
+    
+    TBM=find.best.model(Tl_Av_M~Bl_Av_M+Locomotor_use,mf_marstree,mf_mars); TB$AIC_Weights
+    anova(TBM$Model_summaries$corPagel, type="marginal")
+    
   ##Tail vs body WEIGHT
     TW=find.best.model(Tl_mm~Wt_g*Locomotor_use,marsTree,mars);TW$AIC_Weights
-     
-    ###look at the model summary of the most likely model, e.g. 
-    TW$Model_summaries$corBrownian$tTable
-      
+    anova(TW$Model_summaries$corBrownian, type="marginal")  
+    
+    ###no interactions, therefore
+    TW_no_inter=find.best.model(Tl_mm~Wt_g+Locomotor_use,marsTree,mars);TW$AIC_Weights
+    anova(TW_no_inter$Model_summaries$corBrownian, type="marginal") 
+    
+    
     ###using the smaller, m/f specific datasets
-    TW=find.best.model(Tl_Av_F ~Wt_Av_F*Locomotor_use,marsTree, mf_mars);TW$AIC_Weights
-    TW$Model_summaries$corBrownian$tTable
+    TWF=find.best.model(Tl_Av_F ~Wt_Av_F+Locomotor_use,mf_marstree, mf_mars);TW$AIC_Weights
+    anova(TWF$Model_summaries$corBrownian, type="marginal") 
       
-    TW=find.best.model(Tl_Av_M~Wt_Av_M*Locomotor_use,marsTree,mf_mars);TW$AIC_Weights
-    TW$Model_summaries$corBrownian$tTable
+    TWM=find.best.model(Tl_Av_M~Wt_Av_M+Locomotor_use,mf_marstree,mf_mars);TW$AIC_Weights
+    anova(TWF$Model_summaries$corBrownian, type="marginal") 
   
     
 #Rodents
@@ -193,14 +209,35 @@ pairwise.wilcox.test(ratios1$ratios, ratios1$Factor, paired=TRUE, p.adjust.metho
    
 ```
 
-#Plotting bits
+#Plotting male, female and averages 
 
 ```{r}
   
 #plot male-only, female-only, and averaged datasets together
+par(mfrow=c(1,2))
 
-plot(mars_sexes$Bl_M,mars_sexes$Tl_M, col="red", pch=19);points(mars_sexes$Bl_F,mars_sexes$Tl_F, col="blue", pch=19);points(mars$Blength_mm,mars$Tlength_mm, col="green", pch=19);points(mars$Tl_max~mars$Bl_max, col="pink", pch=19);abline(lm(mars_sexes$Tl_M~mars_sexes$Bl_M), col="red");abline(lm(mars_sexes$Tl_F~mars_sexes$Bl_F), col="blue"); abline(lm(mars$Tlength_mm~mars$Blength_mm), col="green"); abline(lm(mars$Tl_max~mars$Bl_max), col="pink")
+plot(mars$Bl_Av_M,mars$Tl_Av_M, col="red", pch=19);points(mars$Bl_Av_F,mars$Tl_Av_F, col="blue", pch=19);points(mars$Bl_mm,mars$Tl_mm, col="green", pch=19);abline(lm(mars$Tl_Av_M~mars$Bl_Av_M), col="red");abline(lm(mars$Tl_Av_F~mars$Bl_Av_F), col="blue"); abline(lm(mars$Tl_mm~mars$Bl_mm), col="green")
+
+
+plot(mars$Wt_Av_M,mars$Tl_Av_M, col="red", pch=19);points(mars$Wt_Av_F,mars$Tl_Av_F, col="blue", pch=19);points(mars$Wt_g,mars$Tl_mm, col="green", pch=19);abline(lm(mars$Tl_Av_M~mars$Wt_Av_M), col="red");abline(lm(mars$Tl_Av_F~mars$Wt_Av_F), col="blue"); abline(lm(mars$Tl_mm~mars$Wt_g), col="green")  
 
 
 ```
+#Plotting according to locomotor mode
 
+```{r}
+
+par(mfrow=c(1,2))
+
+#colour 
+colsOrder=brewer.pal(n=length(levels(mars$Order)), name="Dark2")
+colsLoco=brewer.pal(n=length(levels(mars$Locomotor_use)), name="Dark2")
+
+plot(mars$Tl_mm~mars$Bl_mm, col=cols[mars$Order], pch=19, xlab="log Body length", ylab="log Tail length" );legend("topleft", c("Dasyuromorph" ,  "Diprotodontian", "Peramelemorph"), pch=19, col=colsOrder, cex=0.7)
+#; text(mars$Tl_mm~mars$Bl_mm, labels=mars$Species, cex=0.5)
+
+plot(mars$Tl_mm~mars$Bl_mm, col=colsLoco[mars$Locomotor_use], pch=19, xlab="log Body length", ylab="log Tail length" ); legend("topleft",levels(mars$Locomotor_use) , pch=19, col=colsLoco, cex=0.7)
+
+
+
+```
