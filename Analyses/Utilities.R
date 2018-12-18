@@ -1,10 +1,48 @@
 
+# Running non-parametric comparisons of values 
+#@param variable_stack: input vector of the variables to be compared "stacked" on top of each other
+#@param number_of_variables: number of variables
+
+VarDist.test<-function(variable_stack, number_of_ratios){
+  # stack the three ratios underneath each other, add a factor for the ANOVA
+  
+  
+  ratios1=as.data.frame(cbind(variable_stack, rep(1:number_of_ratios,each=length(variable_stack)/number_of_ratios)))
+  colnames(ratios1)=c("Variables","Factor")
+  as.factor(ratios1$Factor)
+  
+  #run nonparametric comparison of means
+  kruskal_test<-kruskal.test(Variables~as.factor(Factor), data=ratios1 )
+  
+  #only if this is significant, consider pairwise wilcoxon test with bonferroni holmes adjustment for multiple comparisons; this is a paired test so it explicitly compares data points from within each species
+  pairwise_wilcox<-pairwise.wilcox.test(ratios1$Variables, ratios1$Factor, paired=TRUE, p.adjust.method = "BH")
+  
+  return(list(kruskal_test,pairwise_wilcox))
+  
+}
+
+
+
+
+
+
+
+
 
 #Determining the best model under different phylogenetic correlation structures and original vs. Grafen-transformed branch lengths
 
 #@param formula: formula of interest (e.g. Tlength~Wt_g), , data are the data   (assuming 
 #@param tree: phylogenetic tree, matched to tree in the data preparation step
 #@param taildata: data, matched to tree in the data preparation step
+
+
+
+
+
+
+
+
+
 
 #output is output$AIC, then use the name for the highest weighted model to find output$model_summaries$bestmodel
   
