@@ -21,11 +21,39 @@ library(geomorph)
 library(lmSupport)
 library(ggplot2)
 library(nlme)
+library(dplyr)
 
 #the "utilities" file contains functions so this analysis page isn't too cluttered
 source("../Analyses/Utilities.r")
 load(file = "../Data/Processed_Data_for_Pgls.rda")
 
+
+
+```
+
+#Is it appropriate to correlate body mass with tail/body length, given the large weight ranges? Testing the hypothesis that within-species body weight maxima are greater relative to body weight minima, compared to the same ratio in within-species body or tail lengths) - for those species where ranges are available, body mass ranges are substantially greater
+
+```{r}
+#this needs to be unlogged
+ratio_Tl=c(10^(marsFull$Tl_max)/10^(marsFull$Tl_min))
+ratio_Bl=c(10^(marsFull$Bl_max)/10^(marsFull$Bl_min))
+ratio_Wt=c(10^(marsFull$Wt_max)/10^(marsFull$Wt_min))
+
+#Visualizing means of the ratios 
+boxplot(ratio_Tl, ratio_Bl,ratio_Wt)
+
+# stack the three ratios underneath each other, add a factor for the ANOVA
+ratios=c(ratio_Tl, ratio_Bl, ratio_Wt)
+
+ratios1=as.data.frame(cbind(ratios, rep(1:3,each=length(ratio_Tl))))
+colnames(ratios1)=c("ratios","Factor")
+as.factor(ratios1$Factor)
+
+#run nonparametric comparison of means
+kruskal.test(ratios~as.factor(Factor), data=ratios1 )
+
+#since this is significant, run pairwise wilcoxon test with bonferroni holmes adjustment for multiple comparisons; this is a paired test so it explicitly compares data points from within each species
+pairwise.wilcox.test(ratios1$ratios, ratios1$Factor, paired=TRUE, p.adjust.method = "BH")
 
 
 ```
@@ -110,7 +138,13 @@ load(file = "../Data/Processed_Data_for_Pgls.rda")
     ###look at the model summary of the most likely model, e.g. 
     TB$Model_summaries$corBrownian$tTable
       
-    ###using the smaller, m/f specific datasets
+   
+    ###if the interactions are not significant (i.e. slopes are not sig. different), drop them    
+    TB_no_inter=find.best.model(Tl_mm~Bl_mm+Locomotor_use,marsTree,mars);TB$AIC_Weights
+    TB_no_inter$Model_summaries$corBrownian$tTable
+    anova(TB_no_inter$Model_summaries$corBrownian, type="marginal")
+    
+     ###using the smaller, m/f specific datasets
     TB=find.best.model(Tl_Av_F ~Bl_Av_F*Locomotor_use,marsTree, mf_mars);TB$AIC_Weights
     TB$Model_summaries$corBrownian$tTable
       
