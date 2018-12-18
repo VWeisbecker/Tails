@@ -40,10 +40,8 @@ logdata[,2:(ncol(numcols)+1)]=numcols_log10
 
 mars=logdata[1:138,]
 rownames(mars)=mars$Species
-#exclude wombats who are outliers
-grep("Vombatus_ursinus", mars$Species)
-grep("Lasiorhinus_latifrons", mars$Species)
-mars=mars[-(66:67),]
+#exclude wombats who are outliers using grep (which returns the number of the row that has the species name)
+mars=mars[-((grep("Vombatus_ursinus", mars$Species)):(grep("Lasiorhinus_latifrons", mars$Species))),]
 
 rod=logdata[144:207,]
 rownames(rod)=rod$Species
@@ -166,6 +164,8 @@ mars<-mars_synch
 marsTree<-marsTree_synch
 rodTree<-rodTree_synch
 
-save(marsFull,rodFull,mars,rod,marsTree, rodTree, dasy_data, dasy_tree,peram_data, peram_tree,dip_data,dip_tree,murine_data,murine_tree, mf_mars, mf_rod,mf_marstree, mf_rodtree, file = "../Data/Processed_Data_for_Pgls.rda")
+#save(marsFull,rodFull,mars,rod,marsTree, rodTree, dasy_data, dasy_tree,peram_data, peram_tree,dip_data,dip_tree,murine_data,murine_tree, mf_mars, mf_rod,mf_marstree, mf_rodtree, file = "../Data/Processed_Data_for_Pgls.rda")
+
+save(marsFull,mars,marsTree, dasy_data, dasy_tree,peram_data, peram_tree,dip_data,dip_tree, mf_mars, mf_marstree,  file = "../Data/Processed_Data_for_Pgls.rda")
 
 ```
