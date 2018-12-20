@@ -143,15 +143,14 @@ murine_tree=drop.tip(rodTree_synch, name.check(rodTree_synch,murine_data)$tree_n
 
 ```
 
-#Processing data for partitions with m/f data available (assuming if m present, f is also present; but some species don't have male/female averages so they get deleted)
+#Processing data for partitions with m/f data available (assuming if m present, f is also present; but some species don't have male/female averages so they get deleted). This is only possible in marsupials, there are only 6 rodent species with m/f data and phylogenetic informatoin
 ```{r}
 mf_mars=mars_synch[which(mars_synch$Tl_Av_F !="NA"),]
 mf_mars=mf_mars[which(mf_mars$Wt_Av_F !="NA"),]
 #this will give an error if name.check is OK - or at least I only encountered this error if this was the case
 mf_marstree=drop.tip(marsTree_synch, name.check(marsTree_synch,mf_mars)$tree_not_data )
 
-mf_rod=rod_synch[which(rod_synch$Tl_Av_F !="NA"),]
-mf_rodtree=drop.tip(rodTree_synch, name.check(rodTree_synch,mf_rod)$tree_not_data )
+
 
 ```
 

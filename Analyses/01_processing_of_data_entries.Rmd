@@ -4,6 +4,9 @@ author: "Vera Weisbecker"
 date: "8 December 2018"
 output: html_document
 ---
+
+
+
 #The below summarizes the table according to the values given:
 
 #For missing average male and female values:average the min and max values and enter into m/f average values; 
