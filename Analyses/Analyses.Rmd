@@ -33,7 +33,7 @@ data_raw=read.csv("../Data/raw_data.csv", header=TRUE)
 ```
 
 
-#First, some basic data on the quality of the raw data
+#First, some basic data on the quality of the raw dataset
 
 ```{r}
 
@@ -58,7 +58,7 @@ rownames(DataQuality)=c("Marsupials", "Rodents")
 
 
 
-#Is it appropriate to correlate body mass with tail/body length, given the large weight ranges? Testing the hypothesis that within-species body weight maxima are greater relative to body weight minima(i.e. the range is relatively wider), compared to the same ratio in within-species body or tail lengths) - for those species where ranges are available, body mass ranges are substantially greater
+# Testing the hypothesis that within-species body weight maxima are greater relative to body weight minima(i.e. the range is relatively wider), compared to the same ratio in within-species body or tail lengths) - for those species where ranges are available, body mass ranges are substantially greater
 
 ```{r}
 #Marsupials
@@ -125,7 +125,7 @@ rownames(DataQuality)=c("Marsupials", "Rodents")
 
 ```
 
-#is there a difference in tail/body length relationships between the sexes or if we use maximum tail length?
+#is there a difference in tail/body length relationships between the sexes or if we use maximum tail length? This is only possible in a non phylogenetic context
 
 ```{r}
 #Marsupials:
@@ -162,19 +162,34 @@ rownames(DataQuality)=c("Marsupials", "Rodents")
 
 #Rodents:
 
-  Males<-cbind(rodFull$Tl_Av_M,rodFull$Bl_Av_M,rodFull$Wt_Av_M, rodFull$Locomotor_use,rep(1,length(rodFull$Tl_Av_M)))
-  Females<-cbind(rodFull$Tl_Av_F,rodFull$Bl_Av_F,rodFull$Wt_Av_F,rodFull$Locomotor_use, rep(2,length(rodFull$Tl_Av_F)))
-  Averages<-cbind(rodFull$Tl_mm, rodFull$Bl_mm,rodFull$Wt_g, rodFull$Locomotor_use,rep(3,length(rodFull$Bl_mm)))
+ RodMales<-cbind(rodFull$Tl_Av_M,rodFull$Bl_Av_M,rodFull$Wt_Av_M, rep(1,length(rodFull$Tl_Av_M)))
+  RodFemales<-cbind(rodFull$Tl_Av_F,rodFull$Bl_Av_F,rodFull$Wt_Av_F, rep(2,length(rodFull$Tl_Av_F)))
+  RodAverages<-cbind(rodFull$Tl_mm, rodFull$Bl_mm,rodFull$Wt_g, rep(3,length(rodFull$Bl_mm)))
   
-  Combine=rbind(Males, Females,Averages)
-  Combine=as.data.frame(Combine)
-  colnames(Combine) <-c("Tl","Bl","Wt","Locomotor_use","Sex")
-  Combine$Sex<-as.factor(Combine$Sex)
-  Combine$Locomotor_use<-as.factor(Combine$Locomotor_use)
+  RodCombine=rbind(RodMales, RodFemales,RodAverages)
+  RodCombine=as.data.frame(RodCombine)
+  colnames(RodCombine) <-c("Tl","Bl","Wt","Sex")
+  RodCombine$Sex<-as.factor(RodCombine$Sex)
+ 
   
-  #Are there differences in slope of Tail length and body LENGTH according to locomotor use, sex, or averages between sexes?
-  Sex_locomotion=summary(lm(Combine$Tl~Combine$Bl*Combine$Sex*Combine$Locomotor_use))
-  Sex_locomotion=aov (Combine$Tl~Combine$Bl*Combine$Sex*Combine$Locomotor_use)
+  ##Are there differences in slope of Tail length and body lenght/weight according to locomotor use, sex, or averages between sexes?
+  summary(aov(lm(RodCombine$Tl~RodCombine$Bl*RodCombine$Sex)))
+ 
+  ##No interaction (i.e. slopes are the same), therefore dropping interaction
+  summary(aov(lm(RodCombine$Tl~RodCombine$Bl+RodCombine$Sex)))
+  
+  
+  ##Same with body weight
+  summary(aov(lm(RodCombine$Tl~RodCombine$Wt*RodCombine$Sex)))
+   ##No interaction (i.e. slopes are the same), therefore dropping interaction
+  summary(aov(lm(RodCombine$Tl~RodCombine$Wt+RodCombine$Sex)))
+  
+  
+  
+  
+  #########################clean up below
+  
+  
   
   #If significant interactions, use
   testInteractions(Sex_locomotion)
