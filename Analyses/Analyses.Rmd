@@ -28,8 +28,35 @@ library(RColorBrewer)
 #the "utilities" file contains functions so this analysis page isn't too cluttered
 source("../Analyses/Utilities.r")
 load(file = "../Data/Processed_Data_for_Pgls.rda")
+data_raw=read.csv("../Data/raw_data.csv", header=TRUE)
 
 ```
+
+
+#First, some basic data on the quality of the raw data
+
+```{r}
+
+marsraw=data_raw[1:146,]
+rownames(marsraw)=marsraw$Species
+
+
+rodraw=data_raw[147:210,]
+rownames(rodraw)=rodraw$Species
+
+#How many entries are there for all of the entry categories?
+
+sapply(marsraw[,1:28], function(x) sum(!is.na(x)))
+
+sapply(rodraw[,1:28], function(x) sum(!is.na(x)))
+
+DataQuality=as.data.frame(rbind(sapply(marsraw[,2:28], function(x) sum(!is.na(x))),sapply(rodraw[,2:28], function(x) sum(!is.na(x)))))
+rownames(DataQuality)=c("Marsupials", "Rodents")
+
+```
+
+
+
 
 #Is it appropriate to correlate body mass with tail/body length, given the large weight ranges? Testing the hypothesis that within-species body weight maxima are greater relative to body weight minima(i.e. the range is relatively wider), compared to the same ratio in within-species body or tail lengths) - for those species where ranges are available, body mass ranges are substantially greater
 
