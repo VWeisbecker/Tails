@@ -50,7 +50,7 @@ sapply(marsraw[,1:28], function(x) sum(!is.na(x)))
 
 sapply(rodraw[,1:28], function(x) sum(!is.na(x)))
 
-DataQuality=as.data.frame(rbind(sapply(marsraw[,2:28], function(x) sum(!is.na(x))),sapply(rodraw[,2:28], function(x) sum(!is.na(x)))))
+DataQuality=as.data.frame(rbind(sapply(marsraw[,2:28], function(x) sum((!is.na(x))/nrow(marsraw))*100),sapply(rodraw[,2:28], function(x) sum((!is.na(x)))/nrow(rodraw))*100))
 rownames(DataQuality)=c("Marsupials", "Rodents")
 
 ```
