@@ -55,7 +55,19 @@ rownames(DataQuality)=c("Marsupials", "Rodents")
 
 ```
 
+#Phylogenetic signal of tail length, head and body length, and body weight
 
+```{r}
+# There's something wrong with the order of tips and the dataset; reorder using Emma's trick in the brain code
+marsTree$tip.label
+mars$Species
+
+
+phylosig(marsTree, mars$Tl_mm, method="K", test=FALSE, nsim=1000)
+phylosig(marsTree, mars$Bl_mm, method="K", test=FALSE, nsim=1000)
+phylosig(marsTree, mars$Wt_g, method="K", test=FALSE, nsim=1000)
+
+```
 
 
 # Testing the hypothesis that within-species body weight maxima are greater relative to body weight minima(i.e. the range is relatively wider), compared to the same ratio in within-species body or tail lengths) - for those species where ranges are available, body mass ranges are substantially greater
@@ -238,7 +250,7 @@ rownames(DataQuality)=c("Marsupials", "Rodents")
       #Checking appropriate distribution of model residuals
       qqnorm (MarsTBW$Models$Brownian)
       anova(MarsTBW$Models$Brownian)
-     
+      
       ##dropping the interaction 
       MarsTBWNoInter=find.best.model(Tl_mm~Bl_mm+Wt_g,marsTree,mars);MarsTW$AIC_Weights
       #Checking appropriate distribution of model residuals
