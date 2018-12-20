@@ -132,37 +132,41 @@ rownames(DataQuality)=c("Marsupials", "Rodents")
 
   ##Re-arrange datasets to put males, femals and averages under each other, turning into a data frame for column names
   
-  Males<-cbind(marsFull$Tl_Av_M,marsFull$Bl_Av_M,marsFull$Wt_Av_M, marsFull$Locomotor_use,rep(1,length(marsFull$Tl_Av_M)))
-  Females<-cbind(marsFull$Tl_Av_F,marsFull$Bl_Av_F,marsFull$Wt_Av_F,marsFull$Locomotor_use, rep(2,length(marsFull$Tl_Av_F)))
-  Averages<-cbind(marsFull$Tl_mm, marsFull$Bl_mm,marsFull$Wt_g, marsFull$Locomotor_use,rep(3,length(marsFull$Bl_mm)))
+  Males<-cbind(marsFull$Tl_Av_M,marsFull$Bl_Av_M,marsFull$Wt_Av_M, rep(1,length(marsFull$Tl_Av_M)))
+  Females<-cbind(marsFull$Tl_Av_F,marsFull$Bl_Av_F,marsFull$Wt_Av_F, rep(2,length(marsFull$Tl_Av_F)))
+  Averages<-cbind(marsFull$Tl_mm, marsFull$Bl_mm,marsFull$Wt_g, rep(3,length(marsFull$Bl_mm)))
   
-  Combine=rbind(Males, Females,Averages)
-  Combine=as.data.frame(Combine)
-  colnames(Combine) <-c("Tl","Bl","Wt","Locomotor_use","Sex")
-  Combine$Sex<-as.factor(Combine$Sex)
-  Combine$Locomotor_use<-as.factor(Combine$Locomotor_use)
+  MarsCombine=rbind(Males, Females,Averages)
+  MarsCombine=as.data.frame(MarsCombine)
+  colnames(MarsCombine) <-c("Tl","Bl","Wt","Sex")
+  MarsCombine$Sex<-as.factor(MarsCombine$Sex)
+
   
-  ##Are there differences in slope of Tail length and body LENGTH according to locomotor use, sex, or averages between sexes?
-  Sex_locomotion=summary(lm(Combine$Tl~Combine$Bl*Combine$Sex*Combine$Locomotor_use))
-  Sex_locomotion=aov (Combine$Tl~Combine$Bl*Combine$Sex*Combine$Locomotor_use)
+  ##Are there differences in slope of Tail length and body length or weight according to sex, or averages between sexes?
   
-  ##If significant interactions, use
-  testInteractions(Sex_locomotion)
-  #if not, re-run without interactions; if any intercept is significant, run something like the below
-  TukeyHSD(MaleFemaleaov,which='Sex', data=Combine )
+  ###check model residuals before proceeding; some low-leverage outliers
+  plot(lm(MarsCombine$Tl~MarsCombine$Bl*MarsCombine$Sex))
   
-  ##Are there differences in slope of Tail length and body WEIGHT according to locomotor use, sex, or averages between sexes?
-  Sex_locomotion=summary(lm(Combine$Tl~Combine$Wt *Combine$Sex*Combine$Locomotor_use))
-  Sex_locomotion=aov (Combine$Tl~Combine$Wt*Combine$Sex*Combine$Locomotor_use)
+  ### Do regression slopes differ between sexes?
+  summary(aov (MarsCombine$Tl~MarsCombine$Bl*MarsCombine$Sex))
   
-  ##If significant interactions, use
-  testInteractions(Sex_locomotion)
-  #if not, re-run without interactions; if any intercept is significant, run something like the below
-  TukeyHSD(MaleFemaleaov,which='Sex', data=Combine )
+  ### No significant interactions, therefore dropping interactions to look for differences in intercept
+  summary(aov (MarsCombine$Tl~MarsCombine$Bl+MarsCombine$Sex))
+  
+  ###check model residuals before proceeding
+  plot(lm(MarsCombine$Tl~MarsCombine$Wt*MarsCombine$Sex))
+  
+  ### Do regression slopes differ between sexes?
+  summary(aov (MarsCombine$Tl~MarsCombine$Wt*MarsCombine$Sex))
+  
+  ### No significant interactions, therefore dropping interactions to look for differences in intercept
+  summary(aov (MarsCombine$Tl~MarsCombine$Wt+MarsCombine$Sex))
+  
+  
 
 #Rodents:
 
- RodMales<-cbind(rodFull$Tl_Av_M,rodFull$Bl_Av_M,rodFull$Wt_Av_M, rep(1,length(rodFull$Tl_Av_M)))
+  RodMales<-cbind(rodFull$Tl_Av_M,rodFull$Bl_Av_M,rodFull$Wt_Av_M, rep(1,length(rodFull$Tl_Av_M)))
   RodFemales<-cbind(rodFull$Tl_Av_F,rodFull$Bl_Av_F,rodFull$Wt_Av_F, rep(2,length(rodFull$Tl_Av_F)))
   RodAverages<-cbind(rodFull$Tl_mm, rodFull$Bl_mm,rodFull$Wt_g, rep(3,length(rodFull$Bl_mm)))
   
@@ -172,22 +176,23 @@ rownames(DataQuality)=c("Marsupials", "Rodents")
   RodCombine$Sex<-as.factor(RodCombine$Sex)
  
   
-  ##Are there differences in slope of Tail length and body lenght/weight according to locomotor use, sex, or averages between sexes?
-  summary(aov(lm(RodCombine$Tl~RodCombine$Bl*RodCombine$Sex)))
+  ##Are there differences in slope of tail length and body lenght/weight according to locomotor use, sex, or averages between sexes?
+    ###check for appropriate distribution of model residuals
+    plot(lm(RodCombine$Tl~RodCombine$Bl*RodCombine$Sex))
  
-  ##No interaction (i.e. slopes are the same), therefore dropping interaction
-  summary(aov(lm(RodCombine$Tl~RodCombine$Bl+RodCombine$Sex)))
+    summary(aov(lm(RodCombine$Tl~RodCombine$Bl*RodCombine$Sex)))
   
+   ###No interaction (i.e. slopes are the same), therefore dropping interaction
+    summary(aov(lm(RodCombine$Tl~RodCombine$Bl+RodCombine$Sex)))
   
-  ##Same with body weight
-  summary(aov(lm(RodCombine$Tl~RodCombine$Wt*RodCombine$Sex)))
+    ##Same with body weight
+    plot(lm(RodCombine$Tl~RodCombine$Wt*RodCombine$Sex))
+    summary(aov(lm(RodCombine$Tl~RodCombine$Wt*RodCombine$Sex)))
    ##No interaction (i.e. slopes are the same), therefore dropping interaction
-  summary(aov(lm(RodCombine$Tl~RodCombine$Wt+RodCombine$Sex)))
+    summary(aov(lm(RodCombine$Tl~RodCombine$Wt+RodCombine$Sex)))
   
   
-  
-  
-  #########################clean up below
+  #########################note to self below, delete later
   
   
   
@@ -208,13 +213,106 @@ rownames(DataQuality)=c("Marsupials", "Rodents")
 
 ```
 
-# Do Tail lengths scale differently compared to body lengths/weights in species with different locomotor modes? Fill in as the data are there
+# How do tail lengths scale with body length and weight?
 
 ```{r}
 
 #Marsupials
     
-  ##Tail vs body LENGTH
+      ##Tail vs. body length
+      MarsTB=find.best.model(Tl_mm~Bl_mm,marsTree,mars);MarsTB$AIC_Weights
+      #Checking appropriate distribution of model residuals      
+      qqnorm (MarsTB$Models$Brownian)      
+      MarsTB$Model_summaries$Brownian$tTable
+      
+      
+      ##Tail vs body weight
+      MarsTW=find.best.model(Tl_mm~Wt_g,marsTree,mars);MarsTW$AIC_Weights
+      #Checking appropriate distribution of model residuals
+      qqnorm (MarsTB$Models$Brownian)
+      MarsTW$Model_summaries$Brownian$tTable
+      
+      
+      ##but is there any impact of body weight once head/body length is accounted for?
+      MarsTBW=find.best.model(Tl_mm~Bl_mm*Wt_g,marsTree,mars);MarsTW$AIC_Weights
+      #Checking appropriate distribution of model residuals
+      qqnorm (MarsTBW$Models$Brownian)
+      anova(MarsTBW$Models$Brownian)
+     
+      ##dropping the interaction 
+      MarsTBWNoInter=find.best.model(Tl_mm~Bl_mm+Wt_g,marsTree,mars);MarsTW$AIC_Weights
+      #Checking appropriate distribution of model residuals
+      qqnorm (MarsTBWNoInter$Models$Brownian)
+      anova(MarsTBWNoInter$Models$Brownian)
+
+#Rodents
+  
+  ##With Rattus
+      
+      ###Tail vs. body length
+      rodTB=find.best.model(Tl_mm~Bl_mm,rodTree,rod);rodTB$AIC_Weights
+      #Checking appropriate distribution of model residuals      
+      qqnorm (rodTB$Models$Brownian)      
+      rodTB$Model_summaries$Brownian$tTable
+      
+      
+      ###Tail vs body weight
+      rodTW=find.best.model(Tl_mm~Wt_g,rodTree,rod);rodTW$AIC_Weights
+      #Checking appropriate distribution of model residuals
+      qqnorm (rodTB$Models$Brownian)
+      rodTW$Model_summaries$Brownian$tTable
+      
+      ###but is there any impact of body weight once head/body length is accounted for?
+      rodTBW=find.best.model(Tl_mm~Bl_mm*Wt_g,rodTree,rod);rodTW$AIC_Weights
+      #Checking appropriate distribution of model residuals
+      qqnorm (rodTBW$Models$Brownian)
+      anova(rodTBW$Models$Brownian)
+      
+      ###dropping the interaction 
+      rodTBWNoInter=find.best.model(Tl_mm~Bl_mm+Wt_g,rodTree,rod);rodTW$AIC_Weights
+      #Checking appropriate distribution of model residuals; this one is not ideal
+      qqnorm (rodTBWNoInter$Models$Brownian_GrafScale)
+      #significant but with small effect size
+      anova(rodTBWNoInter$Models$Brownian_GrafScale)
+ 
+      ##Without Rattus
+      
+      ###Tail vs. body length
+      MurTB=find.best.model(Tl_mm~Bl_mm,murine_tree,murine_data);MurTB$AIC_Weights
+      #Checking appropriate distribution of model residuals; excluding Rattus improves this     
+      qqnorm (MurTB$Models$Brownian) 
+      #but no change in scaling coefficient
+      MurTB$Model_summaries$Brownian$tTable
+      
+      
+      ###Tail vs body weight
+      MurTW=find.best.model(Tl_mm~Wt_g,murine_tree,murine_data);MurTW$AIC_Weights
+      #Checking appropriate distribution of model residuals
+      qqnorm (MurTW$Models$Brownian_GrafScale)
+      MurTW$Model_summaries$Brownian$tTable
+      
+      ###but is there any impact of body weight once head/body length is accounted for?
+      MurTBW=find.best.model(Tl_mm~Bl_mm*Wt_g,murine_tree,murine_data);MurTW$AIC_Weights
+      #Checking appropriate distribution of model residuals
+      qqnorm (MurTBW$Models$Brownian)
+      anova(MurTBW$Models$Brownian)
+      
+      ###dropping the interaction 
+      MurTBWNoInter=find.best.model(Tl_mm~Bl_mm+Wt_g,murine_tree,murine_data);MurTW$AIC_Weights
+      #Checking appropriate distribution of model residuals; this one is not ideal
+      qqnorm (MurTBWNoInter$Models$Brownian_GrafScale)
+      #significant but with small effect size; but higher level of significance without Rattus
+      anova(MurTBWNoInter$Models$Brownian_GrafScale)
+
+```
+
+# Aside from the association between body length and tail length,does locomotor mode play a role?
+
+```{r}
+
+#Marsupials
+    
+  ##Tail vs body length
     TB=find.best.model(Tl_mm~Bl_mm*Locomotor_use,marsTree,mars);TB$AIC_Weights
     TB= (gls(Tl_mm~Bl_mm*Locomotor_use, correlation=corBrownian(1,phy=marsTree), data=mars))    
 
@@ -265,9 +363,9 @@ rownames(DataQuality)=c("Marsupials", "Rodents")
     
     ##Tail vs body LENGTH
       RodTB=find.best.model(Tl_mm~Bl_mm*Locomotor_use,rodTree,rod);RodTB$AIC_Weights
-      #several similarly likely models; technically the Pagel correlation structure without Grafen-scaled trees performs slightly better but the level of significance is the same in just Pagel and the original tree (which is also the more likely model in the no interaction model)
-      #qqnorm (RodTB$Models$Pagel_GrafScale)
-      anova(RodTB$Models$Pagel_GrafScale)
+      #several similarly likely models but they yield similar levels of significance
+      qqnorm (RodTB$Models$Pagel_GrafScale)
+      anova(RodTB$Models$Pagel)
       
       ##No interactions (i.e. no differences in tail/Bl slope according to locomotion), so dropping interaction
       RodTBNoInter=find.best.model(Tl_mm~Bl_mm+Locomotor_use,rodTree,rod);RodTBNoInter$AIC_Weights
@@ -306,6 +404,7 @@ rownames(DataQuality)=c("Marsupials", "Rodents")
       
    
 ```
+
 
 #Plotting male, female and averages 
 
