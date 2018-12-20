@@ -43,16 +43,19 @@ rownames(mars)=mars$Species
 #exclude wombats who are outliers using grep (which returns the number of the row that has the species name)
 mars=mars[-((grep("Vombatus_ursinus", mars$Species)):(grep("Lasiorhinus_latifrons", mars$Species))),]
 
-rod=logdata[147:207,]
+rod=logdata[147:210,]
 rownames(rod)=rod$Species
 
-#deleting all entries that have NAs in their main data and locomotor use; this means some species don't have weight data
+#deleting all entries that have NAs in their main data and locomotor use; this means some species don't have weight data. There is also one specie of rodent deleted because of lack of 
 mars=mars[-which(is.na( mars$Tl_mm)) ,]
 mars=mars[-which(is.na(mars$Locomotor_use)),]
 
-rod=rod[-which(is.na(rod$Tl_mm) & is.na(rod$Locomotor_use)),]
+rod=rod[-which(is.na(rod$Tl_mm)),]
 rod=rod[-which(is.na(rod$Locomotor_use)),]
 
+#drop unused "Rattus" level from mars
+
+mars$Order<-  droplevels(mars$Order, exclude="Rattus")
 
 ```
 
@@ -121,7 +124,7 @@ name.check(rodTree_synch,rod_synch)
 ```{r}
 
 #Dasyuromorphs
-dasy_data=mars[which(mars_synch$Order =="Dasyuromorph"),]
+dasy_data=mars_synch[which(mars_synch$Order =="Dasyuromorph"),]
 dasy_tree=drop.tip(marsTree_synch, name.check(marsTree_synch,dasy_data)$tree_not_data )
 
 #Peramelemorphs
@@ -140,9 +143,10 @@ murine_tree=drop.tip(rodTree_synch, name.check(rodTree_synch,murine_data)$tree_n
 
 ```
 
-#Processing data for partitions with m/f data available (assuming if m present, f is also present)
+#Processing data for partitions with m/f data available (assuming if m present, f is also present; but some species don't have male/female averages so they get deleted)
 ```{r}
 mf_mars=mars_synch[which(mars_synch$Tl_Av_F !="NA"),]
+mf_mars=mf_mars[which(mf_mars$Wt_Av_F !="NA"),]
 #this will give an error if name.check is OK - or at least I only encountered this error if this was the case
 mf_marstree=drop.tip(marsTree_synch, name.check(marsTree_synch,mf_mars)$tree_not_data )
 
@@ -164,8 +168,8 @@ mars<-mars_synch
 marsTree<-marsTree_synch
 rodTree<-rodTree_synch
 
-#save(marsFull,rodFull,mars,rod,marsTree, rodTree, dasy_data, dasy_tree,peram_data, peram_tree,dip_data,dip_tree,murine_data,murine_tree, mf_mars, mf_rod,mf_marstree, mf_rodtree, file = "../Data/Processed_Data_for_Pgls.rda")
+save(marsFull,rodFull,mars,rod,marsTree, rodTree, dasy_data, dasy_tree,peram_data, peram_tree,dip_data,dip_tree,murine_data,murine_tree, mf_mars, mf_rod,mf_marstree, mf_rodtree, file = "../Data/Processed_Data_for_Pgls.rda")
 
-save(marsFull,mars,marsTree, dasy_data, dasy_tree,peram_data, peram_tree,dip_data,dip_tree, mf_mars, mf_marstree,  file = "../Data/Processed_Data_for_Pgls.rda")
+#save(marsFull,mars,marsTree, dasy_data, dasy_tree,peram_data, peram_tree,dip_data,dip_tree, mf_mars, mf_marstree,  file = "../Data/Processed_Data_for_Pgls.rda")
 
 ```

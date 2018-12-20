@@ -279,36 +279,72 @@ plot(mars$Wt_Av_M,mars$Tl_Av_M, col="red", pch=19);points(mars$Wt_Av_F,mars$Tl_A
 
 
 ```
-#Plotting according to locomotor mode
+
+#Plotting according to tail use and phylogeny - body length
 
 ```{r}
 
-##Marsupials
-
-
-  ## initial setup: colours and margins
-  colsOrderM=brewer.pal(n=length(levels(mars$Order)), name="Dark2")
-  colsLoco=brewer.pal(n=length(levels(mars$Locomotor_use)), name="Dark2")
-  colsOrderR=brewer.pal(n=length(levels(rodFull$Order)), name="Dark2")
-  cexes<-0.6
-  adjs=-0.3
+#Tail vs body length
+  ##Marsupials
   
-  #4 panels, with margins of 2 lines
-  par(mfrow=c(2,2), mar = c(4,4,4,4))
+  
+    ## initial setup: colours and margins
+    colsOrderM=brewer.pal(n=length(levels(mars$Order)), name="Dark2")
+    colsLoco=brewer.pal(n=length(levels(mars$Locomotor_use)), name="Dark2")
+    colsOrderR=brewer.pal(n=length(levels(rodFull$Order)), name="Dark2")
+    cexes<-0.6
+    adjs=-0.3
+    
+    #4 panels, with margins of 2 lines
+    par(mfrow=c(2,2), mar = c(4,4,4,4))
+  
+  plot(mars$Tl_mm~mars$Bl_mm, col=colsOrderM[mars$Order], pch=19, xlab="log Body length", ylab="log Tail length" );legend("bottomright", c("Dasyuromorph" ,  "Diprotodontian", "Peramelemorph"), pch=19, col=colsOrderM, cex=cexes); #text(mars$Tl_mm~mars$Bl_mm, labels=mars$Species, cex=0.5)
+  
+  plot(mars$Tl_mm~mars$Bl_mm, col=colsLoco[mars$Locomotor_use], pch=19, xlab="log Body length", ylab="log Tail length" ); legend("bottomright",levels(mars$Locomotor_use) , pch=19, col=colsLoco, cex=cexes)
+  
+  mtext("Marsupials", adj=adjs,side=3, line=2, cex=1)
+  
+  ##Rodents
+  
+  plot(rodFull$Tl_mm~rodFull$Bl_mm, col=colsOrderR[rodFull$Order], pch=19, xlab="log Body length", ylab="log Tail length" );legend("bottomright", c("Murine" ,  "Rattus"), pch=19, col=colsOrderR, cex=cexes); #text(rodFull$Tl_mm~rodFull$Bl_mm, labels=rodFull$Species, cex=cexes)
+  
+  plot(rodFull$Tl_mm~rodFull$Bl_mm, col=colsLoco[rodFull$Locomotor_use], pch=19, xlab="log Body length", ylab="log Tail length" ); legend("bottomright",levels(rodFull$Locomotor_use) , pch=19, col=colsLoco, cex=cexes)
+  
+  mtext("Rodents", adj=adjs, line=2, cex = 1)
 
-plot(mars$Tl_mm~mars$Bl_mm, col=colsOrderM[mars$Order], pch=19, xlab="log Body length", ylab="log Tail length" );legend("bottomright", c("Dasyuromorph" ,  "Diprotodontian", "Peramelemorph"), pch=19, col=colsOrderM, cex=cexes); #text(mars$Tl_mm~mars$Bl_mm, labels=mars$Species, cex=0.5)
+```
 
-plot(mars$Tl_mm~mars$Bl_mm, col=colsLoco[mars$Locomotor_use], pch=19, xlab="log Body length", ylab="log Tail length" ); legend("bottomright",levels(mars$Locomotor_use) , pch=19, col=colsLoco, cex=cexes)
 
-mtext("Marsupials", adj=adjs,side=3, line=2, cex=1)
+#Plotting according to tail use and phylogeny - body mass
 
-##Rodents
+```{r}
 
-plot(rodFull$Tl_mm~rodFull$Bl_mm, col=colsOrderR[rodFull$Order], pch=19, xlab="log Body length", ylab="log Tail length" );legend("bottomright", c("Murine" ,  "Rattus"), pch=19, col=colsOrderR, cex=cexes); #text(rodFull$Tl_mm~rodFull$Bl_mm, labels=rodFull$Species, cex=cexes)
-
-plot(rodFull$Tl_mm~rodFull$Bl_mm, col=colsLoco[rodFull$Locomotor_use], pch=19, xlab="log Body length", ylab="log Tail length" ); legend("bottomright",levels(rodFull$Locomotor_use) , pch=19, col=colsLoco, cex=cexes)
-
-mtext("Rodents", adj=adjs, line=2, cex = 1)
-
+#Tail vs body length
+  ##Marsupials
+  
+  
+    ## initial setup: colours and margins
+    colsOrderM=brewer.pal(n=length(levels(mars$Order)), name="Dark2")
+    colsLoco=brewer.pal(n=length(levels(mars$Locomotor_use)), name="Dark2")
+    colsOrderR=brewer.pal(n=length(levels(rodFull$Order)), name="Dark2")
+    cexes<-0.6
+    adjs=-0.3
+    
+    #4 panels, with margins of 2 lines
+    par(mfrow=c(2,2), mar = c(4,4,4,4))
+  
+  plot(mars$Tl_mm~mars$Wt_g, col=colsOrderM[mars$Order], pch=19, xlab="log Body length", ylab="log Tail length" );legend("bottomright", c("Dasyuromorph" ,  "Diprotodontian", "Peramelemorph"), pch=19, col=colsOrderM, cex=cexes); #text(mars$Tl_mm~mars$Wt_g, labels=mars$Species, cex=0.5)
+  
+  plot(mars$Tl_mm~mars$Wt_g, col=colsLoco[mars$Locomotor_use], pch=19, xlab="log Body length", ylab="log Tail length" ); legend("bottomright",levels(mars$Locomotor_use) , pch=19, col=colsLoco, cex=cexes)
+  
+  mtext("Marsupials", adj=adjs,side=3, line=2, cex=1)
+  
+  ##Rodents
+  
+  plot(rodFull$Tl_mm~rodFull$Wt_g, col=colsOrderR[rodFull$Order], pch=19, xlab="log Body length", ylab="log Tail length" );legend("bottomright", c("Murine" ,  "Rattus"), pch=19, col=colsOrderR, cex=cexes); #text(rodFull$Tl_mm~rodFull$Wt_g, labels=rodFull$Species, cex=cexes)
+  
+  plot(rodFull$Tl_mm~rodFull$Wt_g, col=colsLoco[rodFull$Locomotor_use], pch=19, xlab="log Body length", ylab="log Tail length" ); legend("bottomright",levels(rodFull$Locomotor_use) , pch=19, col=colsLoco, cex=cexes)
+  
+  mtext("Rodents", adj=adjs, line=2, cex = 1)
 
 ```

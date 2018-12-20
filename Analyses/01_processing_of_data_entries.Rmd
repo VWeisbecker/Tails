@@ -18,7 +18,7 @@ output: html_document
 
 ```{r }
 
-#change this to "raw data once it's there"
+
 data=read.csv("../Data/raw_data.csv", header=TRUE)
 
 #make a matrix for all data but also add 3 columns for final Tl, Bl and Wt

@@ -21,28 +21,11 @@ MinMaxtest<-function(variable_stack, number_of_ratios){
   
 }
 
-
-
-
-
-
-
-
-
 #Determining the best model under different phylogenetic correlation structures and original vs. Grafen-transformed branch lengths
 
 #@param formula: formula of interest (e.g. Tlength~Wt_g), , data are the data   (assuming 
 #@param tree: phylogenetic tree, matched to tree in the data preparation step
 #@param taildata: data, matched to tree in the data preparation step
-
-
-
-
-
-
-
-
-
 
 #output is output$AIC, then use the name for the highest weighted model to find output$model_summaries$bestmodel
   
