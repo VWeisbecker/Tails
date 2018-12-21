@@ -24,6 +24,8 @@ library(ggplot2)
 library(nlme)
 library(dplyr)
 library(RColorBrewer)
+library(surface)
+
 
 #the "utilities" file contains functions so this analysis page isn't too cluttered
 source("../Analyses/Utilities.r")
@@ -425,6 +427,38 @@ phylosig(rodTree, rod$Wt_g, method="K", test=FALSE, nsim=1000)
 
 
 #Plotting male, female and averages 
+
+```{r}
+#Using the SURFACE package to look for significant shifts in evolutoinary regime
+  
+ForSurf=as.data.frame(cbind(mars$Tl_mm, mars$Bl_mm))
+colnames(ForSurf) <- c("T1", "BL")
+rownames(ForSurf) <- rownames(mars)
+
+MarsSurfTree<-nameNodes(marsTree)
+olist<-convertTreeData(MarsSurfTree,ForSurf)
+otree<-olist[[1]]; odata<-olist[[2]]
+
+fwd<-surfaceForward(otree, odata)
+k<-length(fwd)
+
+bwd<-surfaceBackward(otree, odata, starting_model = fwd[[k]], aic_threshold = 0, only_best = TRUE, verbose = FALSE, plotaic = FALSE)
+bsum<-surfaceSummary(bwd)
+kk<-length(bwd)
+
+fsum=surfaceSummary(fwd)
+bsum <- surfaceSummary(bwd)
+
+surfaceTreePlot(MarsSurfTree, bwd[[kk]], labelshifts = T)
+
+```
+
+
+
+
+
+
+
 
 ```{r}
   
