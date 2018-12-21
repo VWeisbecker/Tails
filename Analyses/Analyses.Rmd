@@ -139,7 +139,7 @@ phylosig(rodTree, rod$Wt_g, method="K", test=FALSE, nsim=1000)
 
 ```
 
-#is there a difference in tail/body length relationships between the sexes or if we use maximum tail length? This is only possible in a non phylogenetic context
+#is there a difference in tail/body length relationships between the sexes? This is only possible in a non phylogenetic context
 
 ```{r}
 #Marsupials:
