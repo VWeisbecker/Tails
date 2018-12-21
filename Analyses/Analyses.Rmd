@@ -44,11 +44,7 @@ rownames(marsraw)=marsraw$Species
 rodraw=data_raw[147:210,]
 rownames(rodraw)=rodraw$Species
 
-#How many entries are there for all of the entry categories?
-
-sapply(marsraw[,1:28], function(x) sum(!is.na(x)))
-
-sapply(rodraw[,1:28], function(x) sum(!is.na(x)))
+#How many percent of the dataset entries are there for each of the entry categories?
 
 DataQuality=as.data.frame(rbind(sapply(marsraw[,2:28], function(x) sum((!is.na(x))/nrow(marsraw))*100),sapply(rodraw[,2:28], function(x) sum((!is.na(x)))/nrow(rodraw))*100))
 rownames(DataQuality)=c("Marsupials", "Rodents")
@@ -66,6 +62,10 @@ mars$Species
 phylosig(marsTree, mars$Tl_mm, method="K", test=FALSE, nsim=1000)
 phylosig(marsTree, mars$Bl_mm, method="K", test=FALSE, nsim=1000)
 phylosig(marsTree, mars$Wt_g, method="K", test=FALSE, nsim=1000)
+
+phylosig(rodTree, rod$Tl_mm, method="K", test=FALSE, nsim=1000)
+phylosig(rodTree, rod$Bl_mm, method="K", test=FALSE, nsim=1000)
+phylosig(rodTree, rod$Wt_g, method="K", test=FALSE, nsim=1000)
 
 ```
 
@@ -225,7 +225,7 @@ phylosig(marsTree, mars$Wt_g, method="K", test=FALSE, nsim=1000)
 
 ```
 
-# How do tail lengths scale with body length and weight?
+# How do tail lengths scale with body length and weight? 
 
 ```{r}
 
@@ -244,22 +244,7 @@ phylosig(marsTree, mars$Wt_g, method="K", test=FALSE, nsim=1000)
       qqnorm (MarsTB$Models$Brownian)
       MarsTW$Model_summaries$Brownian$tTable
       
-      
-      ##but is there any impact of body weight once head/body length is accounted for?
-      MarsTBW=find.best.model(Tl_mm~Bl_mm*Wt_g,marsTree,mars);MarsTW$AIC_Weights
-      #Checking appropriate distribution of model residuals
-      qqnorm (MarsTBW$Models$Brownian)
-      anova(MarsTBW$Models$Brownian)
-      
-      ##dropping the interaction 
-      MarsTBWNoInter=find.best.model(Tl_mm~Bl_mm+Wt_g,marsTree,mars);MarsTW$AIC_Weights
-      #Checking appropriate distribution of model residuals
-      qqnorm (MarsTBWNoInter$Models$Brownian)
-      anova(MarsTBWNoInter$Models$Brownian)
-
-#Rodents
-  
-  ##With Rattus
+ ##rodents with Rattus
       
       ###Tail vs. body length
       rodTB=find.best.model(Tl_mm~Bl_mm,rodTree,rod);rodTB$AIC_Weights
@@ -274,20 +259,7 @@ phylosig(marsTree, mars$Wt_g, method="K", test=FALSE, nsim=1000)
       qqnorm (rodTB$Models$Brownian)
       rodTW$Model_summaries$Brownian$tTable
       
-      ###but is there any impact of body weight once head/body length is accounted for?
-      rodTBW=find.best.model(Tl_mm~Bl_mm*Wt_g,rodTree,rod);rodTW$AIC_Weights
-      #Checking appropriate distribution of model residuals
-      qqnorm (rodTBW$Models$Brownian)
-      anova(rodTBW$Models$Brownian)
-      
-      ###dropping the interaction 
-      rodTBWNoInter=find.best.model(Tl_mm~Bl_mm+Wt_g,rodTree,rod);rodTW$AIC_Weights
-      #Checking appropriate distribution of model residuals; this one is not ideal
-      qqnorm (rodTBWNoInter$Models$Brownian_GrafScale)
-      #significant but with small effect size
-      anova(rodTBWNoInter$Models$Brownian_GrafScale)
- 
-      ##Without Rattus
+  ##rodents without Rattus
       
       ###Tail vs. body length
       MurTB=find.best.model(Tl_mm~Bl_mm,murine_tree,murine_data);MurTB$AIC_Weights
@@ -303,18 +275,52 @@ phylosig(marsTree, mars$Wt_g, method="K", test=FALSE, nsim=1000)
       qqnorm (MurTW$Models$Brownian_GrafScale)
       MurTW$Model_summaries$Brownian$tTable
       
-      ###but is there any impact of body weight once head/body length is accounted for?
+```
+
+# Does the significance level drop if body weight and body length are both part of the model?
+
+```{r}
+      
+#Marsupials
+
+      MarsTBW=find.best.model(Tl_mm~Bl_mm*Wt_g,marsTree,mars);MarsTW$AIC_Weights
+      #Checking appropriate distribution of model residuals
+      qqnorm (MarsTBW$Models$Brownian)
+      anova(MarsTBW$Models$Brownian, type="marginal")
+      
+      ##dropping the interaction 
+      MarsTBWNoInter=find.best.model(Tl_mm~Bl_mm+Wt_g,marsTree,mars);MarsTW$AIC_Weights
+      #Checking appropriate distribution of model residuals
+      qqnorm (MarsTBWNoInter$Models$Brownian)
+      anova(MarsTBWNoInter$Models$Brownian, type="marginal")
+
+#Rodents with Rattus
+      
+      rodTBW=find.best.model(Tl_mm~Bl_mm*Wt_g,rodTree,rod);rodTW$AIC_Weights
+      #Checking appropriate distribution of model residuals
+      qqnorm (rodTBW$Models$Brownian)
+      anova(rodTBW$Models$Brownian)
+      
+      ###dropping the interaction 
+      rodTBWNoInter=find.best.model(Tl_mm~Bl_mm+Wt_g,rodTree,rod);rodTW$AIC_Weights
+      #Checking appropriate distribution of model residuals; this one is not ideal
+      qqnorm (rodTBWNoInter$Models$Brownian_GrafScale)
+      #significant but with small effect size
+      anova(rodTBWNoInter$Models$Brownian_GrafScale, type="marginal")
+ 
+#Rodents without Rattus
+ 
       MurTBW=find.best.model(Tl_mm~Bl_mm*Wt_g,murine_tree,murine_data);MurTW$AIC_Weights
       #Checking appropriate distribution of model residuals
-      qqnorm (MurTBW$Models$Brownian)
-      anova(MurTBW$Models$Brownian)
+      qqnorm (MurTBW$Models$Brownian_GrafScale)
+      anova(MurTBW$Models$Brownian_GrafScale, type="marginal")
       
       ###dropping the interaction 
       MurTBWNoInter=find.best.model(Tl_mm~Bl_mm+Wt_g,murine_tree,murine_data);MurTW$AIC_Weights
       #Checking appropriate distribution of model residuals; this one is not ideal
       qqnorm (MurTBWNoInter$Models$Brownian_GrafScale)
       #significant but with small effect size; but higher level of significance without Rattus
-      anova(MurTBWNoInter$Models$Brownian_GrafScale)
+      anova(MurTBWNoInter$Models$Brownian_GrafScale, type="marginal")
 
 ```
 
@@ -422,7 +428,8 @@ phylosig(marsTree, mars$Wt_g, method="K", test=FALSE, nsim=1000)
 
 ```{r}
   
-#plot male-only, female-only, and averaged datasets together
+#plot male-only, female-only, and averaged datasets together - Marsupials only 
+
 par(mfrow=c(1,2))
 
 plot(mars$Bl_Av_M,mars$Tl_Av_M, col="red", pch=19);points(mars$Bl_Av_F,mars$Tl_Av_F, col="blue", pch=19);points(mars$Bl_mm,mars$Tl_mm, col="green", pch=19);abline(lm(mars$Tl_Av_M~mars$Bl_Av_M), col="red");abline(lm(mars$Tl_Av_F~mars$Bl_Av_F), col="blue"); abline(lm(mars$Tl_mm~mars$Bl_mm), col="green")
@@ -436,32 +443,35 @@ plot(mars$Wt_Av_M,mars$Tl_Av_M, col="red", pch=19);points(mars$Wt_Av_F,mars$Tl_A
 #Plotting according to tail use and phylogeny - body length
 
 ```{r}
-
-#Tail vs body length
-  ##Marsupials
+#Marsupials
   
-  
-    ## initial setup: colours and margins
+  ## initial setup: colours and margins
     colsOrderM=brewer.pal(n=length(levels(mars$Order)), name="Dark2")
     colsLoco=brewer.pal(n=length(levels(mars$Locomotor_use)), name="Dark2")
     colsOrderR=brewer.pal(n=length(levels(rodFull$Order)), name="Dark2")
-    cexes<-0.6
-    adjs=-0.3
+    # Size of points
+    cexes <- 0.8
+    # this adjusts the titles of the double panel
+    adjs <- -0.3
+    # spaces between legend lines
+    yInter <- 0.3
+    #size of the box is determined by text width
+    textwidth <- 0.5
     
     #4 panels, with margins of 2 lines
     par(mfrow=c(2,2), mar = c(4,4,4,4))
   
-  plot(mars$Tl_mm~mars$Bl_mm, col=colsOrderM[mars$Order], pch=19, xlab="log Body length", ylab="log Tail length" );legend("bottomright", c("Dasyuromorph" ,  "Diprotodontian", "Peramelemorph"), pch=19, col=colsOrderM, cex=cexes); #text(mars$Tl_mm~mars$Bl_mm, labels=mars$Species, cex=0.5)
+  plot(mars$Tl_mm~mars$Bl_mm, col=colsOrderM[mars$Order], pch=19, xlab="log Body length", ylab="log Tail length") ;legend("bottomright", c("Dasyuromorph" ,  "Diprotodontian", "Peramelemorph"), pch=19, col=colsOrderM, cex=cexes,y.intersp = yInter, text.width = textwidth ); #text(mars$Tl_mm~mars$Bl_mm, labels=mars$Species, cex=0.5)
   
-  plot(mars$Tl_mm~mars$Bl_mm, col=colsLoco[mars$Locomotor_use], pch=19, xlab="log Body length", ylab="log Tail length" ); legend("bottomright",levels(mars$Locomotor_use) , pch=19, col=colsLoco, cex=cexes)
+  plot(mars$Tl_mm~mars$Bl_mm, col=colsLoco[mars$Locomotor_use], pch=19, xlab="log Body length", ylab="log Tail length" ); legend("bottomright",levels(mars$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, y.intersp = yInter, text.width = textwidth)
   
   mtext("Marsupials", adj=adjs,side=3, line=2, cex=1)
   
   ##Rodents
   
-  plot(rodFull$Tl_mm~rodFull$Bl_mm, col=colsOrderR[rodFull$Order], pch=19, xlab="log Body length", ylab="log Tail length" );legend("bottomright", c("Murine" ,  "Rattus"), pch=19, col=colsOrderR, cex=cexes); #text(rodFull$Tl_mm~rodFull$Bl_mm, labels=rodFull$Species, cex=cexes)
+  plot(rodFull$Tl_mm~rodFull$Bl_mm, col=colsOrderR[rodFull$Order], pch=19, xlab="log Body length", ylab="log Tail length" );legend("bottomright", c("Murine" ,  "Rattus"), pch=19, col=colsOrderR, cex=cexes,y.intersp = yInter, text.width = textwidth); #text(rodFull$Tl_mm~rodFull$Bl_mm, labels=rodFull$Species, cex=cexes)
   
-  plot(rodFull$Tl_mm~rodFull$Bl_mm, col=colsLoco[rodFull$Locomotor_use], pch=19, xlab="log Body length", ylab="log Tail length" ); legend("bottomright",levels(rodFull$Locomotor_use) , pch=19, col=colsLoco, cex=cexes)
+  plot(rodFull$Tl_mm~rodFull$Bl_mm, col=colsLoco[rodFull$Locomotor_use], pch=19, xlab="log Body length", ylab="log Tail length" ); legend("bottomright",levels(rodFull$Locomotor_use) , pch=19, col=colsLoco, cex=cexes,  ncol=2, y.intersp = yInter, text.width = textwidth)
   
   mtext("Rodents", adj=adjs, line=2, cex = 1)
 
@@ -472,7 +482,6 @@ plot(mars$Wt_Av_M,mars$Tl_Av_M, col="red", pch=19);points(mars$Wt_Av_F,mars$Tl_A
 
 ```{r}
 
-#Tail vs body length
   ##Marsupials
   
   
@@ -482,21 +491,22 @@ plot(mars$Wt_Av_M,mars$Tl_Av_M, col="red", pch=19);points(mars$Wt_Av_F,mars$Tl_A
     colsOrderR=brewer.pal(n=length(levels(rodFull$Order)), name="Dark2")
     cexes<-0.6
     adjs=-0.3
+    x.intersp=1
     
     #4 panels, with margins of 2 lines
     par(mfrow=c(2,2), mar = c(4,4,4,4))
   
-  plot(mars$Tl_mm~mars$Wt_g, col=colsOrderM[mars$Order], pch=19, xlab="log Body length", ylab="log Tail length" );legend("bottomright", c("Dasyuromorph" ,  "Diprotodontian", "Peramelemorph"), pch=19, col=colsOrderM, cex=cexes); #text(mars$Tl_mm~mars$Wt_g, labels=mars$Species, cex=0.5)
+  plot(mars$Tl_mm~mars$Wt_g, col=colsOrderM[mars$Order], pch=19, xlab="log Body mass", ylab="log Tail length" );legend("bottomright", c("Dasyuromorph" ,  "Diprotodontian", "Peramelemorph"), pch=19, col=colsOrderM, cex=cexes); #text(mars$Tl_mm~mars$Wt_g, labels=mars$Species, cex=0.5)
   
-  plot(mars$Tl_mm~mars$Wt_g, col=colsLoco[mars$Locomotor_use], pch=19, xlab="log Body length", ylab="log Tail length" ); legend("bottomright",levels(mars$Locomotor_use) , pch=19, col=colsLoco, cex=cexes)
+  plot(mars$Tl_mm~mars$Wt_g, col=colsLoco[mars$Locomotor_use], pch=19, xlab="log Body mass", ylab="log Tail mass" ); legend("bottomright",levels(mars$Locomotor_use) , pch=19, col=colsLoco, cex=cexes)
   
   mtext("Marsupials", adj=adjs,side=3, line=2, cex=1)
   
   ##Rodents
   
-  plot(rodFull$Tl_mm~rodFull$Wt_g, col=colsOrderR[rodFull$Order], pch=19, xlab="log Body length", ylab="log Tail length" );legend("bottomright", c("Murine" ,  "Rattus"), pch=19, col=colsOrderR, cex=cexes); #text(rodFull$Tl_mm~rodFull$Wt_g, labels=rodFull$Species, cex=cexes)
+  plot(rodFull$Tl_mm~rodFull$Wt_g, col=colsOrderR[rodFull$Order], pch=19, xlab="log Body mass", ylab="log Tail length" );legend("bottomright", c("Murine" ,  "Rattus"), pch=19, col=colsOrderR, cex=cexes); #text(rodFull$Tl_mm~rodFull$Wt_g, labels=rodFull$Species, cex=cexes)
   
-  plot(rodFull$Tl_mm~rodFull$Wt_g, col=colsLoco[rodFull$Locomotor_use], pch=19, xlab="log Body length", ylab="log Tail length" ); legend("bottomright",levels(rodFull$Locomotor_use) , pch=19, col=colsLoco, cex=cexes)
+  plot(rodFull$Tl_mm~rodFull$Wt_g, col=colsLoco[rodFull$Locomotor_use], pch=19, xlab="log Body mass", ylab="log Tail length" ); legend("bottomright",levels(rodFull$Locomotor_use) , pch=19, col=colsLoco, cex=cexes)
   
   mtext("Rodents", adj=adjs, line=2, cex = 1)
 
