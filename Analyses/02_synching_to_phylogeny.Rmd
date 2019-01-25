@@ -38,63 +38,26 @@ logdata[,2:(ncol(numcols)+1)]=numcols_log10
 
 #partition datasets; this cannot be automated easily so need to check for accuracy by looking at dataset
 
-mars=logdata[1:146,]
-rownames(mars)=mars$Species
 #exclude wombats who are outliers using grep (which returns the number of the row that has the species name)
-mars=mars[-((grep("Vombatus_ursinus", mars$Species)):(grep("Lasiorhinus_latifrons", mars$Species))),]
+Data=Data[-((grep("Vombatus_ursinus", Data$Species)):(grep("Lasiorhinus_latifrons", Data$Species))),]
 
-rod=logdata[147:210,]
-rownames(rod)=rod$Species
 
 #deleting all entries that have NAs in their main data and locomotor use; this means some species don't have weight data. There is also one specie of rodent deleted because of lack of 
-mars=mars[-which(is.na( mars$Tl_mm)) ,]
-mars=mars[-which(is.na(mars$Locomotor_use)),]
+Data=Data[-which(is.na( Data$Tl_mm)) ,]
+Data=Data[-which(is.na(Data$Locomotor_use)),]
 
-rod=rod[-which(is.na(rod$Tl_mm)),]
-rod=rod[-which(is.na(rod$Locomotor_use)),]
 
-#drop unused "Rattus" level from mars
 
-mars$Order<-  droplevels(mars$Order, exclude="Rattus")
+#drop unused "Rattus" level from Data
+
+Data$Order<-  droplevels(Data$Order, exclude="Rattus")
 
 ```
 
 #import and process trees
 
 ```{r}
-#marsupial tree 
-marsTree=read.nexus("../Data/MayCollando_Marsupial_tree.nex")
-
-#The rodent tree needs some processing from the file supplied by the publication 
-rodTree_raw=read.nexus("../Data/Smissen_Rowe_2018_Rodent_Tree.nex")
-
-
-#remove catalogue numbers
-rodTree=rodTree_raw
-
-split_tips=list()
-new_tips=list()
-tips_for_processing=rodTree$tip.label; 
-
-for (i in 1:length(tips_for_processing)){
-  
-  split_tips[i]=strsplit(tips_for_processing[i], "_")
-  
-  new_tips[i]=paste (split_tips[[i]][1],split_tips[[i]][2], sep="_" )
-}
-
-newtips=unlist(new_tips)
-
-#replace old tip labels with new ones
-rodTree$tip.label=newtips
-
-#remove duplicate species names from tree
-rodTree=drop.tip(rodTree, which(duplicated(rodTree$tip.label)))
-
-#find typo positions, fix
-rodTree$tip.label[grep("Notomys_mithcellii", rodTree$tip.label)]="Notomys_mitchellii"
-rodTree$tip.label[grep("Conilurus_pencillatus", rodTree$tip.label)]=c("Conilurus_penicillatus")
-
+Tree=read.nexus("../Data/MayCollando_Marsupial_tree.nex")
 
 
 ```
@@ -102,20 +65,14 @@ rodTree$tip.label[grep("Conilurus_pencillatus", rodTree$tip.label)]=c("Conilurus
 
 # Synchronize trees and species by reducing tree to the data available; this has been checked for typos taht cause non-matches (fixed above in the code containing grep). The below culls species that are not in the tree from the data, and species that are not in the data from the tree.
 ```{r}
-#Marsupials: 138 species left; no data that are not present in tree
+#138 species left; no data that are not present in tree
+
+namecheck=name.check(Tree,Data)
+Tree_synch=drop.tip(Tree,namecheck$tree_not_data)
+Data_synch= Data[-which(rownames(Data) %in% namecheck$data_not_tree),]
+name.check(Tree_synch,Data_synch)
 
 
-namecheck=name.check(marsTree,mars)
-marsTree_synch=drop.tip(marsTree,namecheck$tree_not_data)
-mars_synch= mars[-which(rownames(mars) %in% namecheck$data_not_tree),]
-name.check(marsTree_synch,mars_synch)
-
-#Rodents: 
-namecheck=name.check(rodTree, rod)
-rodTree_synch=drop.tip(rodTree,namecheck$tree_not_data)
-#in rodents there are also a few species that are not in the phylogeny, unfortunately:
-rod_synch=rod[-which(rownames(rod) %in% namecheck$data_not_tree), ] 
-name.check(rodTree_synch,rod_synch)
 
 ```
 #process trees for the major marsupial orders as well
@@ -135,15 +92,11 @@ peram_tree=drop.tip(marsTree_synch, name.check(marsTree_synch,peram_data)$tree_n
 dip_data=mars[which(mars_synch$Order =="Diprotodontian"),]
 dip_tree=drop.tip(marsTree_synch, name.check(marsTree_synch,dip_data)$tree_not_data )
 
-#Murines
-murine_data=rod[which(rod$Order =="Murine"),]
-murine_tree=drop.tip(rodTree_synch, name.check(rodTree_synch,murine_data)$tree_not_data) 
 
-#not sufficient resolution for Rattus
 
 ```
 
-#Processing data for partitions with m/f data available (assuming if m present, f is also present; but some species don't have male/female averages so they get deleted). This is only possible in marsupials, there are only 6 rodent species with m/f data and phylogenetic informatoin
+#Processing data for partitions with m/f data available (assuming if m present, f is also present; but some species don't have male/female averages so they get deleted). 
 ```{r}
 mf_mars=mars_synch[which(mars_synch$Tl_Av_F !="NA"),]
 mf_mars=mf_mars[which(mf_mars$Wt_Av_F !="NA"),]
@@ -160,14 +113,11 @@ mf_marstree=drop.tip(marsTree_synch, name.check(marsTree_synch,mf_mars)$tree_not
 ```{r}
 
 #putting all outputs and the initial input ("Full" datasets) into one RDA 
-rodFull<-rod
 marsFull<-mars
-rod<-rod_synch
 mars<-mars_synch
 marsTree<-marsTree_synch
-rodTree<-rodTree_synch
 
-save(marsFull,rodFull,mars,rod,marsTree, rodTree, dasy_data, dasy_tree,peram_data, peram_tree,dip_data,dip_tree,murine_data,murine_tree, mf_mars, mf_rod,mf_marstree, mf_rodtree, file = "../Data/Processed_Data_for_Pgls.rda")
+save(marsFull,mars,marsTree, dasy_data, dasy_tree,peram_data, peram_tree,dip_data,dip_tree, mf_mars,mf_marstree, file = "../Data/Processed_Data_for_Pgls.rda")
 
 #save(marsFull,mars,marsTree, dasy_data, dasy_tree,peram_data, peram_tree,dip_data,dip_tree, mf_mars, mf_marstree,  file = "../Data/Processed_Data_for_Pgls.rda")
 
