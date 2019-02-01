@@ -92,7 +92,7 @@ for (i in 1:length(data$Species)){
     
 }
 
-#now re-process data_processed to fill NAs in the main values, first by av eraging male/female values, second (if sex averages are not available) by averaging sex-less min/max values. This overwrites the first pass summary version of data_processed with the second pass summary version
+#now re-process data_processed to fill NAs in the main values, first by averaging male/female values, second (if sex averages are not available) by averaging sex-less min/max values. This overwrites the first pass summary version of data_processed with the second pass summary version
 
 for (i in 1:(nrow(data_processed))){
   
@@ -130,6 +130,9 @@ for (i in 1:(nrow(data_processed))){
       data_processed$Tl_mm[i]<-mean(c(data_processed$Tl_max[i], data_processed$Tl_min[i]))
       }  
 }
+
+#clean up environment
+remove(i)
 
 #Write the csv; row.names need to be FALSE because otherwise it saves with an extra column of numbers
 write.csv(data_processed, file="../Data/Full_dataset.csv", row.names=FALSE)
