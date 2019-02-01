@@ -77,9 +77,9 @@ Dendrolagus_lumholtzi,,,,,,,,,,,,,,,,,,,,,,,,,,,,Pentapedal,Rainforest,Diprotodo
 Gymnobelideus_leadbeateri,160,172,127.5,150,170,145,180,100,166,,,,,,,,,,,,,,,,,,,Prehensile,Forest_shrub,Diprotodontian
 Hemibelideus_lemuroides,,,,,,,,,,315,360,313,400,314,384,230,384,810,1080,850,1170,344,342,346,352,926,1023,Prehensile,Rainforest,Diprotodontian
 Hypsiprymnodon_moschatus,,,,,,,,,,153,273,212,252,132,159,123,153,360,680,453,635,230,233,145,140,529,511,Saltatorial,Rainforest,Diprotodontian
-Lagorchestes_conspicillatus,,,,390,490,370,530,1600,4750,,,,,,,,,,,,,,,,,,,NA,Arid_open,Diprotodontian
-Lagorchestes_hirsutus,,,,,,,,,,310,360,360,390,260,280,245,305,1245,1800,780,1960,330,375,270,275,1580,1740,NA,Arid_open,Diprotodontian
-Lagorchestes_leporides,450,320,,,,,,,,,,,,,,,,,,,,,,,,,,NA,Arid_open,Diprotodontian
+Lagorchestes_conspicillatus,,,,390,490,370,530,1600,4750,,,,,,,,,,,,,,,,,,,Saltatorial,Arid_open,Diprotodontian
+Lagorchestes_hirsutus,,,,,,,,,,310,360,360,390,260,280,245,305,1245,1800,780,1960,330,375,270,275,1580,1740,Saltatorial,Arid_open,Diprotodontian
+Lagorchestes_leporides,450,320,,,,,,,,,,,,,,,,,,,,,,,,,,Saltatorial,Arid_open,Diprotodontian
 Lagostrophus_fasciatus,430,320,1600,400,450,230,360,1000,2300,,,,,,,,,,,,,,,,,,,Saltatorial,Forest_shrub,Diprotodontian
 Lasiorhinus_latifrons,,,,,,,,,,840,1110,850,1100,30,60,25,54,19000,36000,17500,36000,,,,,,,Terrestrial,Arid_open,Diprotodontian
 Macropus_agilis,,,,,,,,,,715,850,593,722,692,840,587,700,16000,27000,9000,15000,800,650,770,640,19000,11000,Pentapedal,Arid_open,Diprotodontian
