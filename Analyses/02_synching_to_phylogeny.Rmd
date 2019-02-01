@@ -39,18 +39,18 @@ logdata[,2:(ncol(numcols)+1)]=numcols_log10
 #partition datasets; this cannot be automated easily so need to check for accuracy by looking at dataset
 
 #exclude wombats who are outliers using grep (which returns the number of the row that has the species name)
-Data=Data[-((grep("Vombatus_ursinus", Data$Species)):(grep("Lasiorhinus_latifrons", Data$Species))),]
+Data=Data[-(c(grep("Vombatus_ursinus", Data$Species),grep("Phascolarctos_cinereus", Data$Species),grep("Lasiorhinus_latifrons", Data$Species))),]
 
 
 #deleting all entries that have NAs in their main data and locomotor use; this means some species don't have weight data. There is also one specie of rodent deleted because of lack of 
 Data=Data[-which(is.na( Data$Tl_mm)) ,]
 Data=Data[-which(is.na(Data$Locomotor_use)),]
 
+#make sure the species names are in teh reows
+
+rownames(Data)<-Data$Species
 
 
-#drop unused "Rattus" level from Data
-
-Data$Order<-  droplevels(Data$Order, exclude="Rattus")
 
 ```
 
@@ -65,7 +65,7 @@ Tree=read.nexus("../Data/MayCollando_Marsupial_tree.nex")
 
 # Synchronize trees and species by reducing tree to the data available; this has been checked for typos taht cause non-matches (fixed above in the code containing grep). The below culls species that are not in the tree from the data, and species that are not in the data from the tree.
 ```{r}
-#138 species left; no data that are not present in tree
+#134 species left; Several new species not present on tree but each of them are represented as close sister groups
 
 namecheck=name.check(Tree,Data)
 Tree_synch=drop.tip(Tree,namecheck$tree_not_data)
