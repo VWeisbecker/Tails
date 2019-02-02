@@ -53,3 +53,68 @@ as.data.frame(rbind(sapply(data_raw[,2:28], function(x) sum((!is.na(x))/nrow(dat
 rownames(DataQuality)=c("Marsupials", "Rodents")
 
 
+
+#Rodents
+
+##return the min/max values to their un-logged form
+ratio_Tl=c(10^(rodFull$Tl_max)/10^(rodFull$Tl_min))
+ratio_Bl=c(10^(rodFull$Bl_max)/10^(rodFull$Bl_min))
+ratio_Wt=c(10^(rodFull$Wt_max)/10^(rodFull$Wt_min))
+
+##Visualizing means of the ratios 
+boxplot(ratio_Tl, ratio_Bl,ratio_Wt)
+
+ratiosRod=c(ratio_Tl, ratio_Bl, ratio_Wt)
+
+##The VarDist.test code is in utilities. It runs a Kruskal-Wallis test and then a pairwise wilcoxon test on the ratios
+MinMaxtest(ratiosRod,3)
+
+boxplot(ratio_Tl, ratio_Bl,ratio_Wt)
+
+##Is there a difference between Rattus and the old endemics.
+
+ratio_Tl_Rat<-ratio_Tl[ - (grep("Rattus_leucopus", rodFull$Species):grep("Rattus_fuscipes", rodFull$Species))]
+ratio_Bl_Rat<-ratio_Bl[ - (grep("Rattus_leucopus", rodFull$Species):grep("Rattus_fuscipes", rodFull$Species))]
+ratio_Wt_Rat<-ratio_Wt[ - (grep("Rattus_leucopus", rodFull$Species):grep("Rattus_fuscipes", rodFull$Species))]
+
+ratiosRat=c(ratio_Tl_Band, ratio_Bl_Band, ratio_Wt_Band)
+MinMaxtest(ratiosRat,3)
+
+par(mfrow=c(1,2))
+boxplot(ratio_Tl, ratio_Bl,ratio_Wt, xlab="ratios with Rattus")
+boxplot(ratio_Tl_Rat, ratio_Bl_Rat,ratio_Wt_Rat, xlab="ratios without Rattus")
+
+
+
+
+
+
+
+#Rodents:
+
+RodMales<-cbind(rodFull$Tl_Av_M,rodFull$Bl_Av_M,rodFull$Wt_Av_M, rep(1,length(rodFull$Tl_Av_M)))
+RodFemales<-cbind(rodFull$Tl_Av_F,rodFull$Bl_Av_F,rodFull$Wt_Av_F, rep(2,length(rodFull$Tl_Av_F)))
+RodAverages<-cbind(rodFull$Tl_mm, rodFull$Bl_mm,rodFull$Wt_g, rep(3,length(rodFull$Bl_mm)))
+
+RodCombine=rbind(RodMales, RodFemales,RodAverages)
+RodCombine=as.data.frame(RodCombine)
+colnames(RodCombine) <-c("Tl","Bl","Wt","Sex")
+RodCombine$Sex<-as.factor(RodCombine$Sex)
+
+
+##Are there differences in slope of tail length and body lenght/weight according to locomotor use, sex, or averages between sexes?
+###check for appropriate distribution of model residuals
+plot(lm(RodCombine$Tl~RodCombine$Bl*RodCombine$Sex))
+
+summary(aov(lm(RodCombine$Tl~RodCombine$Bl*RodCombine$Sex)))
+
+###No interaction (i.e. slopes are the same), therefore dropping interaction
+summary(aov(lm(RodCombine$Tl~RodCombine$Bl+RodCombine$Sex)))
+
+##Same with body weight
+plot(lm(RodCombine$Tl~RodCombine$Wt*RodCombine$Sex))
+summary(aov(lm(RodCombine$Tl~RodCombine$Wt*RodCombine$Sex)))
+##No interaction (i.e. slopes are the same), therefore dropping interaction
+summary(aov(lm(RodCombine$Tl~RodCombine$Wt+RodCombine$Sex)))
+
+

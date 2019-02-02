@@ -35,39 +35,31 @@ data_raw=read.csv("../Data/raw_data.csv", header=TRUE)
 ```
 
 
-#First, some basic data on the quality of the raw dataset
+#First, some basic data on the quality of the raw dataset: How many percent of the dataset entries are there for each of the entry types?
 
 ```{r}
 
-marsraw=data_raw[1:146,]
-rownames(marsraw)=marsraw$Species
 
-
-rodraw=data_raw[147:210,]
-rownames(rodraw)=rodraw$Species
-
-#How many percent of the dataset entries are there for each of the entry categories?
-
-DataQuality=as.data.frame(rbind(sapply(marsraw[,2:28], function(x) sum((!is.na(x))/nrow(marsraw))*100),sapply(rodraw[,2:28], function(x) sum((!is.na(x)))/nrow(rodraw))*100))
-rownames(DataQuality)=c("Marsupials", "Rodents")
-
+DataQuality=as.data.frame(sapply(data_raw[,2:28], function(x) sum((!is.na(x))/nrow(data_raw))*100))
+colnames(DataQuality)=c ("% in raw dataset")
+  
 ```
 
 #Phylogenetic signal of tail length, head and body length, and body weight
 
 ```{r}
-# There's something wrong with the order of tips and the dataset; reorder using Emma's trick in the brain code
-marsTree$tip.label
-mars$Species
+# Double-checking tip labels and data row names are in the same order
 
+tree$tip.label==rownames(data)
 
-phylosig(marsTree, mars$Tl_mm, method="K", test=FALSE, nsim=1000)
-phylosig(marsTree, mars$Bl_mm, method="K", test=FALSE, nsim=1000)
-phylosig(marsTree, mars$Wt_g, method="K", test=FALSE, nsim=1000)
+#the actual tree lengths result in a singular matrix that can't be decomposed; ultrametricizing the tree helps
+brlentree=compute.brlen(tree)
+brlentree$tip.label==rownames(data)
 
-phylosig(rodTree, rod$Tl_mm, method="K", test=FALSE, nsim=1000)
-phylosig(rodTree, rod$Bl_mm, method="K", test=FALSE, nsim=1000)
-phylosig(rodTree, rod$Wt_g, method="K", test=FALSE, nsim=1000)
+phylosig(brlentree, data$Tl_mm, method = "K", test=TRUE, nsim=1000)
+phylosig(brlentree, data$Bl_mm, method="K", test=FALSE, nsim=1000)
+phylosig(brlentree, data$Wt_g, method="K", test=FALSE, nsim=1000)
+
 
 ```
 
