@@ -65,11 +65,11 @@ Tree=read.nexus("../Data/MayCollando_Marsupial_tree.nex")
 
 # Synchronize trees and species by reducing tree to the data available; this has been checked for typos taht cause non-matches (fixed above in the code containing grep). The below culls species that are not in the tree from the data, and species that are not in the data from the tree.
 ```{r}
-#134 species left; Several new species not present on tree but each of them are represented as close sister groups
+#134 species left; 14 newly identified species not present on tree but each of them are represented as close sister groups
 
 namecheck=name.check(Tree,Data)
-Tree_synch=drop.tip(Tree,namecheck$tree_not_data)
-Data_synch= Data[-which(rownames(Data) %in% namecheck$data_not_tree),]
+tree_synch=drop.tip(Tree,namecheck$tree_not_data)
+data_synch= Data[-which(rownames(Data) %in% namecheck$data_not_tree),]
 name.check(Tree_synch,Data_synch)
 
 
@@ -81,16 +81,16 @@ name.check(Tree_synch,Data_synch)
 ```{r}
 
 #Dasyuromorphs
-dasy_data=mars_synch[which(mars_synch$Order =="Dasyuromorph"),]
-dasy_tree=drop.tip(marsTree_synch, name.check(marsTree_synch,dasy_data)$tree_not_data )
+dasy_data=data_synch[which(data_synch$Order =="Dasyuromorph"),]
+dasy_tree=drop.tip(tree_synch, name.check(tree_synch,dasy_data)$tree_not_data )
 
 #Peramelemorphs
-peram_data=mars[which(mars_synch$Order =="Peramelemorph"),]
-peram_tree=drop.tip(marsTree_synch, name.check(marsTree_synch,peram_data)$tree_not_data )
+peram_data=data_synch[which(data_synch$Order =="Peramelemorph"),]
+peram_tree=drop.tip(tree_synch, name.check(tree_synch,peram_data)$tree_not_data )
 
 #Diprotodontia
-dip_data=mars[which(mars_synch$Order =="Diprotodontian"),]
-dip_tree=drop.tip(marsTree_synch, name.check(marsTree_synch,dip_data)$tree_not_data )
+dip_data=data_synch[which(data_synch$Order =="Diprotodontian"),]
+dip_tree=drop.tip(tree_synch, name.check(tree_synch,dip_data)$tree_not_data )
 
 
 
@@ -98,10 +98,10 @@ dip_tree=drop.tip(marsTree_synch, name.check(marsTree_synch,dip_data)$tree_not_d
 
 #Processing data for partitions with m/f data available (assuming if m present, f is also present; but some species don't have male/female averages so they get deleted). 
 ```{r}
-mf_mars=mars_synch[which(mars_synch$Tl_Av_F !="NA"),]
-mf_mars=mf_mars[which(mf_mars$Wt_Av_F !="NA"),]
+mf_data=data_synch[which(data_synch$Tl_Av_F !="NA"),]
+mf_data=mf_data[which(mf_data$Wt_Av_F !="NA"),]
 #this will give an error if name.check is OK - or at least I only encountered this error if this was the case
-mf_marstree=drop.tip(marsTree_synch, name.check(marsTree_synch,mf_mars)$tree_not_data )
+mf_datatree=drop.tip(tree_synch, name.check(tree_synch,mf_data)$tree_not_data )
 
 
 
@@ -113,11 +113,11 @@ mf_marstree=drop.tip(marsTree_synch, name.check(marsTree_synch,mf_mars)$tree_not
 ```{r}
 
 #putting all outputs and the initial input ("Full" datasets) into one RDA 
-marsFull<-mars
-mars<-mars_synch
-marsTree<-marsTree_synch
+dataFull<-data
+data<-data_synch
+tree<-tree_synch
 
-save(marsFull,mars,marsTree, dasy_data, dasy_tree,peram_data, peram_tree,dip_data,dip_tree, mf_mars,mf_marstree, file = "../Data/Processed_Data_for_Pgls.rda")
+save(dataFull,data,tree, dasy_data, dasy_tree,peram_data, peram_tree,dip_data,dip_tree, mf_data,mf_datatree, file = "../Data/Processed_Data_for_Pgls.rda")
 
 #save(marsFull,mars,marsTree, dasy_data, dasy_tree,peram_data, peram_tree,dip_data,dip_tree, mf_mars, mf_marstree,  file = "../Data/Processed_Data_for_Pgls.rda")
 

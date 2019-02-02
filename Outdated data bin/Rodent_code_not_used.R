@@ -47,3 +47,9 @@ murine_tree=drop.tip(rodTree_synch, name.check(rodTree_synch,murine_data)$tree_n
 #not sufficient resolution for Rattus
 
 
+
+#in analyses file ot make table of two rows of data quality
+as.data.frame(rbind(sapply(data_raw[,2:28], function(x) sum((!is.na(x))/nrow(data_raw))*100),sapply(rodraw[,2:28], function(x) sum((!is.na(x)))/nrow(rodraw))*100))
+rownames(DataQuality)=c("Marsupials", "Rodents")
+
+
