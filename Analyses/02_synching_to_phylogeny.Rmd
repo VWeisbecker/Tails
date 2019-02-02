@@ -16,12 +16,12 @@ library(geiger)
 #prepare data and trees; this includes deleting entries with NAS in the main averages
 ```{r}
 # The data, partition between marsupials and rodents
-Data=read.csv("../Data/Full_dataset.csv")
+data=read.csv("../data/Full_dataset.csv")
 
 #log10 transform all numerical data
 
 #extract numerical columns
-numcols=as.data.frame(Data[,2:28])
+numcols=as.data.frame(data[,2:28])
 
 #turn NAs into 1 so they turn into easily replaceable zeroes without messing with the logging
 numcols[is.na(numcols)]<-1
@@ -33,45 +33,48 @@ numcols_log10=log10(numcols)
 numcols_log10[numcols_log10==0]<-NA
 
 #replace original data with logged data. +1 because 2:34 is 33. I wish I knew a less pedestrian way of doing this...
-logdata=Data
-logdata[,2:(ncol(numcols)+1)]=numcols_log10
+
+data[,2:(ncol(numcols)+1)]=numcols_log10
 
 #partition datasets; this cannot be automated easily so need to check for accuracy by looking at dataset
 
-#exclude wombats who are outliers using grep (which returns the number of the row that has the species name)
-Data=Data[-(c(grep("Vombatus_ursinus", Data$Species),grep("Phascolarctos_cinereus", Data$Species),grep("Lasiorhinus_latifrons", Data$Species))),]
+#exclude wombats,koalas and marsupial moles who are outliers using grep (which returns the number of the row that has the species name). These are interesting and need to be discussed, but result in low model fits so that they are taken out
+
+data=data[-(c(grep("Vombatus_ursinus", data$Species),grep("Phascolarctos_cinereus", data$Species),grep("Lasiorhinus_latifrons", data$Species), grep("Notoryctes_typhlops", data$Species), grep("Notoryctes_caurinus", data$Species))),]
 
 
 #deleting all entries that have NAs in their main data and locomotor use; this means some species don't have weight data. There is also one specie of rodent deleted because of lack of 
-Data=Data[-which(is.na( Data$Tl_mm)) ,]
-Data=Data[-which(is.na(Data$Locomotor_use)),]
+data=data[-which(is.na( data$Tl_mm)) ,]
+data=data[-which(is.na(data$Locomotor_use)),]
 
 #make sure the species names are in teh reows
 
-rownames(Data)<-Data$Species
+rownames(data)<-data$Species
 
-
-
-```
-
-#import and process trees
-
-```{r}
-Tree=read.nexus("../Data/MayCollando_Marsupial_tree.nex")
+#running this in rmd I get an error message, but it does not seem to impact on the output
 
 
 ```
 
 
-# Synchronize trees and species by reducing tree to the data available; this has been checked for typos taht cause non-matches (fixed above in the code containing grep). The below culls species that are not in the tree from the data, and species that are not in the data from the tree.
+#import and process tree; sSynchronize trees and species by reducing tree to the data available; this has been checked for typos taht cause non-matches (fixed above in the code containing grep). The below culls species that are not in the tree from the data, and species that are not in the data from the tree.
 ```{r}
 #134 species left; 14 newly identified species not present on tree but each of them are represented as close sister groups
+tree=read.nexus("../Data/MayCollando_Marsupial_tree.nex")
+namecheck=name.check(tree,data)
+tree_synch=drop.tip(tree,namecheck$tree_not_data)
+data_synch= data[-which(rownames(data) %in% namecheck$data_not_tree),]
+name.check(tree_synch,data_synch)
 
-namecheck=name.check(Tree,Data)
-tree_synch=drop.tip(Tree,namecheck$tree_not_data)
-data_synch= Data[-which(rownames(Data) %in% namecheck$data_not_tree),]
-name.check(Tree_synch,Data_synch)
+#matching the order of tip labels to the tree
 
+
+match(tree_synch$tip.label,data_synch$Species)
+
+data_synch <-data_synch [,][match(tree_synch$tip.label,data_synch$Species),]
+
+#Check that the re-ordering works
+tree_synch$tip.label==data_synch$Species
 
 
 ```
@@ -112,13 +115,14 @@ mf_datatree=drop.tip(tree_synch, name.check(tree_synch,mf_data)$tree_not_data )
 
 ```{r}
 
-#putting all outputs and the initial input ("Full" datasets) into one RDA 
+#putting all outputs and the initial processed input (dataFull) into one RDA 
 dataFull<-data
 data<-data_synch
 tree<-tree_synch
 
 save(dataFull,data,tree, dasy_data, dasy_tree,peram_data, peram_tree,dip_data,dip_tree, mf_data,mf_datatree, file = "../Data/Processed_Data_for_Pgls.rda")
 
-#save(marsFull,mars,marsTree, dasy_data, dasy_tree,peram_data, peram_tree,dip_data,dip_tree, mf_mars, mf_marstree,  file = "../Data/Processed_Data_for_Pgls.rda")
+#clean up environemtn
+remove(data_synch,tree_synch)
 
 ```

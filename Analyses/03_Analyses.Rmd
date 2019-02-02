@@ -199,11 +199,12 @@ phylosig(tree, data$Wt_g, method="lambda", nsim=1000)
       
 ```
 
-# Aside from the association between body length and tail length,does locomotor mode play a role? Note: sing the smaller, m/f specific datasets is not possible with interactions, so if interactions are found it seems inappropriate to run them
+# Aside from the association between body length and tail length,does locomotor mode play a role? Note: using the smaller, m/f specific datasets is not possible with interactions, so if interactions are found it seems inappropriate to run them
 
+#The below is for tail length vs. body length
 ```{r}
 
-#Tail vs body length
+#There are strong interactions between locomotor mode
 
 TB=find.best.model(Tl_mm~Bl_mm*Locomotor_use,tree,data);TB$AIC_Weights
 
@@ -213,12 +214,39 @@ qqnorm (TB$Models$Brownian)
 ###look at the model summary of the most likely model: there are significant interactions 
 anova(TB$Models$Brownian)
 
-#It is not possible to do post-hoc test in the pgls framework, so instead looking for interactions in the non-phylogenetically corrected lm analysis and using testInteractions from the phia package. Also refer to the plot.
+#It is not possible to do post-hoc test in the pgls framework, so instead looking for interactions in the non-phylogenetically corrected lm analysis and using testInteractions from the phia package. Also refer to the plot. 
 
 TB_lm <- lm(Tl_mm~Bl_mm*Locomotor_use, data=data)
 testInteractions(TB_lm, adjustment="holm")
+```
 
-#Arboreal and prehensile species have different slopes to terrestrial, but not scansorial or pentapedal species. Ecologically this makes sense, so conducting a follow-up analysis separating arboreal and prehensile from the remainder.
+#Arboreal species (mostly possums) scale differently to terrestrial species (mostly dasyurids and peramelids), but not scansorial (mostly dasyurid) or pentapedal (large macropod) species.This is possibly due to the strong phylogenetic signal of locomotion; however, fitting a model that uses phylogenetic distinctions does not result in significant interactions between major clade (order or diprotodontian family):
+
+```{r}
+
+TB=find.best.model(Tl_mm~Bl_mm*Order,tree,data);TB$AIC_Weights
+
+#check if the residuals of the model are OK; the fit is quite good
+qqnorm (TB$Models$Brownian)
+
+###look at the model summary of the most likely model: there are significant interactions 
+anova(TB$Models$Brownian)
+
+#It is not possible to do post-hoc test in the pgls framework, so instead looking for interactions in the non-phylogenetically corrected lm analysis and using testInteractions from the phia package. Also refer to the plot.
+
+TB_lm <- lm(Tl_mm~Bl_mm*Order, data=data)
+testInteractions(TB_lm, adjustment="holm")
+
+#Arboreal species have different slopes to terrestrial species. Ecologically this makes sense, so conducting a follow-up analysis separating arboreal and prehensile from the remainder.
+
+Arb_Prehens=data[which(data$Locomotor_use =="Arboreal"),]
+
+Arb_Prehenstree=drop.tip(tree, name.check(tree,Arb_Prehens)$tree_not_data )
+
+plot(Arb_Prehenstree)
+
+```
+
 
 
 
@@ -226,6 +254,8 @@ testInteractions(TB_lm, adjustment="holm")
 
 
 ##Tail vs body WEIGHT
+
+```{r}
 TW=find.best.model(Tl_mm~Wt_g*Locomotor_use,tree,data);TW$AIC_Weights
 anova(TW$Model_summaries$corBrownian, type="marginal")  
 
