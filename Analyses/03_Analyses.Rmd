@@ -158,7 +158,7 @@ phylosig(tree, data$Wt_g, method="lambda", nsim=1000)
   
   ##Tail vs. body length: Significant and very high correlation coefficient (0.87)
   TB=find.best.model(Tl_mm~Bl_mm,tree,data);TB$AIC_Weights
-  #Checking appropriate distribution of model residuals; , this is using qqnorm.gls from the nlme package. They mostly fall on a line with just a few oddballs, particularly Notoryctes; but they seem relevant to retain as possible variation, so leaving them in.    
+  #Checking appropriate distribution of model residuals; , this is using qqnorm.gls from the nlme package. They mostly fall on a line    
   qqnorm (TB$Models$Brownian)      
   TB$Model_summaries$Brownian$tTable
 
@@ -220,7 +220,7 @@ TB_lm <- lm(Tl_mm~Bl_mm*Locomotor_use, data=data)
 testInteractions(TB_lm, adjustment="holm")
 ```
 
-#Arboreal species (mostly possums) scale differently to terrestrial species (mostly dasyurids and peramelids), but not scansorial (mostly dasyurid) or pentapedal (large macropod) species.This is possibly due to the strong phylogenetic signal of locomotion; however, fitting a model that uses phylogenetic distinctions does not result in significant interactions between major clade (order or diprotodontian family):
+#Arboreal species (mostly possums) scale differently to terrestrial species (mostly dasyurids and peramelids), but not scansorial (mostly dasyurid) or pentapedal (large macropod) species.This could be due to the strong phylogenetic signal of locomotion; however, fitting a model that uses phylogenetic distinctions does not result in significant interactions between major clade (order or diprotodontian family):
 
 ```{r}
 
@@ -232,24 +232,44 @@ qqnorm (TB$Models$Brownian)
 ###look at the model summary of the most likely model: there are significant interactions 
 anova(TB$Models$Brownian)
 
-#It is not possible to do post-hoc test in the pgls framework, so instead looking for interactions in the non-phylogenetically corrected lm analysis and using testInteractions from the phia package. Also refer to the plot.
+#a post-hoc test of the uncorrected lm model also suggests no differences in scaling slope:
 
-TB_lm <- lm(Tl_mm~Bl_mm*Order, data=data)
-testInteractions(TB_lm, adjustment="holm")
-
-#Arboreal species have different slopes to terrestrial species. Ecologically this makes sense, so conducting a follow-up analysis separating arboreal and prehensile from the remainder.
-
-Arb_Prehens=data[which(data$Locomotor_use =="Arboreal"),]
-
-Arb_Prehenstree=drop.tip(tree, name.check(tree,Arb_Prehens)$tree_not_data )
-
-plot(Arb_Prehenstree)
+anova(TB_lm <- lm(Tl_mm~Bl_mm*Order, data=data))
 
 ```
 
+#To look for differences in means, which may also contribute to differences in relative tail length between locomotor modes, we separate arboreal and pentapedal species to look at just saltators, scansorial, and terrestrial species. This shows that non-pentapedal, non-arboreal marsupials - even if including bounding but not pentapedal kangaroos - share the same scaling slope AND intercept!
 
+```{r}
 
+#prepare tree
+NonArbPent=data[c(which(data$Locomotor_use =="Terrestrial"), which ( data$Locomotor_use =="Scansorial"), which(data$Locomotor_use =="Saltatorial")),]
 
+NonArbPentTree=drop.tip(tree, name.check(tree,NonArbPent)$tree_not_data )
+
+#The tree contains dasyurids and peramelids, and non-pentapedal macropods but few possums
+plot(NonArbPentTree)
+
+#model
+
+TBNAP=find.best.model(Tl_mm~Bl_mm*Locomotor_use,NonArbPentTree,NonArbPent);TBNAP$AIC_Weights
+
+#check if the residuals of the model are OK; the fit is ok with some spread at the ends of the distribution
+qqnorm (TBNAP$Models$Brownian)
+
+###look at the model summary of the most likely model; there are no significant interactions
+anova(TBNAP$Models$Brownian)
+
+#Testing without interactions
+TBNAPNoInter=find.best.model(Tl_mm~Bl_mm+Locomotor_use,NonArbPentTree,NonArbPent);TBNAPNoInter$AIC_Weights
+
+#this is quite good and seems to fit the data better than the model with interaction
+qqnorm (TBNAPNoInter$Models$Brownian)
+
+###No differences in intercept!!
+anova(TBNAPNoInter$Models$Brownian)
+
+```
 
 
 
