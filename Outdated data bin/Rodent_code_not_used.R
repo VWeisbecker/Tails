@@ -118,3 +118,34 @@ summary(aov(lm(RodCombine$Tl~RodCombine$Wt*RodCombine$Sex)))
 summary(aov(lm(RodCombine$Tl~RodCombine$Wt+RodCombine$Sex)))
 
 
+
+
+#Rodents with Rattus
+
+rodTBW=find.best.model(Tl_mm~Bl_mm*Wt_g,rodTree,rod);rodTW$AIC_Weights
+#Checking appropriate distribution of model residuals
+qqnorm (rodTBW$Models$Brownian)
+anova(rodTBW$Models$Brownian)
+
+###dropping the interaction 
+rodTBWNoInter=find.best.model(Tl_mm~Bl_mm+Wt_g,rodTree,rod);rodTW$AIC_Weights
+#Checking appropriate distribution of model residuals; this one is not ideal
+qqnorm (rodTBWNoInter$Models$Brownian_GrafScale)
+#significant but with small effect size
+anova(rodTBWNoInter$Models$Brownian_GrafScale, type="marginal")
+
+#Rodents without Rattus
+
+MurTBW=find.best.model(Tl_mm~Bl_mm*Wt_g,murine_tree,murine_data);MurTW$AIC_Weights
+#Checking appropriate distribution of model residuals
+qqnorm (MurTBW$Models$Brownian_GrafScale)
+anova(MurTBW$Models$Brownian_GrafScale, type="marginal")
+
+###dropping the interaction 
+MurTBWNoInter=find.best.model(Tl_mm~Bl_mm+Wt_g,murine_tree,murine_data);MurTW$AIC_Weights
+#Checking appropriate distribution of model residuals; this one is not ideal
+qqnorm (MurTBWNoInter$Models$Brownian_GrafScale)
+#significant but with small effect size; but higher level of significance without Rattus
+anova(MurTBWNoInter$Models$Brownian_GrafScale, type="marginal")
+
+

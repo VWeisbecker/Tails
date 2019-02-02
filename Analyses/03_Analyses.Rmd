@@ -152,6 +152,45 @@ phylosig(tree, data$Wt_g, method="lambda", nsim=1000)
    
 ```
 
+#Plotting according to tail use, locomotor mode, and phylogeny - weight and length are very similar, so I suspect one can be taken out in the end.
+
+```{r}
+
+  
+# initial setup: colours and margins
+  colsOrderM=brewer.pal(n=length(levels(data$Order)), name="Dark2")
+  colsLoco=brewer.pal(n=length(levels(data$Locomotor_use)), name="Dark2")
+  ##Size of points
+  cexes <- 1
+  ## this adjusts the titles of the double panel
+  adjs <- -0.3
+  ## spaces to the left of text
+  xinter <- 0.2
+  ## spaces between legend lines
+  yInter <- 0.25
+  ##size of the box is determined by text width
+  textwidth <- 0.2
+  ##insets the box a bit
+  inset <- 0.01
+  
+    
+    ##4 panels, with margins of 2 lines
+    par(mfrow=c(2,2), mar = c(4,4,4,4))
+  
+plot(data$Tl_mm~data$Bl_mm, col=colsOrderM[data$Order], pch=19, xlab="log Body length", ylab="log Tail length") ;legend("bottomright", c("Dasyuromorph" ,  "Macropod", "Peramelemorph", "Possum"),inset=inset, pch=19, col=colsOrderM, cex=cexes,y.intersp = yInter, x.intersp = xinter,text.width = textwidth+0.1, bty="n" ); text(data$Tl_mm~data$Bl_mm, labels=data$Species, cex=0.5)
+  
+  plot(data$Tl_mm~data$Bl_mm, col=colsLoco[data$Locomotor_use], pch=19, xlab="log Body length", ylab="log Tail length" ); legend("bottomright",inset=inset,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n");text(data$Tl_mm~data$Bl_mm, labels=data$Species, cex=0.5)
+  
+plot(data$Tl_mm~data$Wt_g, col=colsOrderM[data$Order], pch=19, xlab="log Weight (g)", ylab="log Tail length") ;legend("bottomright", c("Dasyuromorph" ,  "Diprotodontian", "Peramelemorph"),inset=inset, pch=19, col=colsOrderM, cex=cexes,y.intersp = yInter, x.intersp = xinter,text.width = textwidth+0.1, bty="n" ); #text(data$Tl_mm~data$Wt_g, labels=data$Species, cex=0.5)
+  
+  plot(data$Tl_mm~data$Wt_g, col=colsLoco[data$Locomotor_use], pch=19, xlab="log Weight (g)", ylab="log Tail length" ); legend("bottomright",inset=inset,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n")
+  
+
+
+```
+
+
+
 # How do tail lengths scale with body length and weight? Which predicts Tail length better? The find. best.model code finds the best fitting tree branch and phylogenetic correlation matrix for each model and allows to run an anova on just that.For details, see utilities.
 
 ```{r}
@@ -199,9 +238,9 @@ phylosig(tree, data$Wt_g, method="lambda", nsim=1000)
       
 ```
 
-# Aside from the association between body length and tail length,does locomotor mode play a role? Note: using the smaller, m/f specific datasets is not possible with interactions, so if interactions are found it seems inappropriate to run them
+# Aside from the association between body length and tail length,does locomotor mode play a role? 
 
-#The below is for tail length vs. body length
+
 ```{r}
 
 #There are strong interactions between locomotor mode
@@ -209,7 +248,7 @@ phylosig(tree, data$Wt_g, method="lambda", nsim=1000)
 TB=find.best.model(Tl_mm~Bl_mm*Locomotor_use,tree,data);TB$AIC_Weights
 
 #check if the residuals of the model are OK; the fit is quite good
-qqnorm (TB$Models$Brownian)
+#qqnorm (TB$Models$Brownian)
 
 ###look at the model summary of the most likely model: there are significant interactions 
 anova(TB$Models$Brownian)
@@ -219,15 +258,38 @@ anova(TB$Models$Brownian)
 TB_lm <- lm(Tl_mm~Bl_mm*Locomotor_use, data=data)
 testInteractions(TB_lm, adjustment="holm")
 ```
+#This pattern is not driven by the anomalies in Peramelemorpha and the genus Macropus?
+```{r}
+which(data$Species=="Macropus_robustus")
+which (data$Species=="Macropus_giganteus")
 
-#Arboreal species (mostly possums) scale differently to terrestrial species (mostly dasyurids and peramelids), but not scansorial (mostly dasyurid) or pentapedal (large macropod) species.This could be due to the strong phylogenetic signal of locomotion; however, fitting a model that uses phylogenetic distinctions does not result in significant interactions between major clade (order or diprotodontian family):
+NoPerams_Roos=data[-c(which(data$Order =="Peramelemorph"), 25:36), ]
+
+NoPerams_RoosTree=drop.tip(tree, name.check(tree,NoPerams_Roos)$tree_not_data )
+
+#The tree contains dasyurids and peramelids, and non-pentapedal macropods but few possums
+plot(NoPerams_RoosTree)
+
+#Testing without interactions
+TBNPR=find.best.model(Tl_mm~Bl_mm*Locomotor_use,NoPerams_RoosTree,NoPerams_Roos);TBNPR$AIC_Weights
+
+#this is quite good and seems to fit the data better than the model with interaction
+#qqnorm (TBNAPNoInter$Models$Brownian)
+
+###Still a significant interaction between locomotor uses
+anova(TBNPR$Models$Brownian, type="marginal")
+
+
+```
+
+#Arboreal species (mostly possums) scale differently to terrestrial species (mostly dasyurids and peramelids), but not scansorial (mostly dasyurid) or pentapedal (large macropod) species. This makes sense because pentapedal and arobreal species use their tail heavily in locomotion. This, and the fact that there are two instances each of arboreal and pentapedal locomotion in a significant interaction, suggests to us that it is these two that are differend from the rest.  However, it could be due to the strong phylogenetic signal of locomotion. Fitting a model that uses phylogenetic distinctions does not result in significant interactions between major clade (order or diprotodontian family):
 
 ```{r}
 
 TB=find.best.model(Tl_mm~Bl_mm*Order,tree,data);TB$AIC_Weights
 
 #check if the residuals of the model are OK; the fit is quite good
-qqnorm (TB$Models$Brownian)
+#qqnorm (TB$Models$Brownian)
 
 ###look at the model summary of the most likely model: there are significant interactions 
 anova(TB$Models$Brownian)
@@ -238,7 +300,7 @@ anova(TB_lm <- lm(Tl_mm~Bl_mm*Order, data=data))
 
 ```
 
-#To look for differences in means, which may also contribute to differences in relative tail length between locomotor modes, we separate arboreal and pentapedal species to look at just saltators, scansorial, and terrestrial species. This shows that non-pentapedal, non-arboreal marsupials - even if including bounding but not pentapedal kangaroos - share the same scaling slope AND intercept!
+#To look for differences in means, which may also contribute to differences in relative tail length between locomotor modes, we separate arboreal and pentapedal species (i.e. the those categories that had interaction terms with several other locomotor modes) to look at just saltators, scansorial, and terrestrial species. This shows that non-pentapedal, non-arboreal marsupials - even if including bounding but not pentapedal kangaroos - share the same scaling slope.
 
 ```{r}
 
@@ -250,73 +312,131 @@ NonArbPentTree=drop.tip(tree, name.check(tree,NonArbPent)$tree_not_data )
 #The tree contains dasyurids and peramelids, and non-pentapedal macropods but few possums
 plot(NonArbPentTree)
 
-#model
-
-TBNAP=find.best.model(Tl_mm~Bl_mm*Locomotor_use,NonArbPentTree,NonArbPent);TBNAP$AIC_Weights
-
-#check if the residuals of the model are OK; the fit is ok with some spread at the ends of the distribution
-qqnorm (TBNAP$Models$Brownian)
-
-###look at the model summary of the most likely model; there are no significant interactions
-anova(TBNAP$Models$Brownian)
-
 #Testing without interactions
-TBNAPNoInter=find.best.model(Tl_mm~Bl_mm+Locomotor_use,NonArbPentTree,NonArbPent);TBNAPNoInter$AIC_Weights
+TBNAP=find.best.model(Tl_mm~Bl_mm+Locomotor_use,NonArbPentTree,NonArbPent);TBNAPNoInter$AIC_Weights
 
 #this is quite good and seems to fit the data better than the model with interaction
-qqnorm (TBNAPNoInter$Models$Brownian)
+#qqnorm (TBNAPNoInter$Models$Brownian)
 
 ###No differences in intercept!!
-anova(TBNAPNoInter$Models$Brownian)
+anova(TBNAP$Models$Brownian, type="marginal")
+
+```
+#SOMETHIGN WRONG, FEWER TIP LABELS THAN SPECIES FOR REASONS i DON'TBut again, is this due to the very low intercept Peramelemorphs having an undue effect on the slope of terrestrial species? It should not in the framework of pgls though.
+```{r}
+
+#prepare tree
+NonArbPentPeram=data[c(which(data$Locomotor_use =="Terrestrial"), which ( data$Locomotor_use =="Scansorial"), which(data$Locomotor_use =="Saltatorial"), which(data$Order=="Peramelemorph")),]
+#XXXXXXXXXX
+NonArbPentPeramTree=drop.tip(tree, name.check(tree,NonArbPentPeram)$tree_not_data ))
+
+NonArbPentPeramTree$tip.label==NonArbPentPeram$Species
+
+#The tree contains dasyurids and peramelids, and non-pentapedal macropods but few possums
+plot(NonArbPentPeramTree)
+
+#MOdel
+TBNAPP=find.best.model(Tl_mm~Bl_mm+Locomotor_use,NonArbPentPeramTree,NonArbPentPeram);TBNAPP$AIC_Weights
+
+#this is quite good and seems to fit the data better than the model with interaction
+#qqnorm (TBNAPNoInter$Models$Brownian)
+
+###No differences in intercept!!
+anova(TBNAP$Models$Brownian, type="marginal")
+
+```
+
+#Arboreal and pentapedal species also share their intercept
+
+```{r}
+
+#prepare tree
+ArbPent=data[-c(which(data$Locomotor_use =="Terrestrial"), which ( data$Locomotor_use =="Scansorial"), which(data$Locomotor_use =="Saltatorial")),]
+
+ArbPentTree=drop.tip(tree, name.check(tree,ArbPent)$tree_not_data )
+
+#The tree contains mostly Diprotodontia
+plot(ArbPentTree)
+
+#The model 
+TBAP=find.best.model(Tl_mm~Bl_mm+Locomotor_use,ArbPentTree,ArbPent);TBAP$AIC_Weights
+
+#this is quite good and seems to fit the data better than the model with interaction
+qqnorm (TBAP$Models$Grafen)
+
+###No differences in intercept here, either.
+anova(TBAP$Models$Grafen, type="marginal")
 
 ```
 
 
 
-##Tail vs body WEIGHT
+#With body weight, there are two instances of arboreal scaling being different to two others; so again, assuming that arboreal species are the ones that are different
 
 ```{r}
+#There are strong interactions between locomotor mode
+
 TW=find.best.model(Tl_mm~Wt_g*Locomotor_use,tree,data);TW$AIC_Weights
-anova(TW$Model_summaries$corBrownian, type="marginal")  
 
-###no interactions, therefore
-TW_no_inter=find.best.model(Tl_mm~Wt_g+Locomotor_use,tree,data);TW$AIC_Weights
-anova(TW_no_inter$Model_summaries$corBrownian, type="marginal") 
+#check if the residuals of the model are OK; the fit is quite good
+qqnorm (TW$Models$Brownian)
+
+###look at the model summary of the most likely model: there are also significant interactions here
+anova(TW$Models$Brownian, type="marginal")
+
+#again, use non-phylogenetic interaction test; with weight, only arboreal species seem different though
+
+TW_lm <- lm(Tl_mm~Wt_g*Locomotor_use, data=data)
+testInteractions(TW_lm, adjustment="holm")
+
+```
+
+# Removing the arboreal species, which we assume are the ones driving the interaction differences, reveals differences in mean betweeen terrestrial species and others. 
+
+```{r}
+#prepare tree
+NonArb_Weight=data[-c(which(data$Locomotor_use =="Arboreal")),]
+
+NonArb_WeightTree=drop.tip(tree, name.check(tree,NonArb_Weight)$tree_not_data )
+
+#The tree contains dasyurids and peramelids, and non-pentapedal macropods but few possums
+plot(NonArb_WeightTree)
+
+#Model
+TWNA=find.best.model(Tl_mm~Wt_g+Locomotor_use,NonArb_WeightTree,NonArb_Weight);TBNAP$AIC_Weights
+
+#qqnorm fit is OK, again with just a couple of "tails"
+#qqnorm (TWNA$Models$Brownian)
+
+###Differences in tail/weight scaling here
+anova(TWNA$Models$Brownian, type = "marginal")
 
 
-###using the smaller, m/f specific datasets
-TWF=find.best.model(Tl_Av_F ~Wt_Av_F+Locomotor_use,mf_tree, mf_data);TW$AIC_Weights
-anova(TWF$Model_summaries$corBrownian, type="marginal") 
+#again, no post-hoc tests can be run on pgls analyses, so using non-phylogenetic one here
 
-TWM=find.best.model(Tl_Av_M~Wt_Av_M+Locomotor_use,mf_tree,mf_data);TW$AIC_Weights
-anova(TWF$Model_summaries$corBrownian, type="marginal") 
-   
+NonArb_Tukey=aov(Tl_mm~Wt_g+Locomotor_use, data=NonArb_Weight)
 
+TukeyHSD(NonArb_Tukey, "Locomotor_use")
 
+#The above gives an odd error message that I have not seen before; but clearly it is not ignoring the contribution of the weight data to the model, which is reassuring:
 
-#BIN - delete later
+NonArb_Tukey1=aov(Tl_mm~Locomotor_use, data=NonArb_Weight)
 
-
-#or use phytools - not sure how to deal with the label warnings
-Locomotor_use=c(data$Locomotor_use)
-names(Locomotor_use)<-names(data$Species)
-phylANOVA(tree,Locomotor_use,data$Tl_mm)
-
-
+TukeyHSD(NonArb_Tukey1)
 
 ```
 
 
-#Plotting male, female and averages 
+ 
 
 ```{r}
-#Using the SURFACE package to look for significant shifts in evolutoinary regime
+#Using the SURFACE package to look for significant shifts in evolutionary regime - this currently does not work because the matrices become singular and can't be decomposed. On a smaller dataset I noticed that the regimes are estimated differently when regression residuals are used.
   
-ForSurf=as.data.frame(cbind(mars$Tl_mm, mars$Bl_mm))
+ForSurf=as.data.frame(cbind(data$Tl_mm, data$Bl_mm))
 colnames(ForSurf) <- c("T1", "BL")
-rownames(ForSurf) <- rownames(mars)
+rownames(ForSurf) <- rownames(data)
 
-MarsSurfTree<-nameNodes(marsTree)
+MarsSurfTree<-nameNodes(tree)
 olist<-convertTreeData(MarsSurfTree,ForSurf)
 otree<-olist[[1]]; odata<-olist[[2]]
 
@@ -347,87 +467,49 @@ surfaceTreePlot(MarsSurfTree, bwd[[kk]], labelshifts = T)
 
 par(mfrow=c(1,2))
 
-plot(mars$Bl_Av_M,mars$Tl_Av_M, col="red", pch=19);points(mars$Bl_Av_F,mars$Tl_Av_F, col="blue", pch=19);points(mars$Bl_mm,mars$Tl_mm, col="green", pch=19);abline(lm(mars$Tl_Av_M~mars$Bl_Av_M), col="red");abline(lm(mars$Tl_Av_F~mars$Bl_Av_F), col="blue"); abline(lm(mars$Tl_mm~mars$Bl_mm), col="green")
+plot(data$Bl_Av_M,data$Tl_Av_M, col="red", pch=19);points(data$Bl_Av_F,data$Tl_Av_F, col="blue", pch=19);points(data$Bl_mm,data$Tl_mm, col="green", pch=19);abline(lm(data$Tl_Av_M~data$Bl_Av_M), col="red");abline(lm(data$Tl_Av_F~data$Bl_Av_F), col="blue"); abline(lm(data$Tl_mm~data$Bl_mm), col="green")
 
 
-plot(mars$Wt_Av_M,mars$Tl_Av_M, col="red", pch=19);points(mars$Wt_Av_F,mars$Tl_Av_F, col="blue", pch=19);points(mars$Wt_g,mars$Tl_mm, col="green", pch=19);abline(lm(mars$Tl_Av_M~mars$Wt_Av_M), col="red");abline(lm(mars$Tl_Av_F~mars$Wt_Av_F), col="blue"); abline(lm(mars$Tl_mm~mars$Wt_g), col="green")  
+plot(data$Wt_Av_M,data$Tl_Av_M, col="red", pch=19);points(data$Wt_Av_F,data$Tl_Av_F, col="blue", pch=19);points(data$Wt_g,data$Tl_mm, col="green", pch=19);abline(lm(data$Tl_Av_M~data$Wt_Av_M), col="red");abline(lm(data$Tl_Av_F~data$Wt_Av_F), col="blue"); abline(lm(data$Tl_mm~data$Wt_g), col="green")  
 
 
 ```
 
-#Plotting according to tail use and phylogeny - body length
 
-```{r}
-#Marsupials
-  
-  ## initial setup: colours and margins
-    colsOrderM=brewer.pal(n=length(levels(mars$Order)), name="Dark2")
-    colsLoco=brewer.pal(n=length(levels(mars$Locomotor_use)), name="Dark2")
-    colsOrderR=brewer.pal(n=length(levels(rodFull$Order)), name="Dark2")
-    # Size of points
-    cexes <- 1
-    # this adjusts the titles of the double panel
-    adjs <- -0.3
-    # spaces to the left of text
-    xinter <- 0.2
-     # spaces between legend lines
-    yInter <- 0.25
-    #size of the box is determined by text width
-    textwidth <- 0.2
-    #insets the box a bit
-    inset <- 0.01
-  
-    
-    #4 panels, with margins of 2 lines
-    par(mfrow=c(2,2), mar = c(4,4,4,4))
-  
-  plot(mars$Tl_mm~mars$Bl_mm, col=colsOrderM[mars$Order], pch=19, xlab="log Body length", ylab="log Tail length") ;legend("bottomright", c("Dasyuromorph" ,  "Diprotodontian", "Peramelemorph"),inset=inset, pch=19, col=colsOrderM, cex=cexes,y.intersp = yInter, x.intersp = xinter,text.width = textwidth+0.1, bty="n" ); #text(mars$Tl_mm~mars$Bl_mm, labels=mars$Species, cex=0.5)
-  
-  plot(mars$Tl_mm~mars$Bl_mm, col=colsLoco[mars$Locomotor_use], pch=19, xlab="log Body length", ylab="log Tail length" ); legend("bottomright",inset=inset,levels(mars$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n")
-  
-  mtext("Marsupials", adj=adjs,side=3, line=2, cex=1)
-  
-  ##Rodents
-  
-  plot(rodFull$Tl_mm~rodFull$Bl_mm, col=colsOrderR[rodFull$Order], pch=19, xlab="log Body length", ylab="log Tail length" );legend("bottomright", c("Murine" ,  "Rattus"),inset=inset, pch=19, col=colsOrderR, cex=cexes, x.intersp = xinter, y.intersp = yInter, text.width = textwidth-0.1, bty="n"); #text(rodFull$Tl_mm~rodFull$Bl_mm, labels=rodFull$Species, cex=cexes)
-  
-  plot(rodFull$Tl_mm~rodFull$Bl_mm, col=colsLoco[rodFull$Locomotor_use], pch=19, xlab="log Body length", ylab="log Tail length" ); legend("bottomright", inset=inset,levels(rodFull$Locomotor_use) , pch=19, col=colsLoco, cex=cexes,  ncol=2, x.intersp = xinter, y.intersp = yInter, text.width = textwidth-0.1, bty="n")
-  
-  mtext("Rodents", adj=adjs, line=2, cex = 1)
-
-```
 
 
 #Plotting according to tail use and phylogeny - body mass ADJUST ACCORDING TO ABOVE WHEN DONE
 
 ```{r}
 
-  ##Marsupials
+ # initial setup: colours and margins
+  colsOrderM=brewer.pal(n=length(levels(data$Order)), name="Dark2")
+  colsLoco=brewer.pal(n=length(levels(data$Locomotor_use)), name="Dark2")
+  ##Size of points
+  cexes <- 1
+  ## this adjusts the titles of the double panel
+  adjs <- -0.3
+  ## spaces to the left of text
+  xinter <- 0.2
+  ## spaces between legend lines
+  yInter <- 0.25
+  ##size of the box is determined by text width
+  textwidth <- 0.2
+  ##insets the box a bit
+  inset <- 0.01
   
-  
-    ## initial setup: colours and margins
-    colsOrderM=brewer.pal(n=length(levels(mars$Order)), name="Dark2")
-    colsLoco=brewer.pal(n=length(levels(mars$Locomotor_use)), name="Dark2")
-    colsOrderR=brewer.pal(n=length(levels(rodFull$Order)), name="Dark2")
-    cexes<-0.6
-    adjs=-0.3
-    x.intersp=1
     
-    #4 panels, with margins of 2 lines
-    par(mfrow=c(2,2), mar = c(4,4,4,4))
-  
-  plot(mars$Tl_mm~mars$Wt_g, col=colsOrderM[mars$Order], pch=19, xlab="log Body mass", ylab="log Tail length" );legend("bottomright", c("Dasyuromorph" ,  "Diprotodontian", "Peramelemorph"), pch=19, col=colsOrderM, cex=cexes); #text(mars$Tl_mm~mars$Wt_g, labels=mars$Species, cex=0.5)
-  
-  plot(mars$Tl_mm~mars$Wt_g, col=colsLoco[mars$Locomotor_use], pch=19, xlab="log Body mass", ylab="log Tail mass" ); legend("bottomright",levels(mars$Locomotor_use) , pch=19, col=colsLoco, cex=cexes)
-  
-  mtext("Marsupials", adj=adjs,side=3, line=2, cex=1)
-  
-  ##Rodents
-  
-  plot(rodFull$Tl_mm~rodFull$Wt_g, col=colsOrderR[rodFull$Order], pch=19, xlab="log Body mass", ylab="log Tail length" );legend("bottomright", c("Murine" ,  "Rattus"), pch=19, col=colsOrderR, cex=cexes); #text(rodFull$Tl_mm~rodFull$Wt_g, labels=rodFull$Species, cex=cexes)
-  
-  plot(rodFull$Tl_mm~rodFull$Wt_g, col=colsLoco[rodFull$Locomotor_use], pch=19, xlab="log Body mass", ylab="log Tail length" ); legend("bottomright",levels(rodFull$Locomotor_use) , pch=19, col=colsLoco, cex=cexes)
-  
-  mtext("Rodents", adj=adjs, line=2, cex = 1)
+   
+
+```
+
+#some code for possibly later
+
+```{r}
+
+#or use phytools - not sure how to deal with the label warnings
+Locomotor_use=c(data$Locomotor_use)
+names(Locomotor_use)<-names(data$Species)
+phylANOVA(tree,Locomotor_use,data$Tl_mm)
 
 ```
