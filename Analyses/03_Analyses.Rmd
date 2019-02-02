@@ -25,6 +25,7 @@ library(nlme)
 library(dplyr)
 library(RColorBrewer)
 library(surface)
+library(phia)
 
 
 #the "utilities" file contains functions so this analysis page isn't too cluttered
@@ -151,175 +152,108 @@ phylosig(tree, data$Wt_g, method="lambda", nsim=1000)
    
 ```
 
-# How do tail lengths scale with body length and weight? 
+# How do tail lengths scale with body length and weight? Which predicts Tail length better? The find. best.model code finds the best fitting tree branch and phylogenetic correlation matrix for each model and allows to run an anova on just that.For details, see utilities.
 
 ```{r}
+  
+  ##Tail vs. body length: Significant and very high correlation coefficient (0.87)
+  TB=find.best.model(Tl_mm~Bl_mm,tree,data);TB$AIC_Weights
+  #Checking appropriate distribution of model residuals; , this is using qqnorm.gls from the nlme package. They mostly fall on a line with just a few oddballs, particularly Notoryctes; but they seem relevant to retain as possible variation, so leaving them in.    
+  qqnorm (TB$Models$Brownian)      
+  TB$Model_summaries$Brownian$tTable
 
-#Marsupials
-    
-      ##Tail vs. body length
-      MarsTB=find.best.model(Tl_mm~Bl_mm,marsTree,mars);MarsTB$AIC_Weights
-      #Checking appropriate distribution of model residuals      
-      qqnorm (MarsTB$Models$Brownian)      
-      MarsTB$Model_summaries$Brownian$tTable
-      
-      
-      ##Tail vs body weight
-      MarsTW=find.best.model(Tl_mm~Wt_g,marsTree,mars);MarsTW$AIC_Weights
-      #Checking appropriate distribution of model residuals
-      qqnorm (MarsTB$Models$Brownian)
-      MarsTW$Model_summaries$Brownian$tTable
-      
- ##rodents with Rattus
-      
-      ###Tail vs. body length
-      rodTB=find.best.model(Tl_mm~Bl_mm,rodTree,rod);rodTB$AIC_Weights
-      #Checking appropriate distribution of model residuals      
-      qqnorm (rodTB$Models$Brownian)      
-      rodTB$Model_summaries$Brownian$tTable
-      
-      
-      ###Tail vs body weight
-      rodTW=find.best.model(Tl_mm~Wt_g,rodTree,rod);rodTW$AIC_Weights
-      #Checking appropriate distribution of model residuals
-      qqnorm (rodTB$Models$Brownian)
-      rodTW$Model_summaries$Brownian$tTable
-      
-  ##rodents without Rattus
-      
-      ###Tail vs. body length
-      MurTB=find.best.model(Tl_mm~Bl_mm,murine_tree,murine_data);MurTB$AIC_Weights
-      #Checking appropriate distribution of model residuals; excluding Rattus improves this     
-      qqnorm (MurTB$Models$Brownian) 
-      #but no change in scaling coefficient
-      MurTB$Model_summaries$Brownian$tTable
-      
-      
-      ###Tail vs body weight
-      MurTW=find.best.model(Tl_mm~Wt_g,murine_tree,murine_data);MurTW$AIC_Weights
-      #Checking appropriate distribution of model residuals
-      qqnorm (MurTW$Models$Brownian_GrafScale)
-      MurTW$Model_summaries$Brownian$tTable
-      
+  
+  ##Tail vs body weight: significant but low correlation coefficient (0.33)
+  TW=find.best.model(Tl_mm~Wt_g,tree,data);TW$AIC_Weights
+  #Checking appropriate distribution of model residuals
+  qqnorm (TB$Models$Brownian)
+  TW$Model_summaries$Brownian$tTable
+  
+  #compute relative probabilities betweeen 0 and 100 by comparing AICS according to Burnham and Anderson
+  AICs=c(TB$Model_summaries$Brownian$AIC,TW$Model_summaries$Brownian$AIC )
+  AICmin=AICs-min(AICs)
+  W=exp(-0.5*AICmin)/sum(exp(-0.5*AICmin))
+  
+  #Not surprisingly, body length is a far better predictor of body length:
+  W 
+  
 ```
 
-# Does the significance level drop if body weight and body length are both part of the model?
+# Weight remains a significant predictor of tail length even when correcting for body mass, but with a very low coefficient
 
 ```{r}
       
-#Marsupials
-
-      MarsTBW=find.best.model(Tl_mm~Bl_mm*Wt_g,marsTree,mars);MarsTW$AIC_Weights
+      TBW=find.best.model(Tl_mm~Bl_mm*Wt_g,tree,data);TBW$AIC_Weights
       #Checking appropriate distribution of model residuals
-      qqnorm (MarsTBW$Models$Brownian)
-      anova(MarsTBW$Models$Brownian, type="marginal")
+      qqnorm (TBW$Models$Brownian)
+      anova(TBW$Models$Brownian, type="marginal")
       
       ##dropping the interaction 
-      MarsTBWNoInter=find.best.model(Tl_mm~Bl_mm+Wt_g,marsTree,mars);MarsTW$AIC_Weights
-      #Checking appropriate distribution of model residuals
-      qqnorm (MarsTBWNoInter$Models$Brownian)
-      anova(MarsTBWNoInter$Models$Brownian, type="marginal")
+      TBWNoInter=find.best.model(Tl_mm~Bl_mm+Wt_g,tree,data);TBWNoInter$AIC_Weights
+      #Checking appropriate distribution of model residuals; some low-leverage outliers deemed acceptable in this context
+      qqnorm (TBWNoInter$Models$Brownian)
+      anova(TBWNoInter$Models$Brownian, type="marginal")
+      
+      TBWNoInter$Models$Brownian$coefficients
 
-
+      
 ```
 
-# Aside from the association between body length and tail length,does locomotor mode play a role?
+# Aside from the association between body length and tail length,does locomotor mode play a role? Note: sing the smaller, m/f specific datasets is not possible with interactions, so if interactions are found it seems inappropriate to run them
 
 ```{r}
 
-#Marsupials
-    
-  ##Tail vs body length
-    TB=find.best.model(Tl_mm~Bl_mm*Locomotor_use,marsTree,mars);TB$AIC_Weights
-    TB= (gls(Tl_mm~Bl_mm*Locomotor_use, correlation=corBrownian(1,phy=marsTree), data=mars))    
+#Tail vs body length
 
-       
-    #check if the residuals of the model are OK, this is using qqnorm.gls from the nlme package
-    qqnorm (TB$Models$Brownian)
-    
-    ###look at the model summary of the most likely model, e.g. 
-    TB$Model_summaries$corBrownian$tTable
-      
-    ###if the interactions are not significant (i.e. slopes are not sig. different), drop them    
-    TB_no_inter=find.best.model(Tl_mm~Bl_mm+Locomotor_use,marsTree,mars);TB$AIC_Weights
-    TB_no_inter$Model_summaries$corBrownian$tTable
-    anova(TB_no_inter$Model_summaries$corBrownian, type="marginal")
+TB=find.best.model(Tl_mm~Bl_mm*Locomotor_use,tree,data);TB$AIC_Weights
+
+#check if the residuals of the model are OK; the fit is quite good
+qqnorm (TB$Models$Brownian)
+
+###look at the model summary of the most likely model: there are significant interactions 
+anova(TB$Models$Brownian)
+
+#It is not possible to do post-hoc test in the pgls framework, so instead looking for interactions in the non-phylogenetically corrected lm analysis and using testInteractions from the phia package. Also refer to the plot.
+
+TB_lm <- lm(Tl_mm~Bl_mm*Locomotor_use, data=data)
+testInteractions(TB_lm, adjustment="holm")
+
+#Arboreal and prehensile species have different slopes to terrestrial, but not scansorial or pentapedal species. Ecologically this makes sense, so conducting a follow-up analysis separating arboreal and prehensile from the remainder.
+
+
+
+
+
+
+##Tail vs body WEIGHT
+TW=find.best.model(Tl_mm~Wt_g*Locomotor_use,tree,data);TW$AIC_Weights
+anova(TW$Model_summaries$corBrownian, type="marginal")  
+
+###no interactions, therefore
+TW_no_inter=find.best.model(Tl_mm~Wt_g+Locomotor_use,tree,data);TW$AIC_Weights
+anova(TW_no_inter$Model_summaries$corBrownian, type="marginal") 
+
+
+###using the smaller, m/f specific datasets
+TWF=find.best.model(Tl_Av_F ~Wt_Av_F+Locomotor_use,mf_tree, mf_data);TW$AIC_Weights
+anova(TWF$Model_summaries$corBrownian, type="marginal") 
+
+TWM=find.best.model(Tl_Av_M~Wt_Av_M+Locomotor_use,mf_tree,mf_data);TW$AIC_Weights
+anova(TWF$Model_summaries$corBrownian, type="marginal") 
    
-     #or use phytools - not sure how to deal with the label warnings
-    Locomotor_use=c(mars$Locomotor_use)
-    names(Locomotor_use)<-names(mars$Species)
-    phylANOVA(marsTree,Locomotor_use,mars$Tl_mm)
-    
-     ###using the smaller, m/f specific datasets note THIS NEEDS LARGE NUMBERS OF DATA SO DOES NOT ALWAYS DO INTERACTIONS
-    TBF=find.best.model(Tl_Av_F ~Bl_Av_F+Locomotor_use,mf_marstree, mf_mars);TB$AIC_Weights
-    anova(TBF$Model_summaries$corPagel, type="marginal")
-    
-    TBM=find.best.model(Tl_Av_M~Bl_Av_M+Locomotor_use,mf_marstree,mf_mars); TB$AIC_Weights
-    anova(TBM$Model_summaries$corPagel, type="marginal")
-    
-  ##Tail vs body WEIGHT
-    TW=find.best.model(Tl_mm~Wt_g*Locomotor_use,marsTree,mars);TW$AIC_Weights
-    anova(TW$Model_summaries$corBrownian, type="marginal")  
-    
-    ###no interactions, therefore
-    TW_no_inter=find.best.model(Tl_mm~Wt_g+Locomotor_use,marsTree,mars);TW$AIC_Weights
-    anova(TW_no_inter$Model_summaries$corBrownian, type="marginal") 
-    
-    
-    ###using the smaller, m/f specific datasets
-    TWF=find.best.model(Tl_Av_F ~Wt_Av_F+Locomotor_use,mf_marstree, mf_mars);TW$AIC_Weights
-    anova(TWF$Model_summaries$corBrownian, type="marginal") 
-      
-    TWM=find.best.model(Tl_Av_M~Wt_Av_M+Locomotor_use,mf_marstree,mf_mars);TW$AIC_Weights
-    anova(TWF$Model_summaries$corBrownian, type="marginal") 
-  
-    
-#Rodents
-    
-   #All rodents 
-    
-    ##Tail vs body LENGTH
-      RodTB=find.best.model(Tl_mm~Bl_mm*Locomotor_use,rodTree,rod);RodTB$AIC_Weights
-      #several similarly likely models but they yield similar levels of significance
-      qqnorm (RodTB$Models$Pagel_GrafScale)
-      anova(RodTB$Models$Pagel)
-      
-      ##No interactions (i.e. no differences in tail/Bl slope according to locomotion), so dropping interaction
-      RodTBNoInter=find.best.model(Tl_mm~Bl_mm+Locomotor_use,rodTree,rod);RodTBNoInter$AIC_Weights
-      #qqnorm (RodTBNoInter$Models$Pagel_GrafScale)
-      anova(RodTBNoInter$Models$Pagel_GrafScale)
-        
-     
-    ##Tail vs body WEIGHT
-      RodTW=find.best.model(Tl_mm~Wt_g*Locomotor_use,rodTree,rod);RodTW$AIC_Weights
-      qqnorm (RodTWNoInter$Models$Pagel_GrafScale)
-      anova(RodTW$Models$Pagel_GrafScale) 
-      
-      ##No interactions (i.e. no differences in tail/Bl slope according to locomotion), so dropping interaction
-      RodTWNoInter=find.best.model(Tl_mm~Wt_g*Locomotor_use,rodTree,rod);RodTWNoInter$AIC_Weights
-      anova(RodTBNoInter$Models$Pagel_GrafScale)
-  
-  #All rodents 
-    
-    ##Tail vs body LENGTH
-      RodTB=find.best.model(Tl_mm~Bl_mm*Locomotor_use,rodTree,rod);RodTB$AIC_Weights
-      #several similarly likely models; technically the Pagel correlation structure without Grafen-scaled trees performs slightly better but the level of significance is the same in just Pagel and the original tree (which is also the more likely model in the no interaction model)
-      anova(RodTB$Models$Pagel_GrafScale)
-      
-      ##No interactions (i.e. no differences in tail/Bl slope according to locomotion), so dropping interaction
-      RodTBNoInter=find.best.model(Tl_mm~Bl_mm+Locomotor_use,rodTree,rod);RodTBNoInter$AIC_Weights
-      anova(RodTBNoInter$Models$Pagel_GrafScale)
-        
-     
-    ##Tail vs body WEIGHT
-      RodTW=find.best.model(Tl_mm~Wt_g*Locomotor_use,rodTree,rod);RodTW$AIC_Weights
-      anova(RodTW$Models$Pagel_GrafScale) 
-      
-      ##No interactions (i.e. no differences in tail/Bl slope according to locomotion), so dropping interaction
-      RodTWNoInter=find.best.model(Tl_mm~Wt_g*Locomotor_use,rodTree,rod);RodTWNoInter$AIC_Weights
-      anova(RodTBNoInter$Models$Pagel_GrafScale)   
-      
-   
+
+
+
+#BIN - delete later
+
+
+#or use phytools - not sure how to deal with the label warnings
+Locomotor_use=c(data$Locomotor_use)
+names(Locomotor_use)<-names(data$Species)
+phylANOVA(tree,Locomotor_use,data$Tl_mm)
+
+
+
 ```
 
 
