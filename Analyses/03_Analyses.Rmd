@@ -56,10 +56,16 @@ tree$tip.label==rownames(data)
 brlentree=compute.brlen(tree)
 brlentree$tip.label==rownames(data)
 
-phylosig(brlentree, data$Tl_mm, method = "K", test=TRUE, nsim=1000)
-phylosig(brlentree, data$Bl_mm, method="K", test=FALSE, nsim=1000)
-phylosig(brlentree, data$Wt_g, method="K", test=FALSE, nsim=1000)
+phylosig(brlentree, data$Tl_mm, method = "K", nsim=1000)
+phylosig(brlentree, data$Bl_mm, method="K" ,nsim=1000)
+phylosig(brlentree, data$Wt_g, method="K", nsim=1000)
 
+
+#lambda works on the tree but gives a different, very high phylogenetic signal
+
+phylosig(tree, data$Tl_mm, method = "lambda", nsim=1000)
+phylosig(tree, data$Bl_mm, method="lambda", nsim=1000)
+phylosig(tree, data$Wt_g, method="lambda", nsim=1000)
 
 ```
 
@@ -70,25 +76,26 @@ phylosig(brlentree, data$Wt_g, method="K", test=FALSE, nsim=1000)
 #Marsupials
 
   ##return the min/max values to their un-logged form
-  ratio_Tl=c(10^(marsFull$Tl_max)/10^(marsFull$Tl_min))
-  ratio_Bl=c(10^(marsFull$Bl_max)/10^(marsFull$Bl_min))
-  ratio_Wt=c(10^(marsFull$Wt_max)/10^(marsFull$Wt_min))
+  ratio_Tl=c(10^(dataFull$Tl_max)/10^(dataFull$Tl_min))
+  ratio_Bl=c(10^(dataFull$Bl_max)/10^(dataFull$Bl_min))
+  ratio_Wt=c(10^(dataFull$Wt_max)/10^(dataFull$Wt_min))
   
   ##Visualizing means of the ratios 
-  boxplot(ratio_Tl, ratio_Bl,ratio_Wt)
+  boxplot(ratio_Tl, ratio_Bl,ratio_Wt, names=c("Tl ratio", "Bl ratio", "Wt ratio"))
   
-  ratiosMars=c(ratio_Tl, ratio_Bl, ratio_Wt)
+  
   
   ##The VarDist.test code is in utilities. It runs a Kruskal-Wallis test and then a pairwise wilcoxon rank sum test on the ratios
+  ratios=c(ratio_Tl, ratio_Bl, ratio_Wt)
+  
   MinMaxtest(ratios,3)
   
-  boxplot(ratio_Tl, ratio_Bl,ratio_Wt)
   
   ##This is not mainly because of the extreme ranges in bandicoots!
   
-  ratio_Tl_Band<-ratio_Tl[ - (grep("Macrotis_leucura", marsFull$Species):grep("Echymipera_rufescens", mars$Species))]
-  ratio_Bl_Band<-ratio_Bl[ - (grep("Macrotis_leucura", marsFull$Species):grep("Echymipera_rufescens", mars$Species))]
-  ratio_Wt_Band<-ratio_Wt[ - (grep("Macrotis_leucura", marsFull$Species):grep("Echymipera_rufescens", mars$Species))]
+  ratio_Tl_Band<-ratio_Tl[ - (grep("Macrotis_leucura", dataFull$Species):grep("Echymipera_rufescens", dataFull$Species))]
+  ratio_Bl_Band<-ratio_Bl[ - (grep("Macrotis_leucura", dataFull$Species):grep("Echymipera_rufescens", dataFull$Species))]
+  ratio_Wt_Band<-ratio_Wt[ - (grep("Macrotis_leucura", dataFull$Species):grep("Echymipera_rufescens", dataFull$Species))]
   
   ratiosBand=c(ratio_Tl_Band, ratio_Bl_Band, ratio_Wt_Band)
   MinMaxtest(ratiosBand,3)
@@ -97,50 +104,18 @@ phylosig(brlentree, data$Wt_g, method="K", test=FALSE, nsim=1000)
   boxplot(ratio_Tl, ratio_Bl,ratio_Wt, xlab="ratios with bandicoots")
   boxplot(ratio_Tl_Band, ratio_Bl_Band,ratio_Wt_Band, xlab="ratios without bandicoots")
 
-#Rodents
-
-  ##return the min/max values to their un-logged form
-  ratio_Tl=c(10^(rodFull$Tl_max)/10^(rodFull$Tl_min))
-  ratio_Bl=c(10^(rodFull$Bl_max)/10^(rodFull$Bl_min))
-  ratio_Wt=c(10^(rodFull$Wt_max)/10^(rodFull$Wt_min))
-  
-  ##Visualizing means of the ratios 
-  boxplot(ratio_Tl, ratio_Bl,ratio_Wt)
-  
-  ratiosRod=c(ratio_Tl, ratio_Bl, ratio_Wt)
-  
-  ##The VarDist.test code is in utilities. It runs a Kruskal-Wallis test and then a pairwise wilcoxon test on the ratios
-  MinMaxtest(ratiosRod,3)
-  
-  boxplot(ratio_Tl, ratio_Bl,ratio_Wt)
-  
-  ##Is there a difference between Rattus and the old endemics.
-  
-  ratio_Tl_Rat<-ratio_Tl[ - (grep("Rattus_leucopus", rodFull$Species):grep("Rattus_fuscipes", rodFull$Species))]
-  ratio_Bl_Rat<-ratio_Bl[ - (grep("Rattus_leucopus", rodFull$Species):grep("Rattus_fuscipes", rodFull$Species))]
-  ratio_Wt_Rat<-ratio_Wt[ - (grep("Rattus_leucopus", rodFull$Species):grep("Rattus_fuscipes", rodFull$Species))]
-  
-  ratiosRat=c(ratio_Tl_Band, ratio_Bl_Band, ratio_Wt_Band)
-  MinMaxtest(ratiosRat,3)
-  
-  par(mfrow=c(1,2))
-  boxplot(ratio_Tl, ratio_Bl,ratio_Wt, xlab="ratios with Rattus")
-  boxplot(ratio_Tl_Rat, ratio_Bl_Rat,ratio_Wt_Rat, xlab="ratios without Rattus")
-
 
 
 ```
 
-#is there a difference in tail/body length relationships between the sexes? This is only possible in a non phylogenetic context
+#is there a difference in tail/body length or tail/weigth relationships between the sexes? This is only possible in a non phylogenetic context
 
 ```{r}
-#Marsupials:
-
-  ##Re-arrange datasets to put males, femals and averages under each other, turning into a data frame for column names
+#Re-arrange datasets to put males, femals and averages under each other, turning into a data frame for column names
   
-  Males<-cbind(marsFull$Tl_Av_M,marsFull$Bl_Av_M,marsFull$Wt_Av_M, rep(1,length(marsFull$Tl_Av_M)))
-  Females<-cbind(marsFull$Tl_Av_F,marsFull$Bl_Av_F,marsFull$Wt_Av_F, rep(2,length(marsFull$Tl_Av_F)))
-  Averages<-cbind(marsFull$Tl_mm, marsFull$Bl_mm,marsFull$Wt_g, rep(3,length(marsFull$Bl_mm)))
+  Males<-cbind(dataFull$Tl_Av_M,dataFull$Bl_Av_M,dataFull$Wt_Av_M, rep(1,length(dataFull$Tl_Av_M)))
+  Females<-cbind(dataFull$Tl_Av_F,dataFull$Bl_Av_F,dataFull$Wt_Av_F, rep(2,length(dataFull$Tl_Av_F)))
+  Averages<-cbind(dataFull$Tl_mm, dataFull$Bl_mm,dataFull$Wt_g, rep(3,length(dataFull$Bl_mm)))
   
   MarsCombine=rbind(Males, Females,Averages)
   MarsCombine=as.data.frame(MarsCombine)
@@ -148,75 +123,32 @@ phylosig(brlentree, data$Wt_g, method="K", test=FALSE, nsim=1000)
   MarsCombine$Sex<-as.factor(MarsCombine$Sex)
 
   
-  ##Are there differences in slope of Tail length and body length or weight according to sex, or averages between sexes?
+#Are there differences in slope or intercept of Tail  and body length or weight according to sex, or averages between sexes? Using Anova from the car packages because this allows type III ANOVAs where the contribution of all other effect is adjusted for while computing each individual effect
   
-  ###check model residuals before proceeding; some low-leverage outliers
-  plot(lm(MarsCombine$Tl~MarsCombine$Bl*MarsCombine$Sex))
+  ## Body length:
   
-  ### Do regression slopes differ between sexes?
-  summary(aov (MarsCombine$Tl~MarsCombine$Bl*MarsCombine$Sex))
+    ###check model residuals before proceeding; some low-leverage outliers which are here accepted
+    plot(lm(MarsCombine$Tl~MarsCombine$Bl*MarsCombine$Sex))
+    
+    ### Do regression slopes differ between sexes? 
+    Anova(lm(MarsCombine$Tl~MarsCombine$Bl*MarsCombine$Sex),type = 3)
+    
+    
+    ### No significant interactions, therefore dropping interactions to look for differences in intercept
+    Anova(lm(MarsCombine$Tl~MarsCombine$Bl+MarsCombine$Sex),type = 3)
   
-  ### No significant interactions, therefore dropping interactions to look for differences in intercept
-  summary(aov (MarsCombine$Tl~MarsCombine$Bl+MarsCombine$Sex))
+    
+  ##Weight
   
-  ###check model residuals before proceeding
-  plot(lm(MarsCombine$Tl~MarsCombine$Wt*MarsCombine$Sex))
+    ###check model residuals before proceeding; no substantial outliers
+    plot(lm(MarsCombine$Tl~MarsCombine$Wt*MarsCombine$Sex))
   
-  ### Do regression slopes differ between sexes?
-  summary(aov (MarsCombine$Tl~MarsCombine$Wt*MarsCombine$Sex))
+    ### No regression slope differences between sexes; no intercept differences either (so smaller females also have commensurately smaller tails it seems, regardless of weight or body length)
+    Anova(lm(MarsCombine$Tl~MarsCombine$Wt*MarsCombine$Sex),type = 3)
+    
+    Anova(lm(MarsCombine$Tl~MarsCombine$Wt+MarsCombine$Sex),type = 3)
   
-  ### No significant interactions, therefore dropping interactions to look for differences in intercept
-  summary(aov (MarsCombine$Tl~MarsCombine$Wt+MarsCombine$Sex))
-  
-  
-
-#Rodents:
-
-  RodMales<-cbind(rodFull$Tl_Av_M,rodFull$Bl_Av_M,rodFull$Wt_Av_M, rep(1,length(rodFull$Tl_Av_M)))
-  RodFemales<-cbind(rodFull$Tl_Av_F,rodFull$Bl_Av_F,rodFull$Wt_Av_F, rep(2,length(rodFull$Tl_Av_F)))
-  RodAverages<-cbind(rodFull$Tl_mm, rodFull$Bl_mm,rodFull$Wt_g, rep(3,length(rodFull$Bl_mm)))
-  
-  RodCombine=rbind(RodMales, RodFemales,RodAverages)
-  RodCombine=as.data.frame(RodCombine)
-  colnames(RodCombine) <-c("Tl","Bl","Wt","Sex")
-  RodCombine$Sex<-as.factor(RodCombine$Sex)
- 
-  
-  ##Are there differences in slope of tail length and body lenght/weight according to locomotor use, sex, or averages between sexes?
-    ###check for appropriate distribution of model residuals
-    plot(lm(RodCombine$Tl~RodCombine$Bl*RodCombine$Sex))
- 
-    summary(aov(lm(RodCombine$Tl~RodCombine$Bl*RodCombine$Sex)))
-  
-   ###No interaction (i.e. slopes are the same), therefore dropping interaction
-    summary(aov(lm(RodCombine$Tl~RodCombine$Bl+RodCombine$Sex)))
-  
-    ##Same with body weight
-    plot(lm(RodCombine$Tl~RodCombine$Wt*RodCombine$Sex))
-    summary(aov(lm(RodCombine$Tl~RodCombine$Wt*RodCombine$Sex)))
-   ##No interaction (i.e. slopes are the same), therefore dropping interaction
-    summary(aov(lm(RodCombine$Tl~RodCombine$Wt+RodCombine$Sex)))
-  
-  
-  #########################note to self below, delete later
-  
-  
-  
-  #If significant interactions, use
-  testInteractions(Sex_locomotion)
-  #if not, re-run without interactions; if any intercept is significant, run something like the below
-  TukeyHSD(MaleFemaleaov,which='Sex', data=Combine )
-  
-  #Are there differences in slope of Tail length and body WEIGHT according to locomotor use, sex, or averages between sexes?
-  Sex_locomotion=summary(lm(Combine$Tl~Combine$Wt *Combine$Sex*Combine$Locomotor_use))
-  Sex_locomotion=aov (Combine$Tl~Combine$Wt*Combine$Sex*Combine$Locomotor_use)
-  
-  #If significant interactions, use
-  testInteractions(Sex_locomotion)
-  #if not, re-run without interactions; if any intercept is significant, run something like the below
-  TukeyHSD(MaleFemaleaov,which='Sex', data=Combine )
-
-
+   
 ```
 
 # How do tail lengths scale with body length and weight? 
@@ -288,33 +220,6 @@ phylosig(brlentree, data$Wt_g, method="K", test=FALSE, nsim=1000)
       qqnorm (MarsTBWNoInter$Models$Brownian)
       anova(MarsTBWNoInter$Models$Brownian, type="marginal")
 
-#Rodents with Rattus
-      
-      rodTBW=find.best.model(Tl_mm~Bl_mm*Wt_g,rodTree,rod);rodTW$AIC_Weights
-      #Checking appropriate distribution of model residuals
-      qqnorm (rodTBW$Models$Brownian)
-      anova(rodTBW$Models$Brownian)
-      
-      ###dropping the interaction 
-      rodTBWNoInter=find.best.model(Tl_mm~Bl_mm+Wt_g,rodTree,rod);rodTW$AIC_Weights
-      #Checking appropriate distribution of model residuals; this one is not ideal
-      qqnorm (rodTBWNoInter$Models$Brownian_GrafScale)
-      #significant but with small effect size
-      anova(rodTBWNoInter$Models$Brownian_GrafScale, type="marginal")
- 
-#Rodents without Rattus
- 
-      MurTBW=find.best.model(Tl_mm~Bl_mm*Wt_g,murine_tree,murine_data);MurTW$AIC_Weights
-      #Checking appropriate distribution of model residuals
-      qqnorm (MurTBW$Models$Brownian_GrafScale)
-      anova(MurTBW$Models$Brownian_GrafScale, type="marginal")
-      
-      ###dropping the interaction 
-      MurTBWNoInter=find.best.model(Tl_mm~Bl_mm+Wt_g,murine_tree,murine_data);MurTW$AIC_Weights
-      #Checking appropriate distribution of model residuals; this one is not ideal
-      qqnorm (MurTBWNoInter$Models$Brownian_GrafScale)
-      #significant but with small effect size; but higher level of significance without Rattus
-      anova(MurTBWNoInter$Models$Brownian_GrafScale, type="marginal")
 
 ```
 
