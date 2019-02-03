@@ -52,89 +52,7 @@ colnames(DataQuality)=c ("% in raw dataset")
 ```
 
 
-# Within species, is there a relatively wider range of weights (i.e. is the minimum a smaller percentage of the maximum) than there is of body length and tail length? Bod mass ranges are substantially greater than tail and body length ranges, hinting at substantial within-species independence of tail/vertebral length compared to weight.
-
-```{r}
-#Marsupials
-
-  ##return the min/max values to their un-logged form
-  ratio_Tl=c(10^(dataFull$Tl_max)/10^(dataFull$Tl_min))
-  ratio_Bl=c(10^(dataFull$Bl_max)/10^(dataFull$Bl_min))
-  ratio_Wt=c(10^(dataFull$Wt_max)/10^(dataFull$Wt_min))
-  
-  ##Visualizing means of the ratios 
-  boxplot(ratio_Tl, ratio_Bl,ratio_Wt, names=c("Tl ratio", "Bl ratio", "Wt ratio"))
-  
-  
-  
-  ##The VarDist.test code is in utilities. It runs a Kruskal-Wallis test and then a pairwise wilcoxon rank sum test on the ratios; BL and TL do not have significant ranges, Wt is significantly greater
-  ratios=c(ratio_Tl, ratio_Bl, ratio_Wt)
-  
-  MinMaxtest(ratios,3)
-  
-  
-  ##This is not mainly because of the extreme ranges in bandicoots!
-  
-  ratio_Tl_Band<-ratio_Tl[ - (grep("Macrotis_leucura", dataFull$Species):grep("Echymipera_rufescens", dataFull$Species))]
-  ratio_Bl_Band<-ratio_Bl[ - (grep("Macrotis_leucura", dataFull$Species):grep("Echymipera_rufescens", dataFull$Species))]
-  ratio_Wt_Band<-ratio_Wt[ - (grep("Macrotis_leucura", dataFull$Species):grep("Echymipera_rufescens", dataFull$Species))]
-  
-  ratiosBand=c(ratio_Tl_Band, ratio_Bl_Band, ratio_Wt_Band)
-  MinMaxtest(ratiosBand,3)
-  
-  par(mfrow=c(1,2))
-  boxplot(ratio_Tl, ratio_Bl,ratio_Wt, xlab="ratios with bandicoots")
-  boxplot(ratio_Tl_Band, ratio_Bl_Band,ratio_Wt_Band, xlab="ratios without bandicoots")
-
-
-
-```
-
-#Addressing the question if phylogenetic signal of tail and body length is higher than body weight because
-
-```{r}
-# Double-checking tip labels and data row names are in the same order
-
-tree$tip.label==rownames(data)
-
-#the actual tree lengths result in a singular matrix that can't be decomposed; ultrametricizing the tree helps.
-brlentree=compute.brlen(tree)
-brlentree$tip.label==rownames(data)
-
-phylosig(brlentree, data$Tl_mm, method = "K", nsim=1000)
-phylosig(brlentree, data$Bl_mm, method="K" ,nsim=1000)
-phylosig(brlentree, data$Wt_g, method="K", nsim=1000)
-
-
-#lambda works on the tree but gives a different, very high phylogenetic signal
-
-phylosig(tree, data$Tl_mm, method = "lambda", nsim=1000)
-phylosig(tree, data$Bl_mm, method="lambda", nsim=1000)
-phylosig(tree, data$Wt_g, method="lambda", nsim=1000)
-
-```
-#If weight is more variable within species, it should also evolve faster than body/tail length- and it does, by nearly an order of magnitude:
-
-```{r}
-RateFrame <- data[,2:4]
-matrix = c("Bl_mm", "Tl_mm", "Wt_g")
-
-summary( compare.multi.evol.rates(A=RateFrame, gp=matrix, phy=tree, Subset = TRUE, iter = 999, print.progress = TRUE))
-
-```
-
-#Also, weight should have greater disparity than body lenght and tail length:
-
-```{r}
-
-
-
-
-```
-
-
-
-#is there a difference in tail/body length or tail/weigth relationships between the sexes? This is only possible in a non phylogenetic context. 
+#Is it appropriate to use species averages, rather than male/female data separately? Since in tail/body length or tail/weigth relationships are the basis for this study, confirming that there are no significant differences in slope or intercept between males- and females-only datasets
 
 
 ```{r}
@@ -196,6 +114,75 @@ plot(data$Wt_Av_M,data$Tl_Av_M, col="red", pch=19);points(data$Wt_Av_F,data$Tl_A
 
 
 
+
+# How constrained are tail lengths, body lengths, and weights relative to each other? First, wihtin species: Body mass ranges are substantially greater than tail and body length ranges, hinting at substantial within-species independence of tail/vertebral length compared to weight.
+
+```{r}
+#Marsupials
+
+  ##return the min/max values to their un-logged form
+  ratio_Tl=c(10^(dataFull$Tl_max)/10^(dataFull$Tl_min))
+  ratio_Bl=c(10^(dataFull$Bl_max)/10^(dataFull$Bl_min))
+  ratio_Wt=c(10^(dataFull$Wt_max)/10^(dataFull$Wt_min))
+  
+  ##Visualizing means of the ratios 
+  boxplot(ratio_Tl, ratio_Bl,ratio_Wt, names=c("Tl ratio", "Bl ratio", "Wt ratio"))
+  
+  
+  
+  ##The VarDist.test code is in utilities. It runs a Kruskal-Wallis test and then a pairwise wilcoxon rank sum test on the ratios; BL and TL do not have significant ranges, Wt is significantly greater
+  ratios=c(ratio_Tl, ratio_Bl, ratio_Wt)
+  
+  MinMaxtest(ratios,3)
+  
+  
+  ##This is not mainly because of the extreme ranges in bandicoots!
+  
+  ratio_Tl_Band<-ratio_Tl[ - (grep("Macrotis_leucura", dataFull$Species):grep("Echymipera_rufescens", dataFull$Species))]
+  ratio_Bl_Band<-ratio_Bl[ - (grep("Macrotis_leucura", dataFull$Species):grep("Echymipera_rufescens", dataFull$Species))]
+  ratio_Wt_Band<-ratio_Wt[ - (grep("Macrotis_leucura", dataFull$Species):grep("Echymipera_rufescens", dataFull$Species))]
+  
+  ratiosBand=c(ratio_Tl_Band, ratio_Bl_Band, ratio_Wt_Band)
+  MinMaxtest(ratiosBand,3)
+  
+  par(mfrow=c(1,2))
+  boxplot(ratio_Tl, ratio_Bl,ratio_Wt, xlab="ratios with bandicoots")
+  boxplot(ratio_Tl_Band, ratio_Bl_Band,ratio_Wt_Band, xlab="ratios without bandicoots")
+
+
+
+```
+
+
+#If weight is more variable within species, it should also evolve faster than body/tail length- and it does, by nearly an order of magnitude:
+
+```{r}
+RateFrame <- data[,2:4]
+matrix = c("Bl_mm", "Tl_mm", "Wt_g")
+
+summary( compare.multi.evol.rates(A=RateFrame, gp=matrix, phy=tree, Subset = TRUE, iter = 999, print.progress = TRUE))
+
+```
+
+#However, the phylogenetic signal of weight and body length are similar and higher than that of tail lengths. 
+
+```{r}
+# Double-checking tip labels and data row names are in the same order
+
+tree$tip.label==rownames(data)
+
+#the actual tree lengths result in a singular matrix that can't be decomposed; ultrametricizing the tree helps.
+brlentree=compute.brlen(tree)
+brlentree$tip.label==rownames(data)
+
+phylosig(brlentree, data$Tl_mm, method = "K", nsim=1000)
+phylosig(brlentree, data$Bl_mm, method="K" ,nsim=1000)
+phylosig(brlentree, data$Wt_g, method="K", nsim=1000)
+
+
+```
+
+
 #Plotting according to tail use, locomotor mode, and phylogeny - weight and length are very similar, so I suspect one can be taken out in the end.
 
 ```{r}
@@ -232,7 +219,6 @@ plot(data$Tl_mm~data$Wt_g, col=colsOrderM[data$Order], pch=19, xlab="log Weight 
 
 
 ```
-
 
 
 # How do tail lengths scale with body length and weight? Which predicts Tail length better? The find. best.model code finds the best fitting tree branch and phylogenetic correlation matrix for each model and allows to run an anova on just that.For details, see utilities.
@@ -283,7 +269,6 @@ plot(data$Tl_mm~data$Wt_g, col=colsOrderM[data$Order], pch=19, xlab="log Weight 
 ```
 
 # Aside from the association between body length and tail length,does locomotor mode play a role? 
-
 
 ```{r}
 
