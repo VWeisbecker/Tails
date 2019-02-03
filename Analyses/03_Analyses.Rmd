@@ -7,9 +7,7 @@ output: html_document
 
 
 
-## load required packages and processed data
-
-
+## load required packages 
 
 ```{r }
 library(ape)
@@ -25,7 +23,15 @@ library(dplyr)
 library(RColorBrewer)
 library(surface)
 library(phia)
+if(!require(devtools)) install.packages("devtools")
+library(devtools)
+install_github("TGuillerme/dispRity", ref = "release")
+library(dispRity)
+```
 
+#Read in data and utilities code
+
+```{r}
 
 #the "utilities" file contains functions so this analysis page isn't too cluttered
 source("../Analyses/Utilities.r")
@@ -84,7 +90,7 @@ colnames(DataQuality)=c ("% in raw dataset")
 
 ```
 
-#Phylogenetic signal of tail length, head and body length, and body weight
+#Addressing the question if phylogenetic signal of tail and body length is higher than body weight because
 
 ```{r}
 # Double-checking tip labels and data row names are in the same order
@@ -107,6 +113,26 @@ phylosig(tree, data$Bl_mm, method="lambda", nsim=1000)
 phylosig(tree, data$Wt_g, method="lambda", nsim=1000)
 
 ```
+#If weight is more variable within species, it should also evolve faster than body/tail length- and it does, by nearly an order of magnitude:
+
+```{r}
+RateFrame <- data[,2:4]
+matrix = c("Bl_mm", "Tl_mm", "Wt_g")
+
+summary( compare.multi.evol.rates(A=RateFrame, gp=matrix, phy=tree, Subset = TRUE, iter = 999, print.progress = TRUE))
+
+```
+
+#Also, weight should have greater disparity than body lenght and tail length:
+
+```{r}
+
+
+
+
+```
+
+
 
 #is there a difference in tail/body length or tail/weigth relationships between the sexes? This is only possible in a non phylogenetic context. 
 
