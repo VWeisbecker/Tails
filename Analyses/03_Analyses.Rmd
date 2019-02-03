@@ -1,6 +1,6 @@
 ---
 title: "Analyses"
-author: "Vera Weisbecker and Cruise Speck"
+author: "Vera Weisbecker"
 date: "5 December 2018"
 output: html_document
 ---
