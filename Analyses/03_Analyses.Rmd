@@ -110,8 +110,6 @@ plot(data$Wt_Av_M,data$Tl_Av_M, col="red", pch=19);points(data$Wt_Av_F,data$Tl_A
 ```
 
 
-
-
 # How constrained are tail lengths, body lengths, and weights relative to each other? First, wihtin species: Body mass ranges are substantially greater than tail and body length ranges, hinting at substantial within-species independence of tail/vertebral length compared to weight.
 
 ```{r}
@@ -133,7 +131,7 @@ plot(data$Wt_Av_M,data$Tl_Av_M, col="red", pch=19);points(data$Wt_Av_F,data$Tl_A
   MinMaxtest(ratios,3)
   
   
-  ##This is not mainly because of the extreme ranges in bandicoots!
+  ##This is not  because of the extreme ranges in bandicoots!
   
   ratio_Tl_Band<-ratio_Tl[ - (grep("Macrotis_leucura", dataFull$Species):grep("Echymipera_rufescens", dataFull$Species))]
   ratio_Bl_Band<-ratio_Bl[ - (grep("Macrotis_leucura", dataFull$Species):grep("Echymipera_rufescens", dataFull$Species))]
@@ -240,7 +238,7 @@ plot(data$Tl_mm~data$Wt_g, col=colsOrderM[data$Order], pch=19, xlab="log Weight 
   AICmin=AICs-min(AICs)
   W=exp(-0.5*AICmin)/sum(exp(-0.5*AICmin))
   
-  #Not surprisingly, body length is a far better predictor of tail length:
+  #Body length is a far better predictor of tail length:
   W 
   
 ```
@@ -284,7 +282,7 @@ anova(TB$Models$Brownian)
 #In the plot, Peremelemorphs and the genus Macropus are suggestive of different intercept and slope, respectively. Thus checking if the significant interaction is driven by these two
 ```{r}
 
-#Removing peramelemorphs by classifire and Macropus species from looking at the first and last Macropus in the dataset
+#Removing peramelemorphs by classifier and Macropus species from looking at the first and last Macropus in the dataset
 
 NoPerams_Roos=data[-c(which(data$Order =="Peramelemorph"), which(data$Species=="Macropus_robustus"):which (data$Species=="Macropus_giganteus")), ]
 
@@ -354,7 +352,7 @@ TBNAP=find.best.model(Tl_mm~Bl_mm+Locomotor_use,NonArbPentTree,NonArbPent);TBNAP
 #this is quite good and seems to fit the data better than the model with interaction
 #qqnorm (TBNAPNoInter$Models$Brownian)
 
-###No differences in intercept!!
+###No differences in intercep
 anova(TBNAP$Models$Brownian, type="marginal")
 
 ```
