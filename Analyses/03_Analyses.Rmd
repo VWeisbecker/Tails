@@ -17,7 +17,6 @@ library(caper)
 library(car)
 library(multcomp)
 library(geomorph)
-#library(lmSupport)
 library(nlme)
 library(dplyr)
 library(RColorBrewer)
@@ -48,6 +47,17 @@ colnames(DataQuality)=c ("% in raw dataset")
   
 ```
 
+#the data are not normally distributed, rather they are bimodal in all cases. All model fits will therefore consider if the model residuals are regularly distributed
+
+```{r}
+par(mfrow= c(3,1))
+
+hist(data$Bl_mm, main="Frequency distribution of log Body length (mm)")
+hist(data$Tl_mm, main="Frequency distribution of log Tail length (mm)")
+hist(data$Wt_g, main="Frequency distribution of log Body mass (g)")
+
+
+```
 
 #Is it appropriate to use species averages, rather than male/female data separately? Since in tail/body length or tail/weigth relationships are the basis for this study, confirming that there are no significant differences in slope or intercept between males- and females-only datasets
 
