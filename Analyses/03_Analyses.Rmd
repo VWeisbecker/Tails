@@ -192,42 +192,6 @@ phylosig(brlentree, data$Wt_g, method="K", nsim=1000)
 ```
 
 
-#Plotting according to tail use, locomotor mode, and phylogeny - weight and length are very similar, so I suspect one can be taken out in the end.
-
-```{r}
-
-  
-# initial setup: colours and margins
-  colsOrderM=brewer.pal(n=length(levels(data$Order)), name="Dark2")
-  colsLoco=brewer.pal(n=length(levels(data$Locomotor_use)), name="Dark2")
-  ##Size of points
-  cexes <- 1
-  ## this adjusts the titles of the double panel
-  adjs <- -0.3
-  ## spaces to the left of text
-  xinter <- 0.2
-  ## spaces between legend lines
-  yInter <- 0.25
-  ##size of the box is determined by text width
-  textwidth <- 0.2
-  ##insets the box a bit
-  inset <- 0.01
-  
-    
-    ##4 panels, with margins of 2 lines
-    par(mfrow=c(2,2), mar = c(4,4,4,4))
-  
-plot(data$Tl_mm~data$Bl_mm, col=colsOrderM[data$Order], pch=19, xlab="log Body length", ylab="log Tail length") ;legend("bottomright", c("Dasyuromorph" ,  "Macropod", "Peramelemorph", "Possum"),inset=inset, pch=19, col=colsOrderM, cex=cexes,y.intersp = yInter, x.intersp = xinter,text.width = textwidth+0.1, bty="n" ); #text(data$Tl_mm~data$Bl_mm, labels=data$Species, cex=0.5)
-  
-  plot(data$Tl_mm~data$Bl_mm, col=colsLoco[data$Locomotor_use], pch=19, xlab="log Body length", ylab="log Tail length" ); legend("bottomright",inset=inset,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n");#text(data$Tl_mm~data$Bl_mm, labels=data$Species, cex=0.5)
-  
-plot(data$Tl_mm~data$Wt_g, col=colsOrderM[data$Order], pch=19, xlab="log Weight (g)", ylab="log Tail length") ;legend("bottomright", c("Dasyuromorph" ,  "Diprotodontian", "Peramelemorph"),inset=inset, pch=19, col=colsOrderM, cex=cexes,y.intersp = yInter, x.intersp = xinter,text.width = textwidth+0.1, bty="n" ); #text(data$Tl_mm~data$Wt_g, labels=data$Species, cex=0.5)
-  
-  plot(data$Tl_mm~data$Wt_g, col=colsLoco[data$Locomotor_use], pch=19, xlab="log Weight (g)", ylab="log Tail length" ); legend("bottomright",inset=inset,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n")
-  
-
-
-```
 
 
 # How do tail lengths scale with body length and weight? Which predicts Tail length better? The find. best.model code finds the best fitting tree branch and phylogenetic correlation matrix for each model and allows to run an anova on just that.For details, see utilities.
@@ -361,7 +325,7 @@ NonArbPentTree=drop.tip(tree, name.check(tree,NonArbPent)$tree_not_data )
 plot(NonArbPentTree)
 
 #Testing without interactions
-TBNAP=find.best.model(Tl_mm~Bl_mm+Locomotor_use,NonArbPentTree,NonArbPent);TBNAPNoInter$AIC_Weights
+TBNAP=find.best.model(Tl_mm~Bl_mm+Locomotor_use,NonArbPentTree,NonArbPent);TBNAP$AIC_Weights
 
 #this is quite good and seems to fit the data better than the model with interaction
 #qqnorm (TBNAPNoInter$Models$Brownian)
@@ -457,6 +421,64 @@ TukeyHSD(NonArb_Tukey1)
 
  
  
+#Plotting according to tail use, locomotor mode, and phylogeny - weight and length are very similar, so I suspect one can be taken out in the end.
+
+```{r}
+
+#determine the regression line coefficients from all the different pgls analyses conducted above, with separate lines where differences in slope or intercept were found.
+
+ArbPentline_Bl <- gls(Tl_mm~Bl_mm, correlation=corBrownian (1,phy=ArbPentTree), data=ArbPent)
+
+
+pgls.abline.function <- function (model_intercept, model_slope, value1, value2){
+ Y1 <- model_slope*value1+model_intercept
+ Y2 <- model_slope*value2+model_intercept
+ vector <- c(value1,value2,Y1,Y2)
+
+ line_coords <- list(vector)
+  
+ return(line_coords)
+  
+}
+
+ArbPentLine<-pgls.abline.function (ArbPentline_Bl$coefficients[1],ArbPentline_Bl$coefficients[2], 2,2.8)
+
+
+
+plot(x,y)
+lines(x=X, y=Y)
+
+# initial setup: colours and margins
+  colsOrderM=brewer.pal(n=length(levels(data$Order)), name="Dark2")
+  colsLoco=brewer.pal(n=length(levels(data$Locomotor_use)), name="Dark2")
+  ##Size of points
+  cexes <- 1
+  ## this adjusts the titles of the double panel
+  adjs <- -0.3
+  ## spaces to the left of text
+  xinter <- 0.2
+  ## spaces between legend lines
+  yInter <- 0.25
+  ##size of the box is determined by text width
+  textwidth <- 0.2
+  ##insets the box a bit
+  inset <- 0.01
+  
+    
+    ##4 panels, with margins of 2 lines
+    par(mfrow=c(2,2), mar = c(4,4,4,4))
+  
+plot(data$Tl_mm~data$Bl_mm, col=colsOrderM[data$Order], pch=19, xlab="log Body length", ylab="log Tail length") ;legend("bottomright", c("Dasyuromorph" ,  "Macropod", "Peramelemorph", "Possum"),inset=inset, pch=19, col=colsOrderM, cex=cexes,y.intersp = yInter, x.intersp = xinter,text.width = textwidth+0.1, bty="n" );  #text(data$Tl_mm~data$Bl_mm, labels=data$Species, cex=0.5)
+  
+plot(data$Tl_mm~data$Bl_mm, col=colsLoco[data$Locomotor_use], pch=19, xlab="log Body length", ylab="log Tail length" ); legend("bottomright",inset=inset,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n"); lines (x=c(2,2.8), y=c( 2.102229, 2.6538), col=colsLoco[1], lwd=2)   #text(data$Tl_mm~data$Bl_mm, labels=data$Species, cex=0.5)
+  
+plot(data$Tl_mm~data$Wt_g, col=colsOrderM[data$Order], pch=19, xlab="log Weight (g)", ylab="log Tail length") ;legend("bottomright", c("Dasyuromorph" ,  "Diprotodontian", "Peramelemorph"),inset=inset, pch=19, col=colsOrderM, cex=cexes,y.intersp = yInter, x.intersp = xinter,text.width = textwidth+0.1, bty="n" ); #text(data$Tl_mm~data$Wt_g, labels=data$Species, cex=0.5)
+  
+  plot(data$Tl_mm~data$Wt_g, col=colsLoco[data$Locomotor_use], pch=19, xlab="log Weight (g)", ylab="log Tail length" ); legend("bottomright",inset=inset,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n")
+  
+
+
+```
  
  
  
