@@ -79,5 +79,18 @@ find.best.model<-function(formula, Tree, taildata) {
 }
 
  
+
+#A code to predict the y parameters of a given x for pgls (or any other) coefficients; this produces code that can be copied and pasted into the plots to add lines for regressions of specific lengths (avoiding a confusion of lines that extrapolate beyond the actual data points)
+
+pgls.line.text <- function (model_intercept, model_slope, value1, value2){
+  Y1 <- model_slope*value1+model_intercept
+  Y2 <- model_slope*value2+model_intercept
+  vector <- c(value1,value2,Y1,Y2)
+  
+  line_coords <- list(vector)
+  
+  return(paste("lines(x=c(" , line_coords[[1]][1], "," , line_coords[[1]][2],")",",y=c(", line_coords[[1]][3],",", line_coords[[1]][4] , "))", sep="" ))
+  
+}
  
 
