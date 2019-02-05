@@ -427,8 +427,10 @@ TukeyHSD(NonArb_Tukey1)
 
 #determine the regression line coefficients from all the different pgls analyses conducted above, with separate lines where differences in slope or intercept were found.
 
-ArbPentline_Bl <- gls(Tl_mm~Bl_mm, correlation=corBrownian (1,phy=ArbPentTree), data=ArbPent)
+ArbPentline_Bl_formula <- gls(Tl_mm~Bl_mm, correlation=corBrownian (1,phy=ArbPentTree), data=ArbPent)
+ArbPentLine<-pgls.abline.function (ArbPentline_Bl_formula$coefficients[1],ArbPentline_Bl_formula$coefficients[2], 1.8,2.8)
 
+paste("lines(x=c(" , ArbPentLine[[1]][1], "," , ArbPentLine[[1]][2],")",",y=c(", ArbPentLine[[1]][3],",", ArbPentLine[[1]][4] , "))", sep="" )
 
 pgls.abline.function <- function (model_intercept, model_slope, value1, value2){
  Y1 <- model_slope*value1+model_intercept
@@ -437,11 +439,11 @@ pgls.abline.function <- function (model_intercept, model_slope, value1, value2){
 
  line_coords <- list(vector)
   
- return(line_coords)
+ return(paste("x=c(" ,line_coords[[1]][1],line_coords[[1]][2]),")","y=c(",line_coords[[1]][3],line_coords[[1]][4]), ")" )
   
 }
 
-ArbPentLine<-pgls.abline.function (ArbPentline_Bl$coefficients[1],ArbPentline_Bl$coefficients[2], 2,2.8)
+
 
 
 
@@ -470,7 +472,7 @@ lines(x=X, y=Y)
   
 plot(data$Tl_mm~data$Bl_mm, col=colsOrderM[data$Order], pch=19, xlab="log Body length", ylab="log Tail length") ;legend("bottomright", c("Dasyuromorph" ,  "Macropod", "Peramelemorph", "Possum"),inset=inset, pch=19, col=colsOrderM, cex=cexes,y.intersp = yInter, x.intersp = xinter,text.width = textwidth+0.1, bty="n" );  #text(data$Tl_mm~data$Bl_mm, labels=data$Species, cex=0.5)
   
-plot(data$Tl_mm~data$Bl_mm, col=colsLoco[data$Locomotor_use], pch=19, xlab="log Body length", ylab="log Tail length" ); legend("bottomright",inset=inset,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n"); lines (x=c(2,2.8), y=c( 2.102229, 2.6538), col=colsLoco[1], lwd=2)   #text(data$Tl_mm~data$Bl_mm, labels=data$Species, cex=0.5)
+plot(data$Tl_mm~data$Bl_mm, col=colsLoco[data$Locomotor_use], pch=19, xlab="log Body length", ylab="log Tail length" ); legend("bottomright",inset=inset,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n"); lines (x=c(1.8,2.8), y=c( 1.964323, 2.6538), col=colsLoco[1], lwd=2)   #text(data$Tl_mm~data$Bl_mm, labels=data$Species, cex=0.5)
   
 plot(data$Tl_mm~data$Wt_g, col=colsOrderM[data$Order], pch=19, xlab="log Weight (g)", ylab="log Tail length") ;legend("bottomright", c("Dasyuromorph" ,  "Diprotodontian", "Peramelemorph"),inset=inset, pch=19, col=colsOrderM, cex=cexes,y.intersp = yInter, x.intersp = xinter,text.width = textwidth+0.1, bty="n" ); #text(data$Tl_mm~data$Wt_g, labels=data$Species, cex=0.5)
   
