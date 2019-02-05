@@ -131,10 +131,14 @@ plot(data$Wt_Av_M,data$Tl_Av_M, col="red", pch=19);points(data$Wt_Av_F,data$Tl_A
   ratio_Wt=c(10^(dataFull$Wt_max)/10^(dataFull$Wt_min))
   
   ##Visualizing means of the ratios 
-  boxplot(ratio_Tl, ratio_Bl,ratio_Wt, names=c("Tl ratio", "Bl ratio", "Wt ratio"))
+
+lwd <- 2
+  boxplot(ratio_Tl, ratio_Bl,ratio_Wt, names=c("Tl ratio", "Bl ratio", "Wt ratio"), col=c("hotpink1","hotpink1","cadetblue2")); 
+arrows(x0=1,x1=2, y0=3, y1=3, length = 0.1, angle = 90, code=3, lwd=lwd, ); text(x=1.5, y=3.2, labels="0.48"); 
+arrows(x0=2,x1=2.8, y0=4.5, y1=4.5, length = 0.1, angle = 90, code=3, lwd=lwd, ); text(x=2.4, y=4.7, labels="0.000"); 
+arrows(x0=1,x1=2.8, y0=5.2, y1=5.2, length = 0.1, angle = 90, code=3, lwd=lwd, ); text(x=1.9, y=5.4, labels="0.000"); 
   
-  
-  
+ 
   ##The VarDist.test code is in utilities. It runs a Kruskal-Wallis test and then a pairwise wilcoxon rank sum test on the ratios; BL and TL do not have significant ranges, Wt is significantly greater
   ratios=c(ratio_Tl, ratio_Bl, ratio_Wt)
   
@@ -457,32 +461,3 @@ TukeyHSD(NonArb_Tukey1)
  
  
  
- 
- 
- 
-
-```{r}
-#Using the SURFACE package to look for significant shifts in evolutionary regime - this currently does not work because the matrices become singular and can't be decomposed. On a smaller dataset I noticed that the regimes are estimated differently when regression residuals are used.
-  
-ForSurf=as.data.frame(cbind(data$Tl_mm, data$Bl_mm))
-colnames(ForSurf) <- c("T1", "BL")
-rownames(ForSurf) <- rownames(data)
-
-MarsSurfTree<-nameNodes(tree)
-olist<-convertTreeData(MarsSurfTree,ForSurf)
-otree<-olist[[1]]; odata<-olist[[2]]
-
-fwd<-surfaceForward(otree, odata)
-k<-length(fwd)
-
-bwd<-surfaceBackward(otree, odata, starting_model = fwd[[k]], aic_threshold = 0, only_best = TRUE, verbose = FALSE, plotaic = FALSE)
-bsum<-surfaceSummary(bwd)
-kk<-length(bwd)
-
-fsum=surfaceSummary(fwd)
-bsum <- surfaceSummary(bwd)
-
-surfaceTreePlot(MarsSurfTree, bwd[[kk]], labelshifts = T)
-
-```
-
