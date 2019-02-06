@@ -52,9 +52,9 @@ colnames(DataQuality)=c ("% in raw dataset")
 ```{r}
 par(mfrow= c(3,1))
 
-hist(data$Bl_mm, main="Frequency distribution of log Body length (mm)")
-hist(data$Tl_mm, main="Frequency distribution of log Tail length (mm)")
-hist(data$Wt_g, main="Frequency distribution of log Body mass (g)")
+hist(data$Bl_mm, main="Frequency distribution of log Body length (mm)", xlab= "log Body length (mm)")
+hist(data$Tl_mm, main="Frequency distribution of log Tail length (mm)", xlab="log Tail length (mm) ")
+hist(data$Wt_g, main="Frequency distribution of log Body mass (g)", xlab="log Weight (g)" )
 
 
 ```
@@ -109,12 +109,30 @@ hist(data$Wt_g, main="Frequency distribution of log Body mass (g)")
   
 #plot male-only, female-only, and averaged datasets together
 
+lwd=2
+
 par(mfrow=c(1,2))
 
-plot(data$Bl_Av_M,data$Tl_Av_M, col="red", pch=19);points(data$Bl_Av_F,data$Tl_Av_F, col="blue", pch=19);points(data$Bl_mm,data$Tl_mm, col="green", pch=19);abline(lm(data$Tl_Av_M~data$Bl_Av_M), col="red");abline(lm(data$Tl_Av_F~data$Bl_Av_F), col="blue"); abline(lm(data$Tl_mm~data$Bl_mm), col="green")
+plot(data$Bl_Av_M,data$Tl_Av_M, col="red", pch=19, xlab="log Body length (mm)", ylab="log Tail length (mm)");
+points(data$Bl_Av_F,data$Tl_Av_F, col="blue", pch=19);
+points(data$Bl_mm,data$Tl_mm, col="cyan", pch=19);
+abline(lm(data$Tl_Av_M~data$Bl_Av_M), col="red",lwd=lwd);
+abline(lm(data$Tl_Av_F~data$Bl_Av_F), col="blue",lwd=lwd); 
+abline(lm(data$Tl_mm~data$Bl_mm), col="cyan", lwd=lwd);
+legend("bottomright",c("Male", "Female", "Combined") , pch=19, col=c("red","blue", "cyan"), cex=1)
+
+plot(data$Wt_Av_M,data$Tl_Av_M, col="red", pch=19, xlab="log Body length (mm)", ylab="log Tail length (mm)");
+points(data$Wt_Av_F,data$Tl_Av_F, col="blue", pch=19);
+points(data$Wt_g,data$Tl_mm, col="cyan", pch=19);
+abline(lm(data$Tl_Av_M~data$Wt_Av_M), col="red",lwd=lwd);
+abline(lm(data$Tl_Av_F~data$Wt_Av_F), col="blue",lwd=lwd); 
+abline(lm(data$Tl_mm~data$Wt_g), col="cyan", lwd=lwd);
+legend("bottomright",c("Male", "Female", "Combined") , pch=19, col=c("red","blue", "cyan"), cex=1)
 
 
-plot(data$Wt_Av_M,data$Tl_Av_M, col="red", pch=19);points(data$Wt_Av_F,data$Tl_Av_F, col="blue", pch=19);points(data$Wt_g,data$Tl_mm, col="green", pch=19);abline(lm(data$Tl_Av_M~data$Wt_Av_M), col="red");abline(lm(data$Tl_Av_F~data$Wt_Av_F), col="blue"); abline(lm(data$Tl_mm~data$Wt_g), col="green")  
+plot(data$Wt_Av_M,data$Tl_Av_M, col="red", pch=19);points(data$Wt_Av_F,data$Tl_Av_F, col="blue", pch=19);points(data$Wt_g,data$Tl_mm, col="cyan", pch=19);abline(lm(data$Tl_Av_M~data$Wt_Av_M), col="red");abline(lm(data$Tl_Av_F~data$Wt_Av_F), col="blue"); abline(lm(data$Tl_mm~data$Wt_g), col="cyan")  
+
+legend("bottomright",inset=0.08,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n");  
 
 
 ```
