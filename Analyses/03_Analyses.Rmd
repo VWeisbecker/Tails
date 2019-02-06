@@ -195,6 +195,7 @@ matrix = c("Bl_mm", "Tl_mm", "Wt_g")
 
 rate_comp=compare.multi.evol.rates(A=RateFrame, gp=matrix, phy=compute.brlen(tree), Subset = FALSE, iter = 999, print.progress = FALSE)
                                   
+summary (rate_comp)
 rate_comp$pairwise.pvalue
 rate_comp$sigma.d.gp.ratio
                                                                     
@@ -209,13 +210,17 @@ rate_comp$sigma.d.gp.ratio
 
 tree$tip.label==rownames(data)
 
-#the actual tree lengths result in a singular matrix that can't be decomposed; ultrametricizing the tree helps.
+#the actual tree lengths result in a singular matrix that can't be decomposed; ultrametricizing the tree helps, as above.
 brlentree=compute.brlen(tree)
 brlentree$tip.label==rownames(data)
 
 phylosig(brlentree, data$Tl_mm, method = "K", nsim=1000)
 phylosig(brlentree, data$Bl_mm, method="K" ,nsim=1000)
 phylosig(brlentree, data$Wt_g, method="K", nsim=1000)
+
+phylosig(brlentree, data$Tl_mm, method = "lambda", nsim=1000)
+phylosig(brlentree, data$Bl_mm, method="lambda" ,nsim=1000)
+phylosig(brlentree, data$Wt_g, method="lambda", nsim=1000)
 
 
 ```

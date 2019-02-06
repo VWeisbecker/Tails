@@ -92,7 +92,9 @@ pgls.line.text <- function (model_intercept, model_slope, value1, value2){
   
   line_coords <- list(vector)
   
-  return(paste("lines(x=c(" , line_coords[[1]][1], "," , line_coords[[1]][2],")",",y=c(", line_coords[[1]][3],",", line_coords[[1]][4] , "))", sep="" ))
+  line <-(paste("lines(x=c(" , line_coords[[1]][1], "," , line_coords[[1]][2],")",",y=c(", line_coords[[1]][3],",", line_coords[[1]][4] , "))", sep="" ))
+  
+  return(line)
   
 }
  
