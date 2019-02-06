@@ -171,9 +171,14 @@ arrows(x0=1,x1=2.8, y0=5.2, y1=5.2, length = 0.1, angle = 90, code=3, lwd=lwd, )
   ratiosBand=c(ratio_Tl_Band, ratio_Bl_Band, ratio_Wt_Band)
   MinMaxtest(ratiosBand,3)
   
-  par(mfrow=c(1,2))
-  boxplot(ratio_Tl, ratio_Bl,ratio_Wt, xlab="ratios with bandicoots")
-  boxplot(ratio_Tl_Band, ratio_Bl_Band,ratio_Wt_Band, xlab="ratios without bandicoots")
+  
+ 
+ 
+boxplot(ratio_Tl_Band, ratio_Bl_Band,ratio_Wt_Band, names=c("Tl ratio", "Bl ratio", "Wt ratio"), xlab="Ratios without Peramelemorpha", col=c("hotpink1","hotpink1","cadetblue2"))
+      
+arrows(x0=1,x1=2, y0=3, y1=3, length = 0.1, angle = 90, code=3, lwd=lwd, ); text(x=1.5, y=3.2, labels="0.44"); 
+arrows(x0=2,x1=2.8, y0=4.5, y1=4.5, length = 0.1, angle = 90, code=3, lwd=lwd, ); text(x=2.4, y=4.7, labels="0.000"); 
+arrows(x0=1,x1=2.8, y0=5.2, y1=5.2, length = 0.1, angle = 90, code=3, lwd=lwd, ); text(x=1.9, y=5.4, labels="0.000")
 
 
 
