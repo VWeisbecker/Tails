@@ -191,7 +191,14 @@ arrows(x0=1,x1=2.8, y0=5.2, y1=5.2, length = 0.1, angle = 90, code=3, lwd=lwd, )
 RateFrame <- data[,2:4]
 matrix = c("Bl_mm", "Tl_mm", "Wt_g")
 
-summary( compare.multi.evol.rates(A=RateFrame, gp=matrix, phy=tree, Subset = TRUE, iter = 999, print.progress = TRUE))
+#The below gives a warning that the phylgenetic correlation matrix is singular when the untransformed tree is run. But there are no differences in significance levels regardless which one is used.
+
+rate_comp=compare.multi.evol.rates(A=RateFrame, gp=matrix, phy=compute.brlen(tree), Subset = FALSE, iter = 999, print.progress = FALSE)
+                                  
+rate_comp$pairwise.pvalue
+rate_comp$sigma.d.gp.ratio
+                                                                    
+
 
 ```
 
