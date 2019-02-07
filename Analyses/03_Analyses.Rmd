@@ -183,27 +183,7 @@ arrows(x0=1,x1=2.8, y0=5.2, y1=5.2, length = 0.1, angle = 90, code=3, lwd=lwd, )
 
 
 ```
-
-
-#If weight is more variable within species, it should also evolve faster than body/tail length- and it does, by nearly an order of magnitude:
-
-```{r}
-RateFrame <- data[,2:4]
-matrix = c("Bl_mm", "Tl_mm", "Wt_g")
-
-#The below gives a warning that the phylgenetic correlation matrix is singular when the untransformed tree is run. But there are no differences in significance levels regardless which one is used.
-
-rate_comp=compare.multi.evol.rates(A=RateFrame, gp=matrix, phy=compute.brlen(tree), Subset = FALSE, iter = 999, print.progress = FALSE)
-                                  
-summary (rate_comp)
-rate_comp$pairwise.pvalue
-rate_comp$sigma.d.gp.ratio
-                                                                    
-
-
-```
-
-#However, the phylogenetic signal of weight and body length are similar and higher than that of tail lengths. 
+#Phylogenetic signal of weight and body length are similar and higher than that of tail lengths. 
 
 ```{r}
 # Double-checking tip labels and data row names are in the same order
@@ -225,8 +205,23 @@ phylosig(brlentree, data$Wt_g, method="lambda", nsim=1000)
 
 ```
 
+#If weight is more variable within species, it should also evolve faster than body/tail length- and it does, by nearly an order of magnitude:
+
+```{r}
+RateFrame <- data[,2:4]
+matrix = c("Bl_mm", "Tl_mm", "Wt_g")
+
+#The below gives a warning that the phylgenetic correlation matrix is singular when the untransformed tree is run. But there are no differences in significance levels regardless which one is used.
+
+rate_comp=compare.multi.evol.rates(A=RateFrame, gp=matrix, phy=compute.brlen(tree), Subset = FALSE, iter = 999, print.progress = FALSE)
+                                  
+summary (rate_comp)
+rate_comp$pairwise.pvalue
+rate_comp$sigma.d.gp.ratio
+                                                                    
 
 
+```
 
 # How do tail lengths scale with body length and weight? Which predicts Tail length better? The find. best.model code finds the best fitting tree branch and phylogenetic correlation matrix for each model and allows to run an anova on just that.For details, see utilities.
 
@@ -355,6 +350,13 @@ NonArbPent=data[c(which(data$Locomotor_use =="Terrestrial"), which ( data$Locomo
 
 NonArbPentTree=drop.tip(tree, name.check(tree,NonArbPent)$tree_not_data )
 
+#prepare arboreal and pentapedal only for later plotting as well
+Arb=data[c(which(data$Locomotor_use =="Arboreal")),]
+Arb_Tree=drop.tip(tree, name.check(tree,Arb)$tree_not_data )
+Pent=data[c(which(data$Locomotor_use =="Pentapedal")),]
+Pent_Tree=drop.tip(tree, name.check(tree,Pent)$tree_not_data )
+
+
 #The tree contains dasyurids and peramelids, and non-pentapedal macropods but few possums
 plot(NonArbPentTree)
 
@@ -434,7 +436,7 @@ NonArbTree=drop.tip(tree, name.check(tree,NonArb)$tree_not_data )
 #also prepare the opposite tree for plotting later, although not used in analysis
 Arb=data[c(which(data$Locomotor_use =="Arboreal")),]
 
-Arb_Tree=drop.tip(tree, name.check(tree,Arb_Weight)$tree_not_data )
+Arb_Tree=drop.tip(tree, name.check(tree,Arb)$tree_not_data )
 
 
 #The tree contains dasyurids and peramelids, and non-pentapedal macropods but few possums
