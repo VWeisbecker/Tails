@@ -149,3 +149,26 @@ qqnorm (MurTBWNoInter$Models$Brownian_GrafScale)
 anova(MurTBWNoInter$Models$Brownian_GrafScale, type="marginal")
 
 
+
+#process trees for the major marsupial orders as well
+
+
+
+
+#Dasyuromorphs
+dasy_data=data_synch[which(data_synch$Order =="Dasyuromorph"),]
+dasy_tree=drop.tip(tree_synch, name.check(tree_synch,dasy_data)$tree_not_data )
+
+#Peramelemorphs
+peram_data=data_synch[which(data_synch$Order =="Peramelemorph"),]
+peram_tree=drop.tip(tree_synch, name.check(tree_synch,peram_data)$tree_not_data )
+
+#Diprotodontia
+dip_data=data_synch[which(data_synch$Order =="Diprotodontian"),]
+dip_tree=drop.tip(tree_synch, name.check(tree_synch,dip_data)$tree_not_data )
+
+
+
+
+
+
