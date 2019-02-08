@@ -78,6 +78,10 @@ data_synch <-data_synch [,][match(tree_synch$tip.label,data_synch$Species),]
 #Check that the re-ordering works
 tree_synch$tip.label==data_synch$Species
 
+#Some Petrogale branches are unresolved - hence, need to split these branches using multi2di
+is.binary(tree_synch)
+tree_synch <- multi2di(tree_synch)
+
 
 ```
 
