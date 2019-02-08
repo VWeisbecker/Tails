@@ -80,8 +80,9 @@ tree_synch$tip.label==data_synch$Species
 
 #Some Petrogale branches are unresolved - hence, need to split these branches using multi2di
 is.binary(tree_synch)
-tree_synch <- multi2di(tree_synch)
+tree_synch <- multi2di(tree_synch, random = FALSE)
 
+is.binary(tree_synch)
 
 ```
 
