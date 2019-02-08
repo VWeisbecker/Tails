@@ -211,7 +211,7 @@ phylosig(brlentree, data$Wt_g, method="lambda", nsim=1000)
 RateFrame <- data[,2:4]
 matrix = c("Bl_mm", "Tl_mm", "Wt_g")
 
-#The below gives a warning that the phylgenetic correlation matrix is singular when the untransformed tree is run. But there are no differences in significance levels regardless which one is used. Note that the individual variables fit an OU model better than a Brownian model, but evolutionary rates are to our knowledge only testable within a Brownian motion model (Adams 2012)
+#The below gives a warning that the phylgenetic correlation matrix is singular when the untransformed tree is run. But there are no differences in significance levels regardless which one is used. Note also that the individual variables fit an OU model better than a Brownian model, but evolutionary rates are to our knowledge only testable within a Brownian motion model (Adams 2012)
 
 rate_comp=compare.multi.evol.rates(A=RateFrame, gp=matrix, phy=compute.brlen(tree), Subset = FALSE, iter = 999, print.progress = FALSE)
                                   
