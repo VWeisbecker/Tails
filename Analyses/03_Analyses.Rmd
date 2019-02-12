@@ -22,6 +22,8 @@ library(dplyr)
 library(RColorBrewer)
 library(surface)
 library(phia)
+library(DescTools)
+library(scales)
 
 ```
 
@@ -130,11 +132,6 @@ abline(lm(data$Tl_mm~data$Wt_g), col="cyan", lwd=lwd);
 legend("bottomright",c("Male", "Female", "Combined") , pch=19, col=c("red","blue", "cyan"), cex=1)
 
 
-plot(data$Wt_Av_M,data$Tl_Av_M, col="red", pch=19);points(data$Wt_Av_F,data$Tl_Av_F, col="blue", pch=19);points(data$Wt_g,data$Tl_mm, col="cyan", pch=19);abline(lm(data$Tl_Av_M~data$Wt_Av_M), col="red");abline(lm(data$Tl_Av_F~data$Wt_Av_F), col="blue"); abline(lm(data$Tl_mm~data$Wt_g), col="cyan")  
-
-legend("bottomright",inset=0.08,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n");  
-
-
 ```
 
 
@@ -147,6 +144,10 @@ legend("bottomright",inset=0.08,levels(data$Locomotor_use) , pch=19, col=colsLoc
   ratio_Tl=c(10^(data$Tl_max)/10^(data$Tl_min))
   ratio_Bl=c(10^(data$Bl_max)/10^(data$Bl_min))
   ratio_Wt=c(10^(data$Wt_max)/10^(data$Wt_min))
+  
+  mean(ratio_Tl, na.rm=TRUE)
+  mean(ratio_Bl, na.rm=TRUE)
+  mean(ratio_Wt, na.rm=TRUE)
   
   ##Visualizing means of the ratios 
 
@@ -169,10 +170,14 @@ arrows(x0=1,x1=2.8, y0=5.2, y1=5.2, length = 0.1, angle = 90, code=3, lwd=lwd, )
   ratio_Bl_Band<-ratio_Bl[ - (which(data$Order=="Peramelemorph"))]
   ratio_Wt_Band<-ratio_Wt[ - (which(data$Order=="Peramelemorph"))]
   
+  mean(ratio_Tl_Band, na.rm=TRUE)
+  mean(ratio_Bl_Band, na.rm=TRUE)
+  mean(ratio_Wt_Band, na.rm=TRUE)
+  
   ratiosBand=c(ratio_Tl_Band, ratio_Bl_Band, ratio_Wt_Band)
   MinMaxtest(ratiosBand,3)
   
-  
+  mean (ratio_Tl_Band)
  
  
 boxplot(ratio_Tl_Band, ratio_Bl_Band,ratio_Wt_Band, names=c("Tl ratio", "Bl ratio", "Wt ratio"), xlab="Ratios without Peramelemorpha", col=c("hotpink1","hotpink1","cadetblue2"))
@@ -470,7 +475,7 @@ Arb_Tree=drop.tip(tree, name.check(tree,Arb)$tree_not_data )
 plot(NonArbTree)
 
 #Model
-TWNA=find.best.model(Tl_mm~Wt_g+Locomotor_use,NonArbTree,NonArb);TBNAP$AIC_Weights
+TWNA=find.best.model(Tl_mm~Wt_g+Locomotor_use,NonArbTree,NonArb);TWNA$AIC_Weights
 
 #qqnorm fit is OK, again with just a couple of "tails"
 #qqnorm (TWNA$Models$Brownian)
@@ -567,6 +572,44 @@ lines(x=c(0.7,4.5),y=c(1.72467611669273,2.97159755686062),col="Black", lwd=2)
 
 ```
  
+#A plot that includes ranges as ellipses using the DescTools package for ellipses and scale package for transparency setting
  
+```{r}
+data_ranges_Bl <- data[-c(which(is.na(data$Tl_min)), which (is.na(data$Bl_min))),]
+data_ranges_Wt <- data[-c(which(is.na(data$Tl_min)), which (is.na(data$Wt_min))),]
+
+par(mfrow=c(2,1))
+#Tail vs body length: 
+par(pin=c(5,5))
+
+plot(data_ranges_Bl$Tl_mm~data_ranges_Bl$Bl_mm, col=colsLoco[data$Locomotor_use], pch = pchs[data$Order], xlab="log Body length (mm)", ylab="log Tail length" , xlim=c(1.5,3.6), ylim=c(1.5,3.3) ); 
+DrawEllipse(x=data_ranges_Bl$Bl_mm, y=data_ranges_Bl$Tl_mm, radius.x = (data_ranges$Bl_max - data_ranges$Bl_min), radius.y = (data_ranges$Tl_max - data_ranges$Tl_min), col=alpha (colsLoco[data$Locomotor_use] , 0.05), border=colsLoco[data$Locomotor_use]);
+points(data_ranges_Bl$Tl_mm~data_ranges_Bl$Bl_mm, col="black", pch = pchs[data$Order]);
+legend("bottomright",inset=0.08,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n");  
+legend("topleft", "a", bty="n", cex=1.5, inset=-0.05);
+#first draw wider lines to give a black "frame"
+lines(x=c(1.8,2.8),y=c(1.8776347281739,2.76827754516716), col="black", lwd=5); lines(x=c(2.6,3.2),y=c(2.60573488742311,2.93380010371888), col="black", lwd=5);
+lines(x=c(1.8,3.1),y=c(1.69042118446694,2.7933259492651), col="black", lwd=5);
+#then the coloured lines for filling in
+lines(x=c(1.8,2.8),y=c(1.8776347281739,2.76827754516716), col=colsLoco[1], lwd=3); lines(x=c(2.6,3.2),y=c(2.60573488742311,2.93380010371888), col=colsLoco[2], lwd=3);
+lines(x=c(1.8,3.1),y=c(1.69042118446694,2.7933259492651), col="Black", lwd=3)
+
+#Tail vs body weight:
+plot(data_ranges_Wt$Tl_mm~data_ranges_Wt$Wt_g, col=colsLoco[data$Locomotor_use], pch = pchs[data$Order], xlab="log Weigth (g)", ylab="log Tail length" , xlim=c(0.5,5), ylim=c(1,3.3), asp=1 ); 
+DrawEllipse(x=data_ranges_Wt$Wt_g, y=data_ranges_Wt$Tl_mm, radius.x = (data_ranges$Bl_max - data_ranges$Bl_min), radius.y = (data_ranges$Tl_max - data_ranges$Tl_min), col=alpha (colsLoco[data$Locomotor_use] , 0.05), border=colsLoco[data$Locomotor_use]);
+points(data_ranges_Wt$Tl_mm~data_ranges_Wt$Wt_g, col="black", pch = pchs[data$Order]);
+legend("bottomright",inset=0.12,levels(data$Order) , pch=pchs,  cex=cexes,x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n" );
+legend("topleft", "b", bty="n", cex=1.5,inset=-0.05);
+#first draw wider lines to give a black "frame"
+lines(x=c(0.8,3.5),y=c(1.85285512787502,2.6583303053621), col="Black", lwd=5);
+lines(x=c(0.7,4.5),y=c(1.72467611669273,2.97159755686062),col="Black", lwd=5)
+
+#then the coloured lines for filling in
+lines(x=c(0.8,3.5),y=c(1.85285512787502,2.6583303053621), col=colsLoco[1], lwd=3);
+lines(x=c(0.7,4.5),y=c(1.72467611669273,2.97159755686062),col="Black", lwd=3)
+
+
+
+```
  
  

@@ -13,7 +13,7 @@ library(geiger)
 
 ```
 
-#prepare data and trees; this includes deleting entries with NAS in the main averages
+##prepare data and trees; this includes deleting entries with NAS in the main averages
 ```{r}
 # The data, partition between marsupials and rodents
 data=read.csv("../data/Full_dataset.csv")
