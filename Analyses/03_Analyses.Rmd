@@ -141,68 +141,70 @@ legend("bottomright",c("Male", "Female", "Combined") , pch=19, col=c("red","blue
 
 
  ##return the min/max values to their un-logged form
-  ratio_Tl=c(10^(data$Tl_max)/10^(data$Tl_min))
-  ratio_Bl=c(10^(data$Bl_max)/10^(data$Bl_min))
-  ratio_Wt=c(10^(data$Wt_max)/10^(data$Wt_min))
+  ranges=as.data.frame(cbind(c(10^(data$Tl_max)/10^(data$Tl_min)),c(10^(data$Bl_max)/10^(data$Bl_min)),c(10^(data$Wt_max)/10^(data$Wt_min))))
+rownames(ranges) <-data$Species
+colnames(ranges) <- c("Tl_ratio", "Bl_ratio", "Wt_ratio")
   
-  mean(ratio_Tl, na.rm=TRUE)
-  mean(ratio_Bl, na.rm=TRUE)
-  mean(ratio_Wt, na.rm=TRUE)
+  
+  mean(ranges$Tl_ratio, na.rm=TRUE)
+  mean(ranges$Bl_ratio, na.rm=TRUE)
+  mean(ranges$Wt_ratio, na.rm=TRUE)
+
+  
+ ##The VarDist.test code is in utilities. It runs a Kruskal-Wallis test and then a pairwise wilcoxon rank sum test on the ranges; BL and TL do not have significant ranges, Wt is significantly greater
+  ForVarDist=c(ranges$Tl_ratio, ranges$Bl_ratio)
+  
+  MinMaxtest(ForVarDist,2)  
   
   ##Visualizing means of the ratios 
 
 lwd <- 2
-  boxplot(ratio_Tl, ratio_Bl,ratio_Wt, names=c("Tl ratio", "Bl ratio", "Wt ratio"), col=c("hotpink1","hotpink1","cadetblue2")); 
-arrows(x0=1,x1=2, y0=3, y1=3, length = 0.1, angle = 90, code=3, lwd=lwd, ); text(x=1.5, y=3.2, labels="0.48"); 
-arrows(x0=2,x1=2.8, y0=4.5, y1=4.5, length = 0.1, angle = 90, code=3, lwd=lwd, ); text(x=2.4, y=4.7, labels="0.000"); 
-arrows(x0=1,x1=2.8, y0=5.2, y1=5.2, length = 0.1, angle = 90, code=3, lwd=lwd, ); text(x=1.9, y=5.4, labels="0.000"); 
-  
- 
-  ##The VarDist.test code is in utilities. It runs a Kruskal-Wallis test and then a pairwise wilcoxon rank sum test on the ratios; BL and TL do not have significant ranges, Wt is significantly greater
-  ratios=c(ratio_Tl, ratio_Bl, ratio_Wt)
-  
-  MinMaxtest(ratios,3)
-  
+  boxplot(ranges$Tl_ratio, ranges$Bl_ratio,ranges$Wt_ratio, names=c("Tl ratio", "Bl ratio", "Wt ratio"), col=c("hotpink1","hotpink1","cadetblue2")); 
+arrows(x0=1,x1=2, y0=3, y1=3, length = 0.1, angle = 90, code=3, lwd=lwd, ); 
+  text(x=1.5, y=3.2, labels="p=0.67"); 
+  text(x=1, y=0.9, labels="mean=1.44");
+  text(x=2, y=0.9, labels="mean=1.44");
+  text(x=3, y=0.9, labels="mean=2.64")
+
   
   ##This is not  because of the extreme ranges in bandicoots!
   
-  ratio_Tl_Band<-ratio_Tl[ - (which(data$Order=="Peramelemorph"))]
-  ratio_Bl_Band<-ratio_Bl[ - (which(data$Order=="Peramelemorph"))]
-  ratio_Wt_Band<-ratio_Wt[ - (which(data$Order=="Peramelemorph"))]
+  ranges_Band<-ranges[ - (which(data$Order=="Peramelemorph")),]
   
-  mean(ratio_Tl_Band, na.rm=TRUE)
-  mean(ratio_Bl_Band, na.rm=TRUE)
-  mean(ratio_Wt_Band, na.rm=TRUE)
+  mean(ranges_Band$Tl_ratio, na.rm=TRUE)
+  mean(ranges_Band$Bl_ratio, na.rm=TRUE)
+  mean(ranges_Band$Wt_ratio, na.rm=TRUE)
   
-  ratiosBand=c(ratio_Tl_Band, ratio_Bl_Band, ratio_Wt_Band)
-  MinMaxtest(ratiosBand,3)
+  ForVarDist_Band=c(ranges_Band$Tl_ratio, ranges_Band$Bl_ratio)
+  
+  MinMaxtest(ratiosBand,2)
   
   mean (ratio_Tl_Band)
  
  
-boxplot(ratio_Tl_Band, ratio_Bl_Band,ratio_Wt_Band, names=c("Tl ratio", "Bl ratio", "Wt ratio"), xlab="Ratios without Peramelemorpha", col=c("hotpink1","hotpink1","cadetblue2"))
+boxplot(ranges_Band$Tl_ratio , ranges_Band$Bl_ratio,ranges_Band$Wt_ratio, names=c("Tl ratio", "Bl ratio", "Wt ratio"), xlab="Ratios without Peramelemorpha", col=c("hotpink1","hotpink1","cadetblue2"))
       
-arrows(x0=1,x1=2, y0=3, y1=3, length = 0.1, angle = 90, code=3, lwd=lwd, ); text(x=1.5, y=3.2, labels="0.44"); 
-arrows(x0=2,x1=2.8, y0=4.5, y1=4.5, length = 0.1, angle = 90, code=3, lwd=lwd, ); text(x=2.4, y=4.7, labels="0.000"); 
-arrows(x0=1,x1=2.8, y0=5.2, y1=5.2, length = 0.1, angle = 90, code=3, lwd=lwd, ); text(x=1.9, y=5.4, labels="0.000")
+arrows(x0=1,x1=2, y0=3.5, y1=3.5, length = 0.1, angle = 90, code=3, lwd=lwd, ); text(x=1.5, y=3.7, labels="p=0.56")
+  text(x=1, y=0.9, labels="mean=1.43");
+  text(x=2, y=0.9, labels="mean=1.43");
+  text(x=3, y=0.9, labels="mean=2.55")
+
 
 
 #Are arboreal and pentapedal species more constrained by their weight within species?
 
 
-  ratio_Tl_ArbPent<-ratio_Tl[ c (which (data$Locomotor_use == "Arboreal") , (which (data$Locomotor_use =="Pentapedal" )))]
-  ratio_Bl_ArbPent<-ratio_Bl[ c (which (data$Locomotor_use == "Arboreal") , (which (data$Locomotor_use =="Pentapedal" )))]
-  ratio_Wt_ArbPent<-ratio_Wt[ c (which (data$Locomotor_use == "Arboreal") , (which (data$Locomotor_use =="Pentapedal" )))]
+  rangesArbPent<-ranges[ c (which (data$Locomotor_use == "Arboreal") , (which (data$Locomotor_use =="Pentapedal" ))),]
   
-  ratio_Tl_NonArbPent<-ratio_Tl[- c (which (data$Locomotor_use == "Arboreal") , (which (data$Locomotor_use =="Pentapedal" )))]
-  ratio_Bl_NonArbPent<-ratio_Bl[- c (which (data$Locomotor_use == "Arboreal") , (which (data$Locomotor_use =="Pentapedal" )))]
-  ratio_Wt_NonArbPent<-ratio_Wt[- c (which (data$Locomotor_use == "Arboreal") , (which (data$Locomotor_use =="Pentapedal" )))]
   
-  ratiosArbPent_Tl=c(ratio_Tl_ArbPent, ratio_Tl_NonArbPent)
-  ratiosArbPent_Bl=c(ratio_Bl_ArbPent, ratio_Bl_NonArbPent)
-  ratiosArbPent_Wt=c(ratio_Wt_ArbPent, ratio_Wt_NonArbPent)
+  rangesNonArbPent<-ranges[- c (which (data$Locomotor_use == "Arboreal") , (which (data$Locomotor_use =="Pentapedal" ))),]
+ 
   
- #for convenience running the Minmaxtest code but of course only the Kruskal-Wallis result needs to be considered
+  ratiosArbPent_Tl=c(rangesArbPent$Tl_ratio, rangesNonArbPent$Tl_ratio)
+  ratiosArbPent_Bl=c(rangesArbPent$Bl_ratio, rangesNonArbPent$Bl_ratio)
+  ratiosArbPent_Wt=c(rangesArbPent$Wt_ratio, rangesNonArbPent$Wt_ratio)
+  
+
   #no significant differences in tail ranges
   MinMaxtest(ratiosArbPent_Tl,2)
   #significant but only just
@@ -210,7 +212,39 @@ arrows(x0=1,x1=2.8, y0=5.2, y1=5.2, length = 0.1, angle = 90, code=3, lwd=lwd, )
   #not significant
   MinMaxtest(ratiosArbPent_Wt,2)
 
+```
+# do species with larger ranges of tail length tend to have larger ranges of body weight as well, but this correlation is stronger for body length than tail length
 
+```{r}   
+# Double-checking tip labels and data row names are in the same order
+
+rangesphy <- ranges[-c(which(is.na(ranges$Tl_ratio)), which (is.na(ranges$Bl_ratio)), which (is.na(ranges$Wt_ratio))),]
+namecheck=name.check(tree,rangesphy)
+treeranges=drop.tip(tree,namecheck$tree_not_data)
+name.check(treeranges,rangesphy)
+
+VarTlBl=find.best.model(Tl_ratio~Bl_ratio,treeranges,rangesphy);VarTlBl$AIC_Weights
+  #Checking appropriate distribution of model residuals; , this is using qqnorm.gls from the nlme package. They mostly fall on a line    
+  qqnorm (TB$Models$Pagel)      
+ VarTlBl$Model_summaries$Pagel$tTable
+ VarTlBl$Model_summaries$Pagel$coefficients
+ 
+ VarTlWt=find.best.model(Tl_ratio~Wt_ratio,treeranges,rangesphy);VarTlWt$AIC_Weights
+  #Checking appropriate distribution of model residuals; , this is using qqnorm.gls from the nlme package. They mostly fall on a line    
+  qqnorm (TB$Models$Pagel)      
+ VarTlWt$Model_summaries$Pagel$tTable
+ VarTlWt$Model_summaries$Pagel$coefficients
+ 
+ 
+ #compute relative probabilities betweeen 0 and 100 by comparing AICS according to Burnham and Anderson
+  AICs=c(VarTlBl$Model_summaries$Pagel$AIC,VarTlWt$Model_summaries$Pagel$AIC )
+  AICmin=AICs-min(AICs)
+  W=exp(-0.5*AICmin)/sum(exp(-0.5*AICmin))
+  
+  #The ranges of body length explain teh ranges of tail length far better than weight ranges
+  W 
+ 
+  
 ```
 #Phylogenetic signal of weight and body length are similar and higher than that of tail lengths. 
 
@@ -252,24 +286,30 @@ rate_comp$sigma.d.gp.ratio
 
 
 ```
-
-# How do tail lengths scale with body length and weight? Which predicts Tail length better? The find. best.model code finds the best fitting tree branch and phylogenetic correlation matrix for each model and allows to run an anova on just that.For details, see utilities.
+ 
+# Do tail length and body length scale similarly with body weight? The find. best.model code finds the best fitting tree branch and phylogenetic correlation matrix for each model and allows to run an anova on just that.For details, see utilities.
 
 ```{r}
+ 
+  ##Tail vs body weight: suggestive of geometric similarity at 0.32
+  TW=find.best.model(Tl_mm~Wt_g,tree,data);TW$AIC_Weights
+  #Checking appropriate distribution of model residuals
+  qqnorm (TW$Models$Brownian)
+  TW$Model_summaries$Brownian$tTable  
   
-  ##Tail vs. body length: Significant and very high correlation coefficient (0.87)
+  
+  ##Body length vs body weight: 0.37
+  BW=find.best.model(Bl_mm~Wt_g,tree,data);BW$AIC_Weights
+  #Checking appropriate distribution of model residuals
+  qqnorm (BW$Models$Brownian)
+  BW$Model_summaries$Brownian$tTable  
+  
+  ##Tail vs. body length: Significant and very high correlation coefficient (0.80)
   TB=find.best.model(Tl_mm~Bl_mm,tree,data);TB$AIC_Weights
   #Checking appropriate distribution of model residuals; , this is using qqnorm.gls from the nlme package. They mostly fall on a line    
   qqnorm (TB$Models$Brownian)      
   TB$Model_summaries$Brownian$tTable
 
-  
-  ##Tail vs body weight: significant but low correlation coefficient (0.33)
-  TW=find.best.model(Tl_mm~Wt_g,tree,data);TW$AIC_Weights
-  #Checking appropriate distribution of model residuals
-  qqnorm (TB$Models$Brownian)
-  TW$Model_summaries$Brownian$tTable
-  
   #compute relative probabilities betweeen 0 and 100 by comparing AICS according to Burnham and Anderson
   AICs=c(TB$Model_summaries$Brownian$AIC,TW$Model_summaries$Brownian$AIC )
   AICmin=AICs-min(AICs)
@@ -280,7 +320,7 @@ rate_comp$sigma.d.gp.ratio
   
 ```
 
-# Weight remains a significant predictor of tail length even when correcting for body mass, but with a very low coefficient.
+# Weight remains a significant predictor of tail length even when correcting for body mass, but with lower level of significance and lower effect size.
 
 ```{r}
       
