@@ -526,8 +526,9 @@ Allothers_Wt <- pgls.line.text(Allothers_Wt_F$coefficients[1],Allothers_Wt_F$coe
 
 
 # initial setup: colours and margins
-  colsOrderM=brewer.pal(n=length(levels(data$Order)), name="Dark2")
-  colsLoco=brewer.pal(n=length(levels(data$Locomotor_use)), name="Dark2")
+  #colsOrderM=brewer.pal(n=2+length(levels(data$Order)), name="Paired")
+  colsLoco=brewer.pal(n=3+length(levels(data$Locomotor_use)), name="Dark2")
+  colsLoco=c("dark orange", "purple", "green", "red", "blue")
   pchs=c(8,11,19,17,20,15)
   ##Size of points
   cexes <- 1
@@ -578,28 +579,43 @@ lines(x=c(0.7,4.5),y=c(1.72467611669273,2.97159755686062),col="Black", lwd=2)
 data_ranges_Bl <- data[-c(which(is.na(data$Tl_min)), which (is.na(data$Bl_min))),]
 data_ranges_Wt <- data[-c(which(is.na(data$Tl_min)), which (is.na(data$Wt_min))),]
 
-par(mfrow=c(2,1))
-#Tail vs body length: 
-par(pin=c(5,5))
 
-plot(data_ranges_Bl$Tl_mm~data_ranges_Bl$Bl_mm, col=colsLoco[data$Locomotor_use], pch = pchs[data$Order], xlab="log Body length (mm)", ylab="log Tail length" , xlim=c(1.5,3.6), ylim=c(1.5,3.3) ); 
-DrawEllipse(x=data_ranges_Bl$Bl_mm, y=data_ranges_Bl$Tl_mm, radius.x = (data_ranges$Bl_max - data_ranges$Bl_min), radius.y = (data_ranges$Tl_max - data_ranges$Tl_min), col=alpha (colsLoco[data$Locomotor_use] , 0.05), border=colsLoco[data$Locomotor_use]);
+#par(mfrow=c(2,1))
+
+#Tail vs body length: 
+
+
+plot(data_ranges_Bl$Tl_mm~data_ranges_Bl$Bl_mm, col=colsLoco[data$Locomotor_use], pch = pchs[data$Order], xlab="log Body length (mm)", ylab="log Tail length" , xlim=c(1.6,3.5), ylim=c(1.5,3.3) , asp=1); 
+
+
+DrawEllipse(x=data_ranges_Bl$Bl_mm, y=data_ranges_Bl$Tl_mm, radius.x = (data_ranges_Bl$Bl_max - data_ranges_Bl$Bl_min), radius.y = (data_ranges_Bl$Tl_max - data_ranges_Bl$Tl_min), col=alpha (colsLoco[data$Locomotor_use] , 0.05), border=colsLoco[data$Locomotor_use]);
+
 points(data_ranges_Bl$Tl_mm~data_ranges_Bl$Bl_mm, col="black", pch = pchs[data$Order]);
+
 legend("bottomright",inset=0.08,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n");  
+
 legend("topleft", "a", bty="n", cex=1.5, inset=-0.05);
+
 #first draw wider lines to give a black "frame"
 lines(x=c(1.8,2.8),y=c(1.8776347281739,2.76827754516716), col="black", lwd=5); lines(x=c(2.6,3.2),y=c(2.60573488742311,2.93380010371888), col="black", lwd=5);
 lines(x=c(1.8,3.1),y=c(1.69042118446694,2.7933259492651), col="black", lwd=5);
+
 #then the coloured lines for filling in
 lines(x=c(1.8,2.8),y=c(1.8776347281739,2.76827754516716), col=colsLoco[1], lwd=3); lines(x=c(2.6,3.2),y=c(2.60573488742311,2.93380010371888), col=colsLoco[2], lwd=3);
 lines(x=c(1.8,3.1),y=c(1.69042118446694,2.7933259492651), col="Black", lwd=3)
 
 #Tail vs body weight:
-plot(data_ranges_Wt$Tl_mm~data_ranges_Wt$Wt_g, col=colsLoco[data$Locomotor_use], pch = pchs[data$Order], xlab="log Weigth (g)", ylab="log Tail length" , xlim=c(0.5,5), ylim=c(1,3.3), asp=1 ); 
-DrawEllipse(x=data_ranges_Wt$Wt_g, y=data_ranges_Wt$Tl_mm, radius.x = (data_ranges$Bl_max - data_ranges$Bl_min), radius.y = (data_ranges$Tl_max - data_ranges$Tl_min), col=alpha (colsLoco[data$Locomotor_use] , 0.05), border=colsLoco[data$Locomotor_use]);
+
+
+plot(data_ranges_Wt$Tl_mm~data_ranges_Wt$Wt_g, col=colsLoco[data$Locomotor_use], pch = pchs[data$Order], xlab="log Weigth (g)", ylab="log Tail length" , xlim=c(0.3,5.3), ylim=c(1.2,3.3), asp=1 ); 
+
+DrawEllipse(x=data_ranges_Wt$Wt_g, y=data_ranges_Wt$Tl_mm, radius.x = (data_ranges_Wt$Wt_max - data_ranges_Wt$Wt_min), radius.y = (data_ranges_Wt$Tl_max - data_ranges_Wt$Tl_min), col=alpha (colsLoco[data$Locomotor_use] , 0.05), border=colsLoco[data$Locomotor_use]);
+
 points(data_ranges_Wt$Tl_mm~data_ranges_Wt$Wt_g, col="black", pch = pchs[data$Order]);
 legend("bottomright",inset=0.12,levels(data$Order) , pch=pchs,  cex=cexes,x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n" );
-legend("topleft", "b", bty="n", cex=1.5,inset=-0.05);
+
+legend("topleft", "b", bty="n", cex=1.5,inset=-0.05)
+
 #first draw wider lines to give a black "frame"
 lines(x=c(0.8,3.5),y=c(1.85285512787502,2.6583303053621), col="Black", lwd=5);
 lines(x=c(0.7,4.5),y=c(1.72467611669273,2.97159755686062),col="Black", lwd=5)
