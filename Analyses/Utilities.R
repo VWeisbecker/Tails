@@ -1,5 +1,5 @@
 
-# Running non-parametric comparisons of values 
+# Running non-parametric comparisons of values;  
 #@param variable_stack: input vector of the variables to be compared "stacked" on top of each other
 #@param number_of_variables: number of variables
 
