@@ -177,9 +177,8 @@ arrows(x0=1,x1=2, y0=3, y1=3, length = 0.1, angle = 90, code=3, lwd=lwd, );
   
   ForVarDist_Band=c(ranges_Band$Tl_ratio, ranges_Band$Bl_ratio)
   
-  MinMaxtest(ratiosBand,2)
+  MinMaxtest(ForVarDist_Band,2)
   
-  mean (ratio_Tl_Band)
  
  
 boxplot(ranges_Band$Tl_ratio , ranges_Band$Bl_ratio,ranges_Band$Wt_ratio, names=c("Tl ratio", "Bl ratio", "Wt ratio"), xlab="Ratios without Peramelemorpha", col=c("hotpink1","hotpink1","cadetblue2"))
@@ -212,6 +211,8 @@ arrows(x0=1,x1=2, y0=3.5, y1=3.5, length = 0.1, angle = 90, code=3, lwd=lwd, ); 
   #not significant
   MinMaxtest(ratiosArbPent_Wt,2)
 
+  #Mention constraint on 1 due to the range nature of data; use anova then wilcoxon
+  
 ```
 # do species with larger ranges of tail length tend to have larger ranges of body weight as well, but this correlation is stronger for body length than tail length
 
@@ -224,14 +225,14 @@ treeranges=drop.tip(tree,namecheck$tree_not_data)
 name.check(treeranges,rangesphy)
 
 VarTlBl=find.best.model(Tl_ratio~Bl_ratio,treeranges,rangesphy);VarTlBl$AIC_Weights
-  #Checking appropriate distribution of model residuals; , this is using qqnorm.gls from the nlme package. They mostly fall on a line    
-  qqnorm (TB$Models$Pagel)      
+  #Checking appropriate distribution of model residuals; they are not amazing but will have to do
+  qqnorm (VarTlBl$Models$Pagel)      
  VarTlBl$Model_summaries$Pagel$tTable
  VarTlBl$Model_summaries$Pagel$coefficients
  
  VarTlWt=find.best.model(Tl_ratio~Wt_ratio,treeranges,rangesphy);VarTlWt$AIC_Weights
   #Checking appropriate distribution of model residuals; , this is using qqnorm.gls from the nlme package. They mostly fall on a line    
-  qqnorm (TB$Models$Pagel)      
+  qqnorm (VarTlWt$Models$Pagel)      
  VarTlWt$Model_summaries$Pagel$tTable
  VarTlWt$Model_summaries$Pagel$coefficients
  
