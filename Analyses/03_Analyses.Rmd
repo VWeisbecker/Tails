@@ -160,11 +160,11 @@ colnames(ranges) <- c("Tl_ratio", "Bl_ratio", "Wt_ratio")
 
 lwd <- 2
   boxplot(ranges$Tl_ratio, ranges$Bl_ratio,ranges$Wt_ratio, names=c("Tl ratio", "Bl ratio", "Wt ratio"), col=c("hotpink1","hotpink1","cadetblue2")); 
-arrows(x0=1,x1=2, y0=3, y1=3, length = 0.1, angle = 90, code=3, lwd=lwd, ); 
-  text(x=1.5, y=3.2, labels="p=0.67"); 
-  text(x=1, y=0.9, labels="mean=1.44");
-  text(x=2, y=0.9, labels="mean=1.44");
-  text(x=3, y=0.9, labels="mean=2.64")
+arrows(x0=1,x1=2, y0=3, y1=3, length = 0.1, angle = 90, code=3, lwd=lwd ); 
+  text(x=1.5, y=3.2, labels="p=0.76"); 
+  text(x=1, y=0.9, labels=paste ("mean=",round( mean(ranges$Tl_ratio, na.rm=TRUE), digits=2), sep="" ));
+  text(x=2, y=0.9, labels=paste ("mean=",round( mean(ranges$Bl_ratio, na.rm=TRUE), digits=2), sep="" ));
+  text(x=3, y=0.9, labels=paste ("mean=",round( mean(ranges$Wt_ratio, na.rm=TRUE), digits=2), sep="" ))
 
   
   ##This is not  because of the extreme ranges in bandicoots!
@@ -183,10 +183,10 @@ arrows(x0=1,x1=2, y0=3, y1=3, length = 0.1, angle = 90, code=3, lwd=lwd, );
  
 boxplot(ranges_Band$Tl_ratio , ranges_Band$Bl_ratio,ranges_Band$Wt_ratio, names=c("Tl ratio", "Bl ratio", "Wt ratio"), xlab="Ratios without Peramelemorpha", col=c("hotpink1","hotpink1","cadetblue2"))
       
-arrows(x0=1,x1=2, y0=3.5, y1=3.5, length = 0.1, angle = 90, code=3, lwd=lwd, ); text(x=1.5, y=3.7, labels="p=0.56")
-  text(x=1, y=0.9, labels="mean=1.43");
-  text(x=2, y=0.9, labels="mean=1.43");
-  text(x=3, y=0.9, labels="mean=2.55")
+arrows(x0=1,x1=2, y0=3.5, y1=3.5, length = 0.1, angle = 90, code=3, lwd=lwd, ); text(x=1.5, y=3.7, labels="p=0.76")
+  text(x=1, y=0.9, labels=paste ("mean=",round( mean(ranges_Band$Tl_ratio, na.rm=TRUE), digits=2), sep="" ));
+  text(x=2, y=0.9, labels=paste ("mean=",round( mean(ranges_Band$Tl_ratio, na.rm=TRUE), digits=2), sep="" ));
+  text(x=3, y=0.9, labels=paste ("mean=",round( mean(ranges_Band$Tl_ratio, na.rm=TRUE), digits=2), sep="" ))
 
 
 
@@ -206,7 +206,7 @@ arrows(x0=1,x1=2, y0=3.5, y1=3.5, length = 0.1, angle = 90, code=3, lwd=lwd, ); 
 
   #no significant differences in tail ranges
   MinMaxtest(ratiosArbPent_Tl,2)
-  #significant but only just
+  #No sig. differences
   MinMaxtest(ratiosArbPent_Bl,2)
   #not significant
   MinMaxtest(ratiosArbPent_Wt,2)
@@ -403,7 +403,7 @@ TB=find.best.model(Tl_mm~Bl_mm*Order,tree,data);TB$AIC_Weights
 #check if the residuals of the model are OK; the fit is quite good
 #qqnorm (TB$Models$Brownian)
 
-###look at the model summary of the most likely model: there are significant interactions 
+###look at the model summary of the most likely model: there are no significant interactions 
 anova(TB$Models$Brownian)
 
 #a test of the uncorrected lm model also suggests no differences in scaling slope:
@@ -434,10 +434,10 @@ plot(NonArbPentTree)
 #Testing without interactions
 TBNAP=find.best.model(Tl_mm~Bl_mm+Locomotor_use,NonArbPentTree,NonArbPent);TBNAP$AIC_Weights
 
-#this is quite good and seems to fit the data better than the model with interaction
+#this is quite good
 #qqnorm (TBNAPNoInter$Models$Brownian)
 
-###No differences in intercep
+###No differences in intercept, albeit very close to significance
 anova(TBNAP$Models$Brownian, type="marginal")
 
 ```
