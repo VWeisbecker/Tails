@@ -123,7 +123,7 @@ abline(lm(data$Tl_Av_F~data$Bl_Av_F), col="blue",lwd=lwd);
 abline(lm(data$Tl_mm~data$Bl_mm), col="cyan", lwd=lwd);
 legend("bottomright",c("Male", "Female", "Combined") , pch=19, col=c("red","blue", "cyan"), cex=1)
 
-plot(data$Wt_Av_M,data$Tl_Av_M, col="red", pch=19, xlab="log Body length (mm)", ylab="log Tail length (mm)");
+plot(data$Wt_Av_M,data$Tl_Av_M, col="red", pch=19, xlab="log Weigth (g)", ylab="log Tail length (mm)");
 points(data$Wt_Av_F,data$Tl_Av_F, col="blue", pch=19);
 points(data$Wt_g,data$Tl_mm, col="cyan", pch=19);
 abline(lm(data$Tl_Av_M~data$Wt_Av_M), col="red",lwd=lwd);
@@ -135,7 +135,7 @@ legend("bottomright",c("Male", "Female", "Combined") , pch=19, col=c("red","blue
 ```
 
 
-# How constrained are tail lengths, body lengths, and weights relative to each other? First, wihtin species: Body mass ranges are substantially greater than tail and body length ranges, hinting at substantial within-species independence of tail/vertebral length compared to weight.
+# How constrained are tail lengths, body lengths, and weights relative to each other? First, wihtin species: Body mass ranges are substantially greater than tail and body length ranges, hinting at substantial within-species independence of tail/vertebral length compared to weight. 
 
 ```{r}
 
@@ -161,7 +161,7 @@ colnames(ranges) <- c("Tl_ratio", "Bl_ratio", "Wt_ratio")
 lwd <- 2
   boxplot(ranges$Tl_ratio, ranges$Bl_ratio,ranges$Wt_ratio, names=c("Tl ratio", "Bl ratio", "Wt ratio"), col=c("hotpink1","hotpink1","cadetblue2")); 
 arrows(x0=1,x1=2, y0=3, y1=3, length = 0.1, angle = 90, code=3, lwd=lwd ); 
-  text(x=1.5, y=3.2, labels="p=0.76"); 
+  text(x=1.5, y=3.2, labels="p=0.57"); 
   text(x=1, y=0.9, labels=paste ("mean=",round( mean(ranges$Tl_ratio, na.rm=TRUE), digits=2), sep="" ));
   text(x=2, y=0.9, labels=paste ("mean=",round( mean(ranges$Bl_ratio, na.rm=TRUE), digits=2), sep="" ));
   text(x=3, y=0.9, labels=paste ("mean=",round( mean(ranges$Wt_ratio, na.rm=TRUE), digits=2), sep="" ))
@@ -183,7 +183,7 @@ arrows(x0=1,x1=2, y0=3, y1=3, length = 0.1, angle = 90, code=3, lwd=lwd );
  
 boxplot(ranges_Band$Tl_ratio , ranges_Band$Bl_ratio,ranges_Band$Wt_ratio, names=c("Tl ratio", "Bl ratio", "Wt ratio"), xlab="Ratios without Peramelemorpha", col=c("hotpink1","hotpink1","cadetblue2"))
       
-arrows(x0=1,x1=2, y0=3.5, y1=3.5, length = 0.1, angle = 90, code=3, lwd=lwd, ); text(x=1.5, y=3.7, labels="p=0.76")
+arrows(x0=1,x1=2, y0=3.5, y1=3.5, length = 0.1, angle = 90, code=3, lwd=lwd, ); text(x=1.5, y=3.7, labels="p=0.69")
   text(x=1, y=0.9, labels=paste ("mean=",round( mean(ranges_Band$Tl_ratio, na.rm=TRUE), digits=2), sep="" ));
   text(x=2, y=0.9, labels=paste ("mean=",round( mean(ranges_Band$Tl_ratio, na.rm=TRUE), digits=2), sep="" ));
   text(x=3, y=0.9, labels=paste ("mean=",round( mean(ranges_Band$Tl_ratio, na.rm=TRUE), digits=2), sep="" ))
@@ -192,13 +192,10 @@ arrows(x0=1,x1=2, y0=3.5, y1=3.5, length = 0.1, angle = 90, code=3, lwd=lwd, ); 
 
 #Are arboreal and pentapedal species more constrained by their weight within species?
 
-
   rangesArbPent<-ranges[ c (which (data$Locomotor_use == "Arboreal") , (which (data$Locomotor_use =="Pentapedal" ))),]
-  
   
   rangesNonArbPent<-ranges[- c (which (data$Locomotor_use == "Arboreal") , (which (data$Locomotor_use =="Pentapedal" ))),]
  
-  
   ratiosArbPent_Tl=c(rangesArbPent$Tl_ratio, rangesNonArbPent$Tl_ratio)
   ratiosArbPent_Bl=c(rangesArbPent$Bl_ratio, rangesNonArbPent$Bl_ratio)
   ratiosArbPent_Wt=c(rangesArbPent$Wt_ratio, rangesNonArbPent$Wt_ratio)
@@ -211,8 +208,6 @@ arrows(x0=1,x1=2, y0=3.5, y1=3.5, length = 0.1, angle = 90, code=3, lwd=lwd, ); 
   #not significant
   MinMaxtest(ratiosArbPent_Wt,2)
 
-  #Mention constraint on 1 due to the range nature of data; use anova then wilcoxon
-  
 ```
 # do species with larger ranges of tail length tend to have larger ranges of body weight as well, but this correlation is stronger for body length than tail length
 
@@ -225,19 +220,19 @@ treeranges=drop.tip(tree,namecheck$tree_not_data)
 name.check(treeranges,rangesphy)
 
 VarTlBl=find.best.model(Tl_ratio~Bl_ratio,treeranges,rangesphy);VarTlBl$AIC_Weights
-  #Checking appropriate distribution of model residuals; they are not amazing but will have to do
+  #Checking appropriate distribution of model residuals. These are not very linear, so cautious interpretation is required!
   qqnorm (VarTlBl$Models$Pagel)      
  VarTlBl$Model_summaries$Pagel$tTable
  VarTlBl$Model_summaries$Pagel$coefficients
  
  VarTlWt=find.best.model(Tl_ratio~Wt_ratio,treeranges,rangesphy);VarTlWt$AIC_Weights
-  #Checking appropriate distribution of model residuals; , this is using qqnorm.gls from the nlme package. They mostly fall on a line    
+  #Checking appropriate distribution of model residuals. These are not very linear, so again cautious interpretation is required!
   qqnorm (VarTlWt$Models$Pagel)      
  VarTlWt$Model_summaries$Pagel$tTable
  VarTlWt$Model_summaries$Pagel$coefficients
  
  
- #compute relative probabilities betweeen 0 and 100 by comparing AICS according to Burnham and Anderson
+ #compute relative probabilities betweeen 0 and 1 by comparing AICS according to Burnham and Anderson
   AICs=c(VarTlBl$Model_summaries$Pagel$AIC,VarTlWt$Model_summaries$Pagel$AIC )
   AICmin=AICs-min(AICs)
   W=exp(-0.5*AICmin)/sum(exp(-0.5*AICmin))
@@ -247,29 +242,9 @@ VarTlBl=find.best.model(Tl_ratio~Bl_ratio,treeranges,rangesphy);VarTlBl$AIC_Weig
  
   
 ```
-#Phylogenetic signal of weight and body length are similar and higher than that of tail lengths. 
-
-```{r}
-# Double-checking tip labels and data row names are in the same order
-
-tree$tip.label==rownames(data)
-
-#the actual tree lengths result in a singular matrix that can't be decomposed; ultrametricizing the tree helps, as above.
-brlentree=compute.brlen(tree)
-brlentree$tip.label==rownames(data)
-
-phylosig(brlentree, data$Tl_mm, method = "K", nsim=1000)
-phylosig(brlentree, data$Bl_mm, method="K" ,nsim=1000)
-phylosig(brlentree, data$Wt_g, method="K", nsim=1000)
-
-phylosig(brlentree, data$Tl_mm, method = "lambda", nsim=1000)
-phylosig(brlentree, data$Bl_mm, method="lambda" ,nsim=1000)
-phylosig(brlentree, data$Wt_g, method="lambda", nsim=1000)
 
 
-```
-
-#To understand the mode of evolution (Brownian, Ornstein-Uhlenbeck, or Early burst), we run the fit.continuous function from the phylo package. Note that I have not been able to put this into a loop because of a warning message that .
+#To understand the mode of evolution (Brownian, Ornstein-Uhlenbeck, or Early burst), we run the fit.continuous function from the phylo package. Note that I have not been able to put this into a loop because of a warning message regarding the OU model for tail length.
 
 ```{r}
 
@@ -635,7 +610,7 @@ Terr_Tree=drop.tip(tree, name.check(tree,Terr)$tree_not_data )
   ## this adjusts the titles of the double panel
   adjs <- -0.3
   ## spaces to the left of text
-  xinter <- 1
+  xinter <- 0.3
   ## spaces between legend lines
   yInter <- 0.3
   ##size of the box is determined by text width
@@ -647,8 +622,8 @@ Terr_Tree=drop.tip(tree, name.check(tree,Terr)$tree_not_data )
 par(mfrow=c(2,1))
   
 
-plot(data$Tl_mm~data$Bl_mm, col=colsLoco[data$Locomotor_use], pch = pchs[data$Order], xlab="log Body length (mm)", ylab="log Tail length" ); 
-legend("bottomright",inset=0.08,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n");  
+plot(data$Tl_mm~data$Bl_mm, col=colsLoco[data$Locomotor_use], pch = pchs[data$Order], xlab="log Body length (mm)", ylab="log Tail length",asp=1 ); 
+legend("bottomright",inset=0.2,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter+0.2, text.width = textwidth, bty="n" );  
 legend("topleft", "a", bty="n", cex=1.5, inset=-0.05);
 lines(x=c(1.8,2.7),y=c(1.8776347281739,2.67921326346783),col=colsLoco[1], lwd=2)
 lines(x=c(2.6,3.2),y=c(2.60573488742311,2.93380010371888),col=colsLoco[2], lwd=2)
@@ -662,8 +637,8 @@ lines(x=c(1.7,3.1),y=c(1.63362786425447,2.65638567297399), col=colsLoco[5], lwd=
 #abline(lm(NonArb$Tl_mm~NonArb$Bl_mm))
 #text(data$Tl_mm~data$Bl_mm, labels=data$Species, cex=0.5)
   
-plot(data$Tl_mm~data$Wt_g, col=colsLoco[data$Locomotor_use], pch = pchs[data$Order], xlab="log Weight (g)", ylab="log Tail length" );
-legend("bottomright",inset=0.12,levels(data$Order) , pch=pchs,  cex=cexes,x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n" );
+plot(data$Tl_mm~data$Wt_g, col=colsLoco[data$Locomotor_use], pch = pchs[data$Order], xlab="log Weight (g)", ylab="log Tail length" , asp=1);
+legend("bottomright",inset=0.25,levels(data$Order) , pch=pchs,  cex=cexes,x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n" );
 legend("topleft", "b", bty="n", cex=1.5,inset=-0.05);
 lines(x=c(0.9,3.7),y=c(1.88268754185602,2.71799513332411), col=colsLoco[1], lwd=2)
 lines(x=c(3.6,4.6),y=c(2.61375492837646,2.92719940106734), col=colsLoco[2], lwd=2)
@@ -697,9 +672,9 @@ DrawEllipse(x=data_ranges_Bl$Bl_mm, y=data_ranges_Bl$Tl_mm, radius.x = (data_ran
 
 points(data_ranges_Bl$Tl_mm~data_ranges_Bl$Bl_mm, col="black", pch = pchs[data$Order]);
 
-legend("bottomright",inset=0.08,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n");  
+legend("bottomright",inset=0.25,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter+0.1, text.width = textwidth, bty="n");  
 
-legend("topleft", "a", bty="n", cex=1.5, inset=-0.05);
+legend("topleft", "a", bty="n", cex=1.5 );
 
 #first draw wider lines to give a black "frame"
 #first draw wider lines to give a black "frame"
@@ -715,6 +690,7 @@ lines(x=c(2.6,3.2),y=c(2.60573488742311,2.93380010371888),col=colsLoco[2], lwd=2
 lines(x=c(2.3,2.83),y=c(2.06846791509595,2.75148825513933), col=colsLoco[3], lwd=2)
 lines(x=c(1.9,2.7),y=c(1.99094065810105,2.62786824555291), col=colsLoco[4], lwd=2)
 lines(x=c(1.7,3.1),y=c(1.63362786425447,2.65638567297399), col=colsLoco[5], lwd=2)
+
 #Tail vs body weight:
 
 
@@ -723,7 +699,7 @@ plot(data_ranges_Wt$Tl_mm~data_ranges_Wt$Wt_g, col=colsLoco[data$Locomotor_use],
 DrawEllipse(x=data_ranges_Wt$Wt_g, y=data_ranges_Wt$Tl_mm, radius.x = (data_ranges_Wt$Wt_max - data_ranges_Wt$Wt_min), radius.y = (data_ranges_Wt$Tl_max - data_ranges_Wt$Tl_min), col=alpha (colsLoco[data$Locomotor_use] , 0.05), border=colsLoco[data$Locomotor_use]);
 
 points(data_ranges_Wt$Tl_mm~data_ranges_Wt$Wt_g, col="black", pch = pchs[data$Order]);
-legend("bottomright",inset=0.12,levels(data$Order) , pch=pchs,  cex=cexes,x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n" );
+legend("bottomright",inset=0.13,levels(data$Order) , pch=pchs,  cex=cexes,x.intersp = xinter, y.intersp = yInter+0.3, text.width = textwidth, bty="n" );
 
 legend("topleft", "b", bty="n", cex=1.5,inset=-0.05)
 

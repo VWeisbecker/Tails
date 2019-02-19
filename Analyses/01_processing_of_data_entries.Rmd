@@ -70,7 +70,7 @@ for (i in 1:length(data$Species)){
       
     }
  
-  # if males or females have ranges, enter the max and min for each species in the relevant column; this assumes that overall ranges are never given together with the more informative values by sex 
+  # if males or females have ranges, enter the max and min for each species in the relevant column; this assumes that overall ranges are never given together with the more informative range values by sex 
 
     if((is.na(data$Wt_min_F[i])==FALSE | is.na(data$Wt_min_M[i])==FALSE)){
   
@@ -92,7 +92,7 @@ for (i in 1:length(data$Species)){
     
 }
 
-#now re-process data_processed to fill NAs in the main values, first by averaging male/female values, second (if sex averages are not available) by averaging sex-less min/max values. This overwrites the first pass summary version of data_processed with the second pass summary version
+#now re-process data_processed to fill NAs in the species means, first by averaging male/female values, second (if sex averages are not available) by averaging sex-less min/max values. This overwrites the first pass summary version of data_processed with the second pass summary version
 
 for (i in 1:(nrow(data_processed))){
   
