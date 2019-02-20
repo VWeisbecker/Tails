@@ -42,7 +42,7 @@ data[,2:(ncol(numcols)+1)]=numcols_log10
 
 data=data[-(c(grep("Vombatus_ursinus", data$Species),grep("Phascolarctos_cinereus", data$Species),grep("Lasiorhinus_latifrons", data$Species), grep("Notoryctes_typhlops", data$Species), grep("Notoryctes_caurinus", data$Species))),]
 
-data$Order <- droplevels(data$Order, exclude= "Vombatiform")
+data$Clade <- droplevels(data$Clade, exclude= "Vombatiform")
 
 
 #deleting all entries that have NAs in their main data and locomotor use; this means some species don't have weight data. There is also one specie of rodent deleted because of lack of 

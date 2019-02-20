@@ -1,4 +1,4 @@
-Species,Bl_mm,Tl_mm,Wt_g,Bl_min,Bl_max,Tl_min,Tl_max,Wt_min,Wt_max,Bl_min_M,Bl_max_M,Bl_min_F,Bl_max_F,Tl_min_M,Tl_max_M,Tl_min_F,Tl_max_F,Wt_min_M,Wt_max_M,Wt_min_F,Wt_max_F,Bl_Av_M,Bl_Av_F,Tl_Av_M,Tl_Av_F,Wt_Av_M,Wt_Av_F,Locomotor_use,Order
+Species,Bl_mm,Tl_mm,Wt_g,Bl_min,Bl_max,Tl_min,Tl_max,Wt_min,Wt_max,Bl_min_M,Bl_max_M,Bl_min_F,Bl_max_F,Tl_min_M,Tl_max_M,Tl_min_F,Tl_max_F,Wt_min_M,Wt_max_M,Wt_min_F,Wt_max_F,Bl_Av_M,Bl_Av_F,Tl_Av_M,Tl_Av_F,Wt_Av_M,Wt_Av_F,Locomotor_use,Clade
 Antechinomys_laniger,,,,,,,,,,80,100,70,95,100,150,100,140,,,,,85,85,130,120,30,20,Terrestrial,Dasyuromorph
 Antechinus_agilis,,,,,,,,,,65,124,62,128,63,116,60,103,20,40,16,25,98,84,89,89,30,18,Scansorial,Dasyuromorph
 Antechinus_bellus,,,,,,,,,,121,148,110,130,105,126,93,110,42,66,26,41,134,117,114,100,55,34,Scansorial,Dasyuromorph

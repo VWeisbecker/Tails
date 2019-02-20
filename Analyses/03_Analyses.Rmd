@@ -169,7 +169,7 @@ arrows(x0=1,x1=2, y0=3, y1=3, length = 0.1, angle = 90, code=3, lwd=lwd );
   
   ##This is not  because of the extreme ranges in bandicoots!
   
-  ranges_Band<-ranges[ - (which(data$Order=="Peramelemorph")),]
+  ranges_Band<-ranges[ - (which(data$Clade=="Peramelemorph")),]
   
   mean(ranges_Band$Tl_ratio, na.rm=TRUE)
   mean(ranges_Band$Bl_ratio, na.rm=TRUE)
@@ -281,7 +281,7 @@ W=exp(-0.5*AICmin)/sum(exp(-0.5*AICmin))
 W_Tl=setNames(W, c("BM", "OU","EB"))
 W_Tl
 
-#for weigth
+#for weight
 
 fitBM_w<-fitContinuous(compute.brlen(tree),w, model="BM")
 fitOU_w<-fitContinuous(compute.brlen(tree),w, model="OU")
@@ -365,9 +365,9 @@ rate_comp$sigma.d.gp.ratio
       anova(TBW$Models$Brownian, type="marginal")
       
       ##dropping the interaction 
-      #TBWNoInter=find.best.model(Tl_mm~Bl_mm+Wt_g,tree,data);TBWNoInter$AIC_Weights
+      TBWNoInter=find.best.model(Tl_mm~Bl_mm+Wt_g,tree,data);TBWNoInter$AIC_Weights
       #Checking appropriate distribution of model residuals; some low-leverage outliers deemed acceptable in this context
-      qqnorm (TBWNoInter$Models$Brownian)
+      #qqnorm (TBWNoInter$Models$Brownian)
       anova(TBWNoInter$Models$Brownian, type="marginal")
       
       TBWNoInter$Models$Brownian$coefficients
@@ -396,7 +396,7 @@ anova(TB$Models$Brownian)
 
 #Removing peramelemorphs by classifier and Macropus species from looking at the first and last Macropus in the dataset
 
-NoPerams_Roos=data[-c(which(data$Order =="Peramelemorph"), which(data$Species=="Macropus_robustus"):which (data$Species=="Macropus_giganteus")), ]
+NoPerams_Roos=data[-c(which(data$Clade =="Peramelemorph"), which(data$Species=="Macropus_robustus"):which (data$Species=="Macropus_giganteus")), ]
 
 NoPerams_RoosTree=drop.tip(tree, name.check(tree,NoPerams_Roos)$tree_not_data )
 
@@ -432,7 +432,7 @@ testInteractions(TB_lm, adjustment="holm")
 
 ```{r}
 
-TB=find.best.model(Tl_mm~Bl_mm*Order,tree,data);TB$AIC_Weights
+TB=find.best.model(Tl_mm~Bl_mm*Clade,tree,data);TB$AIC_Weights
 
 #check if the residuals of the model are OK; the fit is quite good
 #qqnorm (TB$Models$Brownian)
@@ -442,7 +442,7 @@ anova(TB$Models$Brownian)
 
 #a test of the uncorrected lm model also suggests no differences in scaling slope:
 
-anova(TB_lm <- lm(Tl_mm~Bl_mm*Order, data=data))
+anova(TB_lm <- lm(Tl_mm~Bl_mm*Clade, data=data))
 
 ```
 
@@ -601,7 +601,7 @@ Terr_Tree=drop.tip(tree, name.check(tree,Terr)$tree_not_data )
   Terrline_Wt <- pgls.line.text(Terrline_Wt_F$coefficients[1],Terrline_Wt_F$coefficients[2], 0.6, 4.5)
 
 # initial setup: colours and margins
-  #colsOrderM=brewer.pal(n=2+length(levels(data$Order)), name="Paired")
+  #colsOrderM=brewer.pal(n=2+length(levels(data$Clade)), name="Paired")
   colsLoco=brewer.pal(n=3+length(levels(data$Locomotor_use)), name="Dark2")
   colsLoco=c("dark orange", "purple", "green", "red", "blue")
   pchs=c(8,11,19,17,20,15)
@@ -622,7 +622,7 @@ Terr_Tree=drop.tip(tree, name.check(tree,Terr)$tree_not_data )
 par(mfrow=c(2,1))
   
 
-plot(data$Tl_mm~data$Bl_mm, col=colsLoco[data$Locomotor_use], pch = pchs[data$Order], xlab="log Body length (mm)", ylab="log Tail length",asp=1 ); 
+plot(data$Tl_mm~data$Bl_mm, col=colsLoco[data$Locomotor_use], pch = pchs[data$Clade], xlab="log Body length (mm)", ylab="log Tail length",asp=1 ); 
 legend("bottomright",inset=0.2,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter+0.2, text.width = textwidth, bty="n" );  
 legend("topleft", "a", bty="n", cex=1.5, inset=-0.05);
 lines(x=c(1.8,2.7),y=c(1.8776347281739,2.67921326346783),col=colsLoco[1], lwd=2)
@@ -637,8 +637,8 @@ lines(x=c(1.7,3.1),y=c(1.63362786425447,2.65638567297399), col=colsLoco[5], lwd=
 #abline(lm(NonArb$Tl_mm~NonArb$Bl_mm))
 #text(data$Tl_mm~data$Bl_mm, labels=data$Species, cex=0.5)
   
-plot(data$Tl_mm~data$Wt_g, col=colsLoco[data$Locomotor_use], pch = pchs[data$Order], xlab="log Weight (g)", ylab="log Tail length" , asp=1);
-legend("bottomright",inset=0.25,levels(data$Order) , pch=pchs,  cex=cexes,x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n" );
+plot(data$Tl_mm~data$Wt_g, col=colsLoco[data$Locomotor_use], pch = pchs[data$Clade], xlab="log Weight (g)", ylab="log Tail length" , asp=1);
+legend("bottomright",inset=0.25,levels(data$Clade) , pch=pchs,  cex=cexes,x.intersp = xinter, y.intersp = yInter, text.width = textwidth, bty="n" );
 legend("topleft", "b", bty="n", cex=1.5,inset=-0.05);
 lines(x=c(0.9,3.7),y=c(1.88268754185602,2.71799513332411), col=colsLoco[1], lwd=2)
 lines(x=c(3.6,4.6),y=c(2.61375492837646,2.92719940106734), col=colsLoco[2], lwd=2)
@@ -647,9 +647,9 @@ lines(x=c(1.2,3.4),y=c(2.00997499587214,2.60906055556869), col=colsLoco[4], lwd=
 lines(x=c(0.6,4.5),y=c(1.70514738410302,2.57299004854511), col=colsLoco[5], lwd=2)
 #plotting by phylogenetic affinity; but not sure how useful this is
   
-  #plot(data$Tl_mm~data$Wt_g, col=colsOrderM[data$Order], pch=19, xlab="log Weight (g)", ylab="log Tail length") ;legend("bottomright", c("Dasyuromorph" ,  "Diprotodontian", "Peramelemorph"),inset=inset, pch=19, col=colsOrderM, cex=cexes,y.intersp = yInter, x.intersp = xinter,text.width = textwidth+0.1, bty="n" ); #text(data$Tl_mm~data$Wt_g, labels=data$Species, cex=0.5)
+  #plot(data$Tl_mm~data$Wt_g, col=colsOrderM[data$Clade], pch=19, xlab="log Weight (g)", ylab="log Tail length") ;legend("bottomright", c("Dasyuromorph" ,  "Diprotodontian", "Peramelemorph"),inset=inset, pch=19, col=colsOrderM, cex=cexes,y.intersp = yInter, x.intersp = xinter,text.width = textwidth+0.1, bty="n" ); #text(data$Tl_mm~data$Wt_g, labels=data$Species, cex=0.5)
   
-  #plot(data$Tl_mm~data$Bl_mm, col=colsOrderM[data$Order], pch=19, xlab="log Body length", ylab="log Tail length") ;legend("bottomright", c("Dasyuromorph" ,  "Macropod", "Peramelemorph", "Possum"),inset=inset, pch=19, col=colsOrderM, cex=cexes,y.intersp = yInter, x.intersp = xinter,text.width = textwidth+0.1, bty="n" );  #text(data$Tl_mm~data$Bl_mm, labels=data$Species, cex=0.5)
+  #plot(data$Tl_mm~data$Bl_mm, col=colsOrderM[data$Clade], pch=19, xlab="log Body length", ylab="log Tail length") ;legend("bottomright", c("Dasyuromorph" ,  "Macropod", "Peramelemorph", "Possum"),inset=inset, pch=19, col=colsOrderM, cex=cexes,y.intersp = yInter, x.intersp = xinter,text.width = textwidth+0.1, bty="n" );  #text(data$Tl_mm~data$Bl_mm, labels=data$Species, cex=0.5)
 
 ```
  
@@ -665,12 +665,12 @@ par(mfrow=c(2,1))
 #Tail vs body length: 
 
 
-plot(data_ranges_Bl$Tl_mm~data_ranges_Bl$Bl_mm, col=colsLoco[data$Locomotor_use], pch = pchs[data$Order], xlab="log Body length (mm)", ylab="log Tail length" , xlim=c(1.6,3.5), ylim=c(1.5,3.3) , asp=1); 
+plot(data_ranges_Bl$Tl_mm~data_ranges_Bl$Bl_mm, col=colsLoco[data$Locomotor_use], pch = pchs[data$Clade], xlab="log Body length (mm)", ylab="log Tail length" , xlim=c(1.6,3.5), ylim=c(1.5,3.3) , asp=1); 
 
 
 DrawEllipse(x=data_ranges_Bl$Bl_mm, y=data_ranges_Bl$Tl_mm, radius.x = (data_ranges_Bl$Bl_max - data_ranges_Bl$Bl_min), radius.y = (data_ranges_Bl$Tl_max - data_ranges_Bl$Tl_min), col=alpha (colsLoco[data$Locomotor_use] , 0.05), border=colsLoco[data$Locomotor_use]);
 
-points(data_ranges_Bl$Tl_mm~data_ranges_Bl$Bl_mm, col="black", pch = pchs[data$Order]);
+points(data_ranges_Bl$Tl_mm~data_ranges_Bl$Bl_mm, col="black", pch = pchs[data$Clade]);
 
 legend("bottomright",inset=0.25,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter+0.1, text.width = textwidth, bty="n");  
 
@@ -694,12 +694,12 @@ lines(x=c(1.7,3.1),y=c(1.63362786425447,2.65638567297399), col=colsLoco[5], lwd=
 #Tail vs body weight:
 
 
-plot(data_ranges_Wt$Tl_mm~data_ranges_Wt$Wt_g, col=colsLoco[data$Locomotor_use], pch = pchs[data$Order], xlab="log Weigth (g)", ylab="log Tail length" , xlim=c(0.3,5.3), ylim=c(1.2,3.3), asp=1 ); 
+plot(data_ranges_Wt$Tl_mm~data_ranges_Wt$Wt_g, col=colsLoco[data$Locomotor_use], pch = pchs[data$Clade], xlab="log Weigth (g)", ylab="log Tail length" , xlim=c(0.3,5.3), ylim=c(1.2,3.3), asp=1 ); 
 
 DrawEllipse(x=data_ranges_Wt$Wt_g, y=data_ranges_Wt$Tl_mm, radius.x = (data_ranges_Wt$Wt_max - data_ranges_Wt$Wt_min), radius.y = (data_ranges_Wt$Tl_max - data_ranges_Wt$Tl_min), col=alpha (colsLoco[data$Locomotor_use] , 0.05), border=colsLoco[data$Locomotor_use]);
 
-points(data_ranges_Wt$Tl_mm~data_ranges_Wt$Wt_g, col="black", pch = pchs[data$Order]);
-legend("bottomright",inset=0.13,levels(data$Order) , pch=pchs,  cex=cexes,x.intersp = xinter, y.intersp = yInter+0.3, text.width = textwidth, bty="n" );
+points(data_ranges_Wt$Tl_mm~data_ranges_Wt$Wt_g, col="black", pch = pchs[data$Clade]);
+legend("bottomright",inset=0.13,levels(data$Clade) , pch=pchs,  cex=cexes,x.intersp = xinter, y.intersp = yInter+0.3, text.width = textwidth, bty="n" );
 
 legend("topleft", "b", bty="n", cex=1.5,inset=-0.05)
 
