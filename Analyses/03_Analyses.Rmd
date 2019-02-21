@@ -364,7 +364,7 @@ rate_comp$sigma.d.gp.ratio
       qqnorm (TBW$Models$Brownian)
       anova(TBW$Models$Brownian, type="marginal")
       
-      ##dropping the interaction 
+      ##dropping the interaction; the Pagel model does not work here and throws an error message, but Pagel models are nearly never a good fit for the data so we here proceed with the Brownian model that best fits the model with interactions. 
       TBWNoInter=find.best.model(Tl_mm~Bl_mm+Wt_g,tree,data);TBWNoInter$AIC_Weights
       #Checking appropriate distribution of model residuals; some low-leverage outliers deemed acceptable in this context
       #qqnorm (TBWNoInter$Models$Brownian)
