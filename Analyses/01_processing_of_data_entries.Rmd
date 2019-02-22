@@ -114,7 +114,7 @@ for (i in 1:(nrow(data_processed))){
       }
   
   
-      #if there are no male/female average values (regardles of newly created above or originally in the book; i.e. the male and female), average the ranges
+      #if there are no male/female average values (regardless of newly created above or originally in the book; i.e. the male and female), average the ranges
       if(is.na(data_processed$Wt_g[i])==TRUE & is.na(data_processed$Wt_Av_F[i])==TRUE){
   
       data_processed$Wt_g[i]<-mean(c(data_processed$Wt_max[i], data_processed$Wt_min[i]))
