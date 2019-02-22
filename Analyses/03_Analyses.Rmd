@@ -204,7 +204,7 @@ arrows(x0=1,x1=2, y0=3, y1=3, length = 0.1, angle = 90, code=3, lwd=lwd );
   
   MinMaxtest(ForVarDist_Band,2)
   
-pdf("../Figures/Supp2_Ranges.pdf") 
+pdf("../Figures/Supp3_Ranges.pdf") 
  
 boxplot(ranges_Band$Tl_ratio , ranges_Band$Bl_ratio,ranges_Band$Wt_ratio, names=c("Tl ratio", "Bl ratio", "Wt ratio"), xlab="Ratios without Peramelemorpha", col=c("hotpink1","hotpink1","cadetblue2"),frame=F);
 
@@ -663,8 +663,8 @@ legend("topleft", "A", bty="n", cex=1.5, inset=-0.05);
 lines(x=c(1.8,2.7),y=c(1.8776347281739,2.67921326346783),col=colsLoco[1], lwd=2)
 lines(x=c(2.6,3.2),y=c(2.60573488742311,2.93380010371888),col=colsLoco[2], lwd=2)
 lines(x=c(2.3,2.83),y=c(2.10594027781454,2.78581969836552), col=colsLoco[3], lwd=2)
-lines(x=c(1.9,2.7),y=c(1.99094065810105,2.62786824555291), col=colsLoco[4], lwd=2)
-lines(x=c(1.7,3.1),y=c(1.64141993621454,2.66363472373482), col=colsLoco[5], lwd=2)
+lines(x=c(1.9,2.7),y=c(1.9958300045442,2.62692913039759), col=colsLoco[4], lwd=2)
+lines(x=c(1.7,3.1),y=c(1.66433210725893,2.63480806919339), col=colsLoco[5], lwd=2)
 #If species names are desired: text(data$Tl_mm~data$Bl_mm, labels=data$Species, cex=0.5)
 
 
@@ -679,8 +679,8 @@ legend("topleft", "B", bty="n", cex=1.5,inset=-0.05);
 lines(x=c(0.9,3.7),y=c(1.88268754185602,2.71799513332411), col=colsLoco[1], lwd=2)
 lines(x=c(3.6,4.6),y=c(2.61375492837646,2.92719940106734), col=colsLoco[2], lwd=2)
 lines(x=c(2.7,4),y=c(2.24843315317741,2.796370076799), col=colsLoco[3], lwd=2)
-lines(x=c(1.2,3.4),y=c(2.00997499587214,2.60906055556869), col=colsLoco[4], lwd=2)
-lines(x=c(0.6,4.5),y=c(1.69836821022779,2.56642013396235), col=colsLoco[5], lwd=2)
+lines(x=c(1.2,3.4),y=c(2.01091510547401,2.61107885348291), col=colsLoco[4], lwd=2)
+lines(x=c(0.6,4.5),y=c(1.72181183623882,2.53888038204326), col=colsLoco[5], lwd=2)
 
 
 dev.off()
