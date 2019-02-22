@@ -32,28 +32,27 @@ numcols_log10=log10(numcols)
 #replace 0s with NAS again
 numcols_log10[numcols_log10==0]<-NA
 
-#replace original data with logged data. +1 because 2:34 is 33. I wish I knew a less pedestrian way of doing this...
+#replace original data with logged data. +1 because 2:34 is 33. There is probably a more elegant way of doing this
 
 data[,2:(ncol(numcols)+1)]=numcols_log10
 
 #partition datasets; this cannot be automated easily so need to check for accuracy by looking at dataset
 
-#exclude wombats,koalas and marsupial moles who are outliers using grep (which returns the number of the row that has the species name). These are interesting and need to be discussed, but result in low model fits so that they are taken out
+#exclude wombats,koalas and marsupial moles who are outliers using grep (which returns the number of the row that has the species name).
 
 data=data[-(c(grep("Vombatus_ursinus", data$Species),grep("Phascolarctos_cinereus", data$Species),grep("Lasiorhinus_latifrons", data$Species), grep("Notoryctes_typhlops", data$Species), grep("Notoryctes_caurinus", data$Species))),]
 
 data$Clade <- droplevels(data$Clade, exclude= "Vombatiform")
 
 
-#deleting all entries that have NAs in their main data and locomotor use; this means some species don't have weight data. There is also one specie of rodent deleted because of lack of 
+#deleting all entries that have NAs in their main data and locomotor use; this means some species don't have weight data. T
+
 data=data[-which(is.na( data$Tl_mm)) ,]
 data=data[-which(is.na(data$Locomotor_use)),]
 
-#make sure the species names are in teh reows
+#make sure the species names are in the reows
 
 rownames(data)<-data$Species
-
-#running this in rmd I get an error message, but it does not seem to impact on the output
 
 
 ```
@@ -62,6 +61,7 @@ rownames(data)<-data$Species
 #import and process tree; sSynchronize trees and species by reducing tree to the data available; this has been checked for typos taht cause non-matches (fixed above in the code containing grep). The below culls species that are not in the tree from the data, and species that are not in the data from the tree.
 ```{r}
 #134 species left; 14 newly identified species not present on tree but each of them are represented as close sister groups
+
 tree=read.nexus("../Data/MayCollando_Marsupial_tree.nex")
 namecheck=name.check(tree,data)
 tree_synch=drop.tip(tree,namecheck$tree_not_data)
@@ -70,16 +70,18 @@ name.check(tree_synch,data_synch)
 
 #matching the order of tip labels to the tree
 
-
 match(tree_synch$tip.label,data_synch$Species)
 
 data_synch <-data_synch [,][match(tree_synch$tip.label,data_synch$Species),]
 
 #Check that the re-ordering works
+
 tree_synch$tip.label==data_synch$Species
 
 #Some Petrogale branches are unresolved - hence, need to split these branches using multi2di
+
 is.binary(tree_synch)
+
 tree_synch <- multi2di(tree_synch, random = FALSE)
 
 is.binary(tree_synch)
@@ -91,7 +93,8 @@ is.binary(tree_synch)
 ```{r}
 mf_data=data_synch[which(data_synch$Tl_Av_F !="NA"),]
 mf_data=mf_data[which(mf_data$Wt_Av_F !="NA"),]
-#this will give an error if name.check is OK - or at least I only encountered this error if this was the case
+
+
 mf_datatree=drop.tip(tree_synch, name.check(tree_synch,mf_data)$tree_not_data )
 
 
