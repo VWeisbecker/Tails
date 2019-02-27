@@ -151,7 +151,7 @@ dev.off()
 ```
 
 
-# How constrained are tail lengths, body lengths, and weights relative to each other? First, wihtin species: Body mass ranges are substantially greater than tail and body length ranges, hinting at substantial within-species independence of tail/vertebral length compared to weight. 
+# Comparing ranges of all three variables; do tail and body length range differ?
 
 ```{r}
 
@@ -236,7 +236,7 @@ dev.off()
   MinMaxtest(ratiosArbPent_Wt,2)
 
 ```
-# do species with larger ranges of tail length tend to have larger ranges of body weight as well, but this correlation is stronger for body length than tail length
+# Species with larger ranges of tail length tend to have larger ranges of body weight as well, but this correlation is stronger for body length than tail length (within the caveat of poor model fits!)
 
 ```{r}   
 # Double-checking tip labels and data row names are in the same order
@@ -357,7 +357,7 @@ rate_comp$sigma.d.gp.ratio
 
 ```
  
-# Do tail length and body length scale similarly with body weight? The find. best.model code finds the best fitting tree branch and phylogenetic correlation matrix for each model and allows to run an anova on just that. For details, see utilities.
+# Do tail length and body length scale similarly with body weight? The find.best.model code finds the best fitting tree branch and phylogenetic correlation matrix for each model and allows to run an anova on just that. For code, see utilities.
 
 ```{r}
  
@@ -411,7 +411,7 @@ rate_comp$sigma.d.gp.ratio
       
 ```
 
-# Aside from the association between body length and tail length,does locomotor mode play a role? 
+# Aside from the association between body length and tail length,does locomotor mode play a role? It does, with significant interaction terms 
 
 ```{r}
 
@@ -427,7 +427,7 @@ anova(TB$Models$Brownian)
 
 ```
 
-#In the plot, Peremelemorphs and the genus Macropus are suggestive of different intercept and slope, respectively. Thus checking if the significant interaction is driven by these two
+#In the plot, Peremelemorphs and the genus _Macropus_ are suggestive of different intercept and slope, respectively. Thus checking if the significant interaction is driven by these two
 ```{r}
 
 #Removing peramelemorphs by classifier and Macropus species from looking at the first and last Macropus in the dataset
@@ -462,7 +462,7 @@ testInteractions(TB_lm, adjustment="holm")
 ```
 
 
-#The interaction results are consistent with the expectation that pentapedal and arboreal species use their tail heavily in locomotion and would thus reflect a difference to the more generalist terrestrial modes. However, despite the use of pgls, the dataset is phylogenetically heavily confounded so that the result could conceivably arise from a very strong phylogenetic signal of locomotion. This possibility is excluded by analysing a model that uses phylogenetic distinctions does not result in significant interactions between major clade (order or diprotodontian family):
+#The interaction results are consistent with the expectation that pentapedal and arboreal species use their tail heavily in locomotion and would thus reflect a difference to the more generalist terrestrial modes. However, despite the use of pgls, locomotor modes and orders/diprotodontian families are highly confounded. The possibility that these specific phylogenetic levels make a difference possibility is excluded by analysing a model that uses phylogenetic distinctions these. This does not reveal significant interactions between major clade (order or diprotodontian family):
 
 ```{r}
 
@@ -588,7 +588,7 @@ anova(SaltTerrModel_Wt$Models$Brownian, type="marginal")
 
 ```{r}
 
-#determine the regression line coefficients from all the different pgls analyses conducted above, with separate lines where differences in slope or intercept were found.
+#determine the regression line coefficients from all the different pgls analyses conducted above, with separate lines whfor the locomotor modes. 
 
 Arb=data[c(which(data$Locomotor_use =="Arboreal")),]
 Arb_Tree=drop.tip(tree, name.check(tree,Arb)$tree_not_data )
@@ -606,7 +606,7 @@ Terr=data[c(which(data$Locomotor_use =="Terrestrial")),]
 Terr_Tree=drop.tip(tree, name.check(tree,Terr)$tree_not_data )
 
 
-#Then use the line text function in utilities to generate the code for the lines
+#Then use the pgls.line.text function in utilities to generate the code for the lines
  ##For body length:
 
   Arbline_Bl_F <-gls(Tl_mm~Bl_mm, correlation=corBrownian (1,phy=Arb_Tree), data=Arb)
