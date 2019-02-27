@@ -264,30 +264,34 @@ VarTlBl=find.best.model(Tl_ratio~Bl_ratio,treeranges,rangesphy);VarTlBl$AIC_Weig
   AICmin=AICs-min(AICs)
   W=exp(-0.5*AICmin)/sum(exp(-0.5*AICmin))
   
-  #The ranges of body length explain teh ranges of tail length far better than weight ranges
+  #The ranges of body length explain the ranges of tail length far better than weight ranges
   W 
  
   
 ```
 
 
-#To understand the mode of evolution (Brownian, Ornstein-Uhlenbeck, or Early burst), we run the fit.continuous function from the phylo package. Note that I have not been able to put this into a loop because of a warning message regarding the OU model for tail length.
+#To understand the mode of evolution (Brownian, Ornstein-Uhlenbeck, or Early burst), we run the fit.continuous function from the phylo package. The data are z transformed only here because the objective of this test was to assess the possible caveats in the subsequent compare.evol.rates test, where weight and length rates will only be comparable if they are scaled to the same mean and standard deviation.
 
 ```{r}
 
-#prepare the data
+#prepare the data (this is the required format for fitContinuous)
 bl <-data$Bl_mm
 tl <-data$Tl_mm
 w <- data$Wt_g
+ 
+
 names(bl) <-data$Species
 names(tl) <-data$Species
 names(w) <-data$Species
 
+
+
 #For Body mass 
 
-fitBM_bl<-fitContinuous(compute.brlen(tree),bl, model="BM")
-fitOU_bl<-fitContinuous(compute.brlen(tree),bl, model="OU")
-fitEB_bl<-fitContinuous(compute.brlen(tree),bl, model="EB")
+fitBM_bl<-fitContinuous(compute.brlen(tree), scale(bl), model="BM")
+fitOU_bl<-fitContinuous(compute.brlen(tree), scale(bl), model="OU")
+fitEB_bl<-fitContinuous(compute.brlen(tree), scale(bl), model="EB")
 
 AICs=c(fitBM_bl$opt$aicc,fitOU_bl$opt$aicc,fitEB_bl$opt$aicc)
 AICmin=AICs-min(AICs)
@@ -297,9 +301,9 @@ W_Bl=setNames(W, c("BM", "OU","EB"))
 W_Bl
 
 #for tail length
-fitBM_tl<-fitContinuous(compute.brlen(tree),tl, model="BM")
-fitOU_tl<-fitContinuous(compute.brlen(tree),tl, model="OU")
-fitEB_tl<-fitContinuous(compute.brlen(tree),tl, model="EB")
+fitBM_tl<-fitContinuous(compute.brlen(tree), scale(tl), model="BM")
+fitOU_tl<-fitContinuous(compute.brlen(tree), scale(tl), model="OU")
+fitEB_tl<-fitContinuous(compute.brlen(tree), scale(tl), model="EB")
 
 AICs=c(fitBM_tl$opt$aicc,fitOU_tl$opt$aicc,fitEB_tl$opt$aicc)
 AICmin=AICs-min(AICs)
@@ -310,9 +314,9 @@ W_Tl
 
 #for weight
 
-fitBM_w<-fitContinuous(compute.brlen(tree),w, model="BM")
-fitOU_w<-fitContinuous(compute.brlen(tree),w, model="OU")
-fitEB_w<-fitContinuous(compute.brlen(tree),w, model="EB")
+fitBM_w<-fitContinuous(compute.brlen(tree), scale(w), model="BM")
+fitOU_w<-fitContinuous(compute.brlen(tree), scale(w), model="OU")
+fitEB_w<-fitContinuous(compute.brlen(tree), scale(w), model="EB")
 
 
 AICs=c(fitBM_w$opt$aicc,fitOU_w$opt$aicc,fitEB_w$opt$aicc)
@@ -330,13 +334,18 @@ rownames (Evol_mode_table) <- c("log Tail length","log Body length",  "log Body 
 ```
 
 
-#If weight is more variable within species, it should also evolve faster than body/tail length- and it does, by nearly an order of magnitude:
+#Are there differences in phylogenetic signal and evolutionary rate between z-scores of the variables? This uses the grafen-transformed tree because the original branch lengths produce singular solutions. Note also that the individual variables fit an OU model better than a Brownian model, but evolutionary rates are to our knowledge only testable within a Brownian motion model (Adams 2012)
 
 ```{r}
-RateFrame <- data[,2:4]
+# phylogenetic signal
+RateFrame <- as.data.frame(sapply(data[,2:4], scale));rownames(RateFrame)<-data$Species; colnames(RateFrame)<-c("Bl_mm", "Tl_mm", "Wt_g")
 matrix = c("Bl_mm", "Tl_mm", "Wt_g")
 
-#The below gives a warning that the phylgenetic correlation matrix is singular when the untransformed tree is run. But there are no differences in significance levels regardless which one is used. Note also that the individual variables fit an OU model better than a Brownian model, but evolutionary rates are to our knowledge only testable within a Brownian motion model (Adams 2012)
+phylosig(tree=compute.brlen(tree), data$Bl_mm, method = "K" )
+phylosig(tree=compute.brlen(tree), data$Tl_mm,method = "K" )
+phylosig(tree=compute.brlen(tree), data$Wt_g,method = "K" )
+
+# evolutionary rates comparison
 
 rate_comp=compare.multi.evol.rates(A=RateFrame, gp=matrix, phy=compute.brlen(tree), Subset = FALSE, iter = 999, print.progress = FALSE)
                                   
@@ -345,7 +354,6 @@ plot(rate_comp)
 rate_comp$pairwise.pvalue
 rate_comp$sigma.d.gp.ratio
                                                                     
-
 
 ```
  
