@@ -1,7 +1,7 @@
 ---
 title: "Tail study"
-author: "Vera Weisbecker and Cruise Speck"
-date: "5 December 2018"
+author: "Anonymous - available on Github"
+date: "27 February 2019"
 output: html_document
 ---
 
