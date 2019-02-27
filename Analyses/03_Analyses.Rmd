@@ -167,7 +167,7 @@ colnames(ranges) <- c("Tl_ratio", "Bl_ratio", "Wt_ratio")
   mean(ranges$Wt_ratio, na.rm=TRUE)
 
   
- ##The VarDist.test code is in utilities. It runs a Kruskal-Wallis test and then a pairwise wilcoxon rank sum test on the ranges; BL and TL do not have significant ranges, Wt is significantly greater
+ ##The VarDist.test code is in utilities. It runs a Kruskal-Wallis test and then a pairwise wilcoxon rank sum test on the ranges of BL and Tl (not Weight, which is on a different scale and thus expected to vary differently)
   ForVarDist=c(ranges$Tl_ratio, ranges$Bl_ratio)
   
   MinMaxtest(ForVarDist,2)  
