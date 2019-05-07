@@ -138,3 +138,141 @@ remove(i)
 write.csv(data_processed, file="../Data/Full_dataset.csv", row.names=FALSE)
 
 ```
+
+#A second, smaller dataset that just computes the full table for species where male and female averages and ranges are known. This is for double-checking that the midpoints and means are comparable
+
+##Separate species from raw data that have m/f ranges and means;THEN compute their mean and overall min/max; THEN compute the mean of the overall min max and compare to species mean
+
+```{r}
+
+data_for_mid_check_compare <- data
+data_for_mid_checks<-data
+
+data[33,]
+is.na(data$Wt_min_F[33])==FALSE & is.na(data$Wt_Av_F[33])==TRUE
+
+which(is.na(data$Wt_min_F)==FALSE & is.na(data$Wt_Av_F)==TRUE)
+
+#Something like this - keep going here to weed out
+
+data_for_mid_checks<-data_for_mid_checks(-c
+                                         
+                                         which(is.na(data$Wt_min_F)==FALSE & is.na(data$Wt_Av_F)==TRUE
+                                         which(is.na(data$Wt_min_M)==FALSE & is.na(data$Wt_Av_M)==TRUE
+                                         )
+
+#if there are male/female ranges, provide their mean; this is clunky but I prefer to have the names written out to reduce human error in assigning column numbers
+for (i in 1:length(data$Species)){
+  
+    
+    #if there are min/max values for males and females, but no average is given, delete
+    if(is.na(data$Wt_min_F[i])==FALSE & is.na(data$Wt_Av_F[i]==TRUE)){
+  
+      data_for_mid_checks[-i,]
+    }
+    
+    if(is.na(data$Wt_min_M[i])==FALSE & is.na(data$Wt_Av_M[i]==TRUE)){
+  
+      data_for_mid_checks[-i,]
+      
+    }
+  
+    if(is.na(data$Bl_min_F[i])==FALSE & is.na(data$Bl_Av_F[i]==TRUE)){
+  
+      data_for_mid_checks[-i,]
+    }
+    
+    if(is.na(data$Bl_min_M[i])==FALSE & is.na(data$Bl_Av_M[i]==TRUE)){
+  
+      data_for_mid_checks[-i,]
+      
+    }
+  
+    if(is.na(data$Tl_min_F[i])==FALSE & is.na(data$Tl_Av_F[i]==TRUE)){
+  
+      data_for_mid_checks[-i,]
+    }
+    
+    if(is.na(data$Tl_min_M[i])==FALSE & is.na(data$Tl_Av_M[i]==TRUE)){
+  
+      data_for_mid_checks[-i,]
+      
+    }
+ 
+  # if males or females have ranges, enter the max and min for each species in the relevant column; this assumes that overall ranges are never given together with the more informative range values by sex 
+
+    if((is.na(data$Wt_min_F[i])==FALSE | is.na(data$Wt_min_M[i])==FALSE)){
+  
+      data_for_mid_checks$Wt_min[i]<-min(c(data$Wt_min_F[i],data$Wt_max_F[i],data$Wt_min_M[i],data$Wt_max_M[i]))
+      data_for_mid_checks$Wt_max[i]<-max(c(data$Wt_max_F[i],data$Wt_max_F[i],data$Wt_max_M[i],data$Wt_max_M[i]))
+    }
+  
+    if(is.na(data$Bl_min_F[i])==FALSE | is.na(data$Bl_min_M[i])==FALSE){
+  
+      data_for_mid_checks$Bl_min[i]<-min(c(data$Bl_min_F[i],data$Bl_max_F[i],data$Bl_min_M[i],data$Bl_max_M[i]))
+      data_for_mid_checks$Bl_max[i]<-max(c(data$Bl_max_F[i],data$Bl_max_F[i],data$Bl_max_M[i],data$Bl_max_M[i]))
+    }
+  
+    if(is.na(data$Tl_min_F[i])==FALSE | is.na(data$Tl_min_M[i])==FALSE){
+  
+      data_for_mid_checks$Tl_min[i]<-min(c(data$Tl_min_F[i],data$Tl_max_F[i],data$Tl_min_M[i],data$Tl_max_M[i]))
+      data_for_mid_checks$Tl_max[i]<-max(c(data$Tl_max_F[i],data$Tl_max_F[i],data$Tl_max_M[i],data$Tl_max_M[i]))
+    }
+    
+}
+
+#now re-process data_for_mid_checks to fill NAs in the species means, first by averaging male/female values, second (if sex averages are not available) by averaging sex-less min/max values. This overwrites the first pass summary version of data_for_mid_checks with the second pass summary version
+
+for (i in 1:(nrow(data_for_mid_checks))){
+  
+   
+      #if there is a male/female average value, use its average as final value (assuming that female ranges also mean that there is a male range)
+      if(is.na(data_for_mid_checks$Wt_g[i])==TRUE & is.na(data_for_mid_checks$Wt_Av_F[i])==FALSE){
+  
+      data_for_mid_checks$Wt_g[i]<-mean(c(data_for_mid_checks$Wt_Av_F[i], data_for_mid_checks$Wt_Av_M[i]))
+      }
+  
+      if(is.na(data_for_mid_checks$Bl_mm[i])==TRUE & is.na(data_for_mid_checks$Bl_Av_F[i])==FALSE){
+  
+      data_for_mid_checks$Bl_mm[i]<-mean(c(data_for_mid_checks$Bl_Av_F[i], data_for_mid_checks$Bl_Av_M[i]))
+      }
+    
+      if(is.na(data_for_mid_checks$Tl_mm[i])==TRUE & is.na(data_for_mid_checks$Tl_Av_F[i])==FALSE){
+  
+      data_for_mid_checks$Tl_mm[i]<-mean(c(data_for_mid_checks$Tl_Av_F[i], data_for_mid_checks$Tl_Av_M[i]))
+      }
+  
+  
+      #if there are no male/female average values (regardless of newly created above or originally in the book; i.e. the male and female), average the ranges
+      if(is.na(data_for_mid_checks$Wt_g[i])==TRUE & is.na(data_for_mid_checks$Wt_Av_F[i])==TRUE){
+  
+      data_for_mid_checks$Wt_g[i]<-mean(c(data_for_mid_checks$Wt_max[i], data_for_mid_checks$Wt_min[i]))
+      }
+  
+      if(is.na(data_for_mid_checks$Bl_mm[i])==TRUE & is.na(data_for_mid_checks$Bl_Av_F[i])==TRUE){
+  
+      data_for_mid_checks$Bl_mm[i]<-mean(c(data_for_mid_checks$Bl_max[i], data_for_mid_checks$Bl_min[i]))
+      }
+    
+      if(is.na(data_for_mid_checks$Tl_mm[i])==TRUE & is.na(data_for_mid_checks$Tl_Av_F[i])==TRUE){
+  
+      data_for_mid_checks$Tl_mm[i]<-mean(c(data_for_mid_checks$Tl_max[i], data_for_mid_checks$Tl_min[i]))
+      }  
+}
+
+#check that the reduction worked: 
+length(data_for_mid_check_compare$Species)
+length(data_for_mid_checks$Species)
+
+#clean up environment
+remove(i)
+
+#Write the csv; row.names need to be FALSE because otherwise it saves with an extra column of numbers
+write.csv(data_for_mid_checks, file="../Data/Full_dataset.csv", row.names=FALSE)
+
+
+
+
+```
+
+
