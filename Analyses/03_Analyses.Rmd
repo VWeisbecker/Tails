@@ -197,7 +197,7 @@ colnames(ranges) <- c("Tl_ratio", "Bl_ratio", "Wt_ratio")
 
 lwd <- 2
 
-pdf("../Figures/Fig1_Ranges.pdf")
+#pdf("../Figures/Fig1_Ranges.pdf")
 
   boxplot(ranges$Tl_ratio, ranges$Bl_ratio,ranges$Wt_ratio, names=c("Tl ratio", "Bl ratio", "Wt ratio"), col=c("hotpink1","hotpink1","cadetblue2"), frame=F);
   
@@ -353,6 +353,7 @@ rownames (Evol_mode_table) <- c("log Tail length","log Body length",  "log Body 
 
 
 ```
+
 
 
 #Are there differences in phylogenetic signal and evolutionary rate between z-scores of the variables? This uses the grafen-transformed tree because the original branch lengths produce singular solutions. Note also that the individual variables fit an OU model better than a Brownian model, but evolutionary rates are to our knowledge only testable within a Brownian motion model (Adams 2012)
@@ -794,4 +795,12 @@ dev.off()
 
 ```
  
+ 
+ #Plotting the tree
+
+```{r}
+
+plot(tree, type="phylogram", cex=0.8, tip.color = colsLoco[data$Locomotor_use])
+
+```
  
