@@ -216,7 +216,7 @@ for (i in 1:(nrow(mean_range_data))){
       }
 }
  
-#Now create and fill columns with overall range averages; but where m/f ranges area available, these will be overwritten in the next step as these are better data
+#Now create and fill columns with overall range averages; but where m/f ranges area available, these will be overwritten in the next step as these are better data and available in most cases
 
 mean_range_data$range_mid_Bl <-  rowMeans(mean_range_data[c('Bl_min', 'Bl_max')], na.rm=TRUE)
 mean_range_data$range_mid_Tl <-  rowMeans(mean_range_data[c('Tl_min', 'Tl_max')], na.rm=TRUE)
