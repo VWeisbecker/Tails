@@ -62,7 +62,7 @@ rownames(data)<-data$Species
 ```{r}
 #134 species left; 14 newly identified species not present on tree but each of them are represented as close sister groups
 
-tree=read.nexus("../Data/MayCollando_Marsupial_tree.nex")
+tree=read.nexus("../Data/MayCollado_Marsupial_tree.nex")
 namecheck=name.check(tree,data)
 tree_synch=drop.tip(tree,namecheck$tree_not_data)
 data_synch= data[-which(rownames(data) %in% namecheck$data_not_tree),]
@@ -78,11 +78,16 @@ data_synch <-data_synch [,][match(tree_synch$tip.label,data_synch$Species),]
 
 tree_synch$tip.label==data_synch$Species
 
-#Some Petrogale branches are unresolved - hence, need to split these branches using multi2di
+#Some Petrogale branches are unresolved - hence, need to split these branches using multi2di and given a small branch length to allow for future use
 
 is.binary(tree_synch)
 
 tree_synch <- multi2di(tree_synch, random = FALSE)
+
+tree_synch$edge.length[c( which (tree_synch$edge.length==0))] <- mean(tree_synch$edge.length)*0.1
+
+#testing that the value is entered
+tree_synch$edge.length[105]
 
 is.binary(tree_synch)
 
@@ -113,7 +118,7 @@ tree<-tree_synch
 
 save(dataFull,data,tree, mf_data,mf_datatree, file = "../Data/Processed_Data_for_Pgls.rda")
 
-#clean up environemtn
+#clean up environment
 remove(data_synch,tree_synch)
 
 ```

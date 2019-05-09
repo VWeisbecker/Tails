@@ -268,7 +268,7 @@ treeranges=drop.tip(tree,namecheck$tree_not_data)
 name.check(treeranges,rangesphy)
 
 VarTlBl=find.best.model(Tl_ratio~Bl_ratio,treeranges,rangesphy);VarTlBl$AIC_Weights
-  #Checking appropriate distribution of model residuals. These are not very linear, so cautious interpretation is required!
+  #Checking appropriate distribution of model residuals. These are moderately linear
   qqnorm (VarTlBl$Models$Pagel)      
  VarTlBl$Model_summaries$Pagel$tTable
  VarTlBl$Model_summaries$Pagel$coefficients
@@ -310,9 +310,9 @@ names(w) <-data$Species
 
 #For Body mass 
 
-fitBM_bl<-fitContinuous(compute.brlen(tree), scale(bl), model="BM")
-fitOU_bl<-fitContinuous(compute.brlen(tree), scale(bl), model="OU")
-fitEB_bl<-fitContinuous(compute.brlen(tree), scale(bl), model="EB")
+fitBM_bl<-fitContinuous((tree), scale(bl), model="BM")
+fitOU_bl<-fitContinuous((tree), scale(bl), model="OU")
+fitEB_bl<-fitContinuous((tree), scale(bl), model="EB")
 
 AICs=c(fitBM_bl$opt$aicc,fitOU_bl$opt$aicc,fitEB_bl$opt$aicc)
 AICmin=AICs-min(AICs)
@@ -322,9 +322,9 @@ W_Bl=setNames(W, c("BM", "OU","EB"))
 W_Bl
 
 #for tail length
-fitBM_tl<-fitContinuous(compute.brlen(tree), scale(tl), model="BM")
-fitOU_tl<-fitContinuous(compute.brlen(tree), scale(tl), model="OU")
-fitEB_tl<-fitContinuous(compute.brlen(tree), scale(tl), model="EB")
+fitBM_tl<-fitContinuous((tree), scale(tl), model="BM")
+fitOU_tl<-fitContinuous((tree), scale(tl), model="OU")
+fitEB_tl<-fitContinuous((tree), scale(tl), model="EB")
 
 AICs=c(fitBM_tl$opt$aicc,fitOU_tl$opt$aicc,fitEB_tl$opt$aicc)
 AICmin=AICs-min(AICs)
@@ -335,9 +335,9 @@ W_Tl
 
 #for weight
 
-fitBM_w<-fitContinuous(compute.brlen(tree), scale(w), model="BM")
-fitOU_w<-fitContinuous(compute.brlen(tree), scale(w), model="OU")
-fitEB_w<-fitContinuous(compute.brlen(tree), scale(w), model="EB")
+fitBM_w<-fitContinuous((tree), scale(w), model="BM")
+fitOU_w<-fitContinuous((tree), scale(w), model="OU")
+fitEB_w<-fitContinuous((tree), scale(w), model="EB")
 
 
 AICs=c(fitBM_w$opt$aicc,fitOU_w$opt$aicc,fitEB_w$opt$aicc)
@@ -356,22 +356,26 @@ rownames (Evol_mode_table) <- c("log Tail length","log Body length",  "log Body 
 
 
 
-#Are there differences in phylogenetic signal and evolutionary rate between z-scores of the variables? This uses the grafen-transformed tree because the original branch lengths produce singular solutions. Note also that the individual variables fit an OU model better than a Brownian model, but evolutionary rates are to our knowledge only testable within a Brownian motion model (Adams 2012)
+#Are there differences in phylogenetic signal and evolutionary rate between z-scores of the variables?
 
 ```{r}
 # phylogenetic signal
 RateFrame <- as.data.frame(sapply(data[,2:4], scale));rownames(RateFrame)<-data$Species; colnames(RateFrame)<-c("Bl_mm", "Tl_mm", "Wt_g")
 matrix = c("Bl_mm", "Tl_mm", "Wt_g")
 
-phylosig(tree=compute.brlen(tree), data$Bl_mm, method = "K" )
-phylosig(tree=compute.brlen(tree), data$Tl_mm,method = "K" )
-phylosig(tree=compute.brlen(tree), data$Wt_g,method = "K" )
+
+phylosig(tree=tree, data$Bl_mm, method = "K" )
+phylosig(tree=tree, data$Tl_mm,method = "K" )
+phylosig(tree=tree, data$Wt_g,method = "K" )
 
 # evolutionary rates comparison
 
-rate_comp=compare.multi.evol.rates(A=RateFrame, gp=matrix, phy=compute.brlen(tree), Subset = FALSE, iter = 999, print.progress = FALSE)
-                                  
+rate_comp=compare.multi.evol.rates(A=RateFrame, gp=matrix, phy=(tree), Subset = FALSE, iter = 999, print.progress = FALSE)
+                           
 summary (rate_comp)
+
+
+
 plot(rate_comp)
 rate_comp$pairwise.pvalue
 rate_comp$sigma.d.gp.ratio
@@ -421,7 +425,7 @@ rate_comp$sigma.d.gp.ratio
       qqnorm (TBW$Models$Brownian)
       anova(TBW$Models$Brownian, type="marginal")
       
-      ##dropping the interaction; the Pagel model does not work here and throws an error message, but Pagel models are nearly never a good fit for the data so we here proceed with the Brownian model that best fits the model with interactions and nearly all other analyses in this study. 
+      ##dropping the interaction;  
       
       TBWNoInter=gls(Tl_mm~Bl_mm+Wt_g, correlation=corBrownian(1,phy=tree), data=data)
       #Checking appropriate distribution of model residuals; some low-leverage outliers deemed acceptable in this context
@@ -449,7 +453,7 @@ anova(TB$Models$Brownian)
 
 ```
 
-#In the plot, Peremelemorphs and the genus _Macropus_ are suggestive of different intercept and slope, respectively. Thus checking if the significant interaction is driven by these two
+#In the plot, Peremelemorphs and the genus _Macropus_ are suggestive of different intercept and slope, respectively. Checking if the significant interaction is driven by these two
 ```{r}
 
 #Removing peramelemorphs by classifier and Macropus species from looking at the first and last Macropus in the dataset
@@ -496,13 +500,18 @@ TB=find.best.model(Tl_mm~Bl_mm*Clade,tree,data);TB$AIC_Weights
 ###look at the model summary of the most likely model: there are no significant interactions 
 anova(TB$Models$Brownian)
 
+
+TBNoInter=find.best.model(Tl_mm~Bl_mm+Clade,tree,data);TB$AIC_Weights
+anova(TBNoInter$Models$Brownian)
+
+
 #a test of the uncorrected lm model also suggests no differences in scaling slope:
 
 anova(TB_lm <- lm(Tl_mm~Bl_mm*Clade, data=data))
 
 ```
 
-#To look for differences in means, which may also contribute to differences in relative tail length between locomotor modes, we separate the dataset to test only intercept means in those locomotor modes that show no significant interaction. This gives an indication of intercept differences in a phylogenetic context. Note, however, that the confidence of significances in such a carved-up dataset is not very high.
+#To look for differences in means, which may also contribute to differences in relative tail length between locomotor modes, we separate the dataset to test only intercept means in those locomotor modes that show no significant interaction in the analyses above. This gives an indication of intercept differences in a phylogenetic context. Note, however, that the confidence of significances in such a carved-up dataset is not very high.
 
 ```{r}
 
@@ -530,14 +539,62 @@ ArbSaltTree=drop.tip(tree, name.check(tree,ArbSalt)$tree_not_data )
 ArbPentScanModel=find.best.model(Tl_mm~Bl_mm+Locomotor_use,ArbPentScanTree,ArbPentScan);ArbPentScanModel$AIC_Weights
 anova(ArbPentScanModel$Models$Grafen, type="marginal")
 
-TerrSaltModel=find.best.model(Tl_mm~Bl_mm+Locomotor_use,TerrSaltTree,TerrSalt);TerrSaltModel$AIC_Weights
-anova(TerrSaltModel$Models$Brownian, type="marginal")
+#Is scaling in this group isometric?
+ArbPentScanScaling=find.best.model(Tl_mm~Bl_mm,ArbPentScanTree,ArbPentScan);ArbPentScanScaling$AIC_Weights
+summary(ArbPentScanScaling$Models$Brownian, type="marginal")
+
+#The inspiration for this code comes from a researchgate entry by Pedro Jose Aphalo
+slope <-ArbPentScanScaling$Model_summaries$Brownian$coefficients[2]
+#I found the use of this in http://esapubs.org/archive/ecol/e088/020/pgls.R; this returns the standard error for the scaling coefficient
+se <- as.numeric(sqrt(diag(ArbPentScanScaling$Models$Brownian$varBeta))[2])
+df <- ArbPentScanScaling$Models$Grafen$dims$N
+t_value_one <- (slope-1)/se
+dt(t_value_one, df=df) / 2 # two sided test
+
+
+
 
 ScanSaltModel=find.best.model(Tl_mm~Bl_mm+Locomotor_use,ScanSaltTree,ScanSalt);ScanSaltModel$AIC_Weights
 anova(ScanSaltModel$Models$Brownian, type="marginal")
 
+ScanSaltScaling <- find.best.model(Tl_mm~Bl_mm,ScanSaltTree,ScanSalt);ScanSaltModel$AIC_Weights
+
+slope <-ScanSaltScaling$Model_summaries$Brownian$coefficients[2]
+se <- as.numeric(sqrt(diag(ScanSaltScaling$Models$Brownian$varBeta))[2])
+df <- ScanSaltScaling$Models$Grafen$dims$N
+t_value_one <- (slope-1)/se
+dt(t_value_one, df=df) / 2 
+
+
+
+
+TerrSaltModel=find.best.model(Tl_mm~Bl_mm+Locomotor_use,TerrSaltTree,TerrSalt);TerrSaltModel$AIC_Weights
+anova(TerrSaltModel$Models$Brownian, type="marginal")
+
+TerrSaltScaling=find.best.model(Tl_mm~Bl_mm,TerrSaltTree,TerrSalt);TerrSaltModel$AIC_Weights
+
+slope <-TerrSaltScaling$Model_summaries$Brownian$coefficients[2]
+se <- as.numeric(sqrt(diag(TerrSaltScaling$Models$Brownian$varBeta))[2])
+df <- TerrSaltScaling$Models$Grafen$dims$N
+t_value_one <- (slope-1)/se
+dt(t_value_one, df=df) / 2 
+
+
+
+
+
 ArbSaltModel=find.best.model(Tl_mm~Bl_mm+Locomotor_use,ArbSaltTree,ArbSalt);ArbSaltModel$AIC_Weights
 anova(ArbSaltModel$Models$Brownian, type="marginal")
+
+ArbSaltScaling=find.best.model(Tl_mm~Bl_mm,ArbSaltTree,ArbSalt);ArbSaltModel$AIC_Weights
+
+slope <-ArbSaltScaling$Model_summaries$Brownian$coefficients[2]
+se <- as.numeric(sqrt(diag(ArbSaltScaling$Models$Brownian$varBeta))[2])
+df <- ArbSaltScaling$Models$Grafen$dims$N
+t_value_one <- (slope-1)/se
+dt(t_value_one, df=df) / 2 
+
+
 
 ```
 
@@ -588,7 +645,7 @@ SaltTerrTree=drop.tip(tree, name.check(tree,SaltTerr)$tree_not_data )
 #in no case is there a significant difference in intercept
 
 ArbPentScanModel_Wt=find.best.model(Tl_mm~Wt_g+Locomotor_use,ArbPentScanTree,ArbPentScan);ArbPentScanModel$AIC_Weights
-anova(ArbPentScanModel$Models$Grafen, type="marginal")
+anova(ArbPentScanModel_Wt$Models$Grafen, type="marginal")
 
 PentSaltModel_Wt=find.best.model(Tl_mm~Wt_g+Locomotor_use,PentSaltTree,PentSalt);PentSaltModel_Wt$AIC_Weights
 anova(PentSaltModel_Wt$Models$Brownian, type="marginal")
@@ -662,6 +719,7 @@ Terr_Tree=drop.tip(tree, name.check(tree,Terr)$tree_not_data )
   
   Terrline_Wt_F <-gls(Tl_mm~Wt_g, correlation=corBrownian (1,phy=Terr_Tree), data=Terr)
   Terrline_Wt <- pgls.line.text(Terrline_Wt_F$coefficients[1],Terrline_Wt_F$coefficients[2], 0.6, 4.5)
+  
 
 # initial setup: colours and margins
   #colsOrderM=brewer.pal(n=2+length(levels(data$Clade)), name="Paired")
@@ -715,6 +773,23 @@ lines(x=c(0.6,4.5),y=c(1.72181183623882,2.53888038204326), col=colsLoco[5], lwd=
 
 dev.off()
  
+
+
+#separate check
+
+
+
+plot(data$Tl_mm~data$Bl_mm, col=colsLoco[data$Locomotor_use], pch = pchs[data$Clade], xlab="log Body length (mm)", ylab="log Tail length",asp=1 ,bty="L");
+abline(lm (Terr$Tl_mm~Terr$Bl_mm), col=colsLoco[5]);lines(x=c(1.7,3.1),y=c(1.66433210725893,2.63480806919339), col=colsLoco[5], lwd=2);
+abline(lm (Scan$Tl_mm~Scan$Bl_mm), col=colsLoco[4]);lines(x=c(1.9,2.7),y=c(1.9958300045442,2.62692913039759), col=colsLoco[4], lwd=2)
+abline(lm (Salt$Tl_mm~Salt$Bl_mm), col=colsLoco[3]);lines(x=c(2.3,2.83),y=c(2.10594027781454,2.78581969836552), col=colsLoco[3], lwd=2)
+abline(lm (Pent$Tl_mm~Pent$Bl_mm), col=colsLoco[2]);lines(x=c(2.6,3.2),y=c(2.60573488742311,2.93380010371888),col=colsLoco[2], lwd=2)
+abline(lm (Arb$Tl_mm~Arb$Bl_mm), col=colsLoco[1]);lines(x=c(1.8,2.7),y=c(1.8776347281739,2.67921326346783),col=colsLoco[1], lwd=2)
+
+
+
+
+
 
 ```
  
