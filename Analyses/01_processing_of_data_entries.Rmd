@@ -167,8 +167,7 @@ data_for_mid_checks <- data_for_mid_checks  [which(
 
 ]
 
-
-#Creating whole-species overall ranges
+#Creating whole-species overall ranges - so the absolute min and max for males and females combined
 
 mean_range_data <-data_for_mid_checks
 
@@ -216,10 +215,39 @@ for (i in 1:(nrow(mean_range_data))){
       mean_range_data$Tl_mm[i]<-mean(c(mean_range_data$Tl_Av_F[i], mean_range_data$Tl_Av_M[i]))
       }
 }
-  
+ 
+#Now create and fill columns with overall range averages; but where m/f ranges area available, these will be overwritten in the next step as these are better data
+
 mean_range_data$range_mid_Bl <-  rowMeans(mean_range_data[c('Bl_min', 'Bl_max')], na.rm=TRUE)
 mean_range_data$range_mid_Tl <-  rowMeans(mean_range_data[c('Tl_min', 'Tl_max')], na.rm=TRUE)
 mean_range_data$range_mid_Wt <-  rowMeans(mean_range_data[c('Wt_min', 'Wt_max')], na.rm=TRUE)
+
+
+# where ranges between males and females are available, averaging all four to create a midpoint
+
+
+for (i in 1:length(mean_range_data$Species)){
+  
+    if((is.na(mean_range_data$Wt_min_F[i])==FALSE | is.na(mean_range_data$Wt_min_M[i])==FALSE)){
+  
+      mean_range_data$range_mid_Wt[i]<-min(c(mean_range_data$Wt_min_F[i],mean_range_data$Wt_max_F[i],mean_range_data$Wt_min_M[i],mean_range_data$Wt_max_M[i]))
+      
+    }
+  
+    if(is.na(mean_range_data$Bl_min_F[i])==FALSE | is.na(mean_range_data$Bl_min_M[i])==FALSE){
+  
+      mean_range_data$range_mid_Bl[i]<-min(c(mean_range_data$Bl_min_F[i],mean_range_data$Bl_max_F[i],mean_range_data$Bl_min_M[i],mean_range_data$Bl_max_M[i]))
+      
+    }
+  
+    if(is.na(mean_range_data$Tl_min_F[i])==FALSE | is.na(mean_range_data$Tl_min_M[i])==FALSE){
+  
+      mean_range_data$range_mid_Tl[i]<-min(c(mean_range_data$Tl_min_F[i],mean_range_data$Tl_max_F[i],mean_range_data$Tl_min_M[i],mean_range_data$Tl_max_M[i]))
+      
+    }
+    
+}
+
   
 #clean up environment
 remove(i)

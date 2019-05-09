@@ -53,22 +53,19 @@ colnames(DataQuality)=c ("% in raw dataset")
 #Next, checking how closely mean and range midpoints correspond.
 
 ```{r}
-par(mfrow=c(1,3))
-
-plot(mean_range_data$Bl_mm~mean_range_data$range_mid_Bl, pch=19)
-plot(mean_range_data$Tl_mm~mean_range_data$range_mid_Tl, pch=19)
-plot(mean_range_data$Wt_g~mean_range_data$range_mid_Wt, pch=19)
-
 
 #mean percentage of weight differences between known mean an inferred midpoing mean 
-mean(abs( mean_range_data$Bl_mm-mean_range_data$range_mid_Bl)*100/mean_range_data$Bl_mm, na.rm = TRUE)
-mean (abs( mean_range_data$Tl_mm-mean_range_data$range_mid_Tl)*100/mean_range_data$Tl_mm, na.rm = TRUE)
+MeanBl <- mean(abs( mean_range_data$Bl_mm-mean_range_data$range_mid_Bl)*100/mean_range_data$Bl_mm, na.rm = TRUE)
+MeanTl <- mean (abs( mean_range_data$Tl_mm-mean_range_data$range_mid_Tl)*100/mean_range_data$Tl_mm, na.rm = TRUE)
+MeanWt <- mean(abs( mean_range_data$Wt_g-mean_range_data$range_mid_Wt)*100/mean_range_data$Wt_g, na.rm = TRUE)
 
-#Check why weight is so much larger - there's got to have been a mistake
+par(mfrow= c(1,3),oma = c(0, 0, 2, 0))
 
-mean(abs( mean_range_data$Wt_g-mean_range_data$range_mid_Wt)*100/mean_range_data$Wt_g, na.rm = TRUE)
+hist(abs(mean_range_data$Bl_mm-mean_range_data$range_mid_Bl)*100/mean_range_data$Bl_mm, xlab = paste("Body length;", "mean",round(MeanBl, 2), sep=" ") , main = "")
+hist(abs( mean_range_data$Tl_mm-mean_range_data$range_mid_Tl)*100/mean_range_data$Tl_mm,xlab = paste("Tail length;", "mean",round(MeanTl, 2), sep=" "), main = "")
+hist(abs(mean_range_data$Wt_g-mean_range_data$range_mid_Wt)*100/mean_range_data$Wt_g, xlab = paste("Weight;", "mean",round(MeanWt, 2), sep=" "), main = "")
 
-cbind(mean_range_data$Wt_g,mean_range_data$range_mid_Wt, abs( mean_range_data$Wt_g-mean_range_data$range_mid_Wt)*100/mean_range_data$Wt_g)
+mtext("Absolute difference of range midpoint from species mean in %" , outer = TRUE, cex = 1)
 
 ```
 
