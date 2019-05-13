@@ -898,10 +898,16 @@ plot(tree, type="phylogram", cex=0.8, tip.color = colsLoco[data$Locomotor_use])
 ```{r}
 
 
+
+
+
+#in a non-phylogenetically corrected space, we can use the phia package to test for interactions, but quite frankly, these do not make sense based on the plot - the green group ("saltatorial") should have significant interactions with them all but doesn't, whereas some others are clearly 
+
+TB_lm <- lm(Tl_mm~Bl_mm*Locomotor_use, data=data)
+testInteractions(TB_lm, adjustment="holm")
+
+
 #First, a plot to show that the below does not match my expectation
-
-#separate check
-
 
 
 plot(data$Tl_mm~data$Bl_mm, col=colsLoco[data$Locomotor_use], pch=19,xlab="log Body length (mm)", ylab="log Tail length",asp=1 ,bty="L");

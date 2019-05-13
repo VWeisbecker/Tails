@@ -1,0 +1,129 @@
+---
+title: "For_Gabriele"
+author: "Vera Weisbecker"
+date: "13 May 2019"
+output: html_document
+---
+
+## load required packages (not all are required, but chucking them all in here)
+
+```{r }
+library(ape)
+library(geiger)
+library(phytools)
+library(caper)
+library(car)
+library(multcomp)
+library(geomorph)
+library(nlme)
+library(dplyr)
+library(RColorBrewer)
+library(surface)
+library(phia)
+
+library(RRPP)
+
+
+#this loads the data and teh relevant tree
+load(file = "../Data/Processed_Data_for_Pgls.rda")
+
+
+```
+
+
+#Chopping up datasets and the tree into each locomotor mode for plotting and possibly determining slope differences later
+
+```{r}
+
+#determine the regression line coefficients from all the different pgls analyses conducted above, with separate lines whfor the locomotor modes. 
+
+Arb=data[c(which(data$Locomotor_use =="Arboreal")),]
+Arb_Tree=drop.tip(tree, name.check(tree,Arb)$tree_not_data )
+
+Pent=data[c(which(data$Locomotor_use =="Pentapedal")),]
+Pent_Tree=drop.tip(tree, name.check(tree,Pent)$tree_not_data )
+
+Scan=data[c(which(data$Locomotor_use =="Scansorial")),]
+Scan_Tree=drop.tip(tree, name.check(tree,Scan)$tree_not_data )
+
+Salt=data[c(which(data$Locomotor_use =="Saltatorial")),]
+Salt_Tree=drop.tip(tree, name.check(tree,Salt)$tree_not_data )
+
+Terr=data[c(which(data$Locomotor_use =="Terrestrial")),]
+Terr_Tree=drop.tip(tree, name.check(tree,Terr)$tree_not_data )
+
+
+```
+
+
+#Below are the pgls results, showing significant interactions between locomotor mode, and then a non-phylogenetic interaction test from the phia package showing a bunch of significant interactions. But in the chunk below, the different slopes are plotted and, these do not really correspond with the interaction test result - the green group ("saltatorial") should have significant interactions with them all but doesn't, whereas some others look parallel but aren't. 
+
+```{r}
+#First, pgls - leaving out a step where AIC comparisons are used to show that corBrownian works best; with significant interactions between locomotor modes
+
+TB <- (gls(Tl_mm~Bl_mm*Locomotor_use, correlation=corBrownian(1,phy=tree), data=data))
+
+anova (TB)
+
+#the only way I know to test these interactions is in a non-phylogenetic context, in this case using the phia package
+
+testInteractions(TB_lm, adjustment="holm")
+
+#but now see the plot below
+
+```
+
+#Below is the plot 
+
+```{r}
+
+colsLoco=c("dark orange", "purple", "green", "red", "blue")
+pchs=c(8,11,19,17,20,15)
+##Size of points
+cexes <- 1
+## this adjusts the titles of the double panel
+adjs <- -0.3
+## spaces to the left of text
+xinter <- 0.5
+## spaces between legend lines
+yInter <- 0.9
+##size of the box is determined by text width
+textwidth <- 0.2
+
+plot(data$Tl_mm~data$Bl_mm, col=colsLoco[data$Locomotor_use], pch=19,xlab="log Body length (mm)", ylab="log Tail length",asp=1 ,bty="L");
+abline(lm (Arb$Tl_mm~Arb$Bl_mm), col=colsLoco[1]);
+abline(lm (Pent$Tl_mm~Pent$Bl_mm), col=colsLoco[2]);
+abline(lm (Salt$Tl_mm~Salt$Bl_mm), col=colsLoco[3]);
+abline(lm (Scan$Tl_mm~Scan$Bl_mm), col=colsLoco[4]);
+abline(lm (Terr$Tl_mm~Terr$Bl_mm), col=colsLoco[5]);
+
+legend("bottomright",inset=0.15,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter+0.1, text.width = textwidth, bty="n")
+
+```
+
+#TWO QUESTIONS:
+
+#1 - Is there a better way of testing interactions, ideally in a phylogenetically corrected context? In particular, is it worth using PiCs and then conventional intercept comparisons (that's something you mentioned)
+
+#2 - I have been asked to report allometric slopes, but only have two easy but not very appropriate options. I can easily report pgls model coefficients for each locomotor mode, and have done so, but these coefficients are not really meant to be used that way; but "normal" lm lines are phylogenetically heavily confounded.
+
+#Gabriele's suggestion
+
+```{r}
+p.cov<-vcv.phylo(tree)
+
+
+gdd.1<-rrpp.data.frame(tail=data$Tl_mm,body=data$Bl_mm,covi=p.cov,loco=data$Locomotor_use)
+
+lmi<-lm.rrpp(tail~body*loco,SS.type = c("I"),Cov=p.cov,data=gdd.1)
+lmi.1<-lm.rrpp(tail~body*loco,SS.type = c("I"),data=gdd.1)
+summary(lmi)
+
+pari<-pairwise(lmi,covariate=data$Bl_mm,groups=data$Locomotor_use)
+pari.1<-pairwise(lmi.1,covariate=body,groups=loco)
+
+summary(pari,confidence=0.95,test.type="dist",show.vectors=T)
+summary(pari.1,confidence=0.95,test.type="dist",show.vectors=T)
+
+
+```
