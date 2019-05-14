@@ -335,7 +335,7 @@ VarTlBl=find.best.model(Tl_ratio~Bl_ratio,treeranges,rangesphy);VarTlBl$AIC_Weig
  VarTlWt$Model_summaries$Pagel$coefficients
  
  
- #compute relative probabilities betweeen 0 and 1 by comparing AICS according to Burnham and Anderson
+ #compute relative probabilities betweeen 0 and 1 by comparing AICS according to Burnham and Anderson (2002)
   AICs=c(VarTlBl$Model_summaries$Pagel$AIC,VarTlWt$Model_summaries$Pagel$AIC )
   AICmin=AICs-min(AICs)
   W=exp(-0.5*AICmin)/sum(exp(-0.5*AICmin))
@@ -524,6 +524,7 @@ anova(TW$Models$Brownian, type="marginal")
 ```
 
 #In the plot of tail length against body length, Peremelemorphs and the genus _Macropus_ are suggestive of different intercept and slope, respectively. Checking if the significant interaction is driven by these two
+
 ```{r}
 
 #Removing peramelemorphs by classifier and Macropus species from looking at the first and last Macropus in the dataset
@@ -578,7 +579,7 @@ summary(Interactions_wt, test.type="dist")
 ```
 
 
-#Despite the use of pgls, locomotor modes and orders/diprotodontian families are highly confounded. The possibility that these specific phylogenetic levels make a difference possibility is excluded by analysing a model that uses phylogenetic distinctions these. This does not reveal significant interactions between major clade (order or diprotodontian family):
+#Despite the use of pgls, locomotor modes and orders/diprotodontian families are highly confounded. The possibility that these specific phylogenetic levels make a difference is excluded by analysing a model that uses phylogenetic distinctions these. This does not reveal significant interactions between major clade (order or diprotodontian family):
 
 ```{r}
 
@@ -849,22 +850,11 @@ plot(tree, type="phylogram", cex=0.8, tip.color = colsLoco[data$Locomotor_use])
 ```
 
 
-#TestInteractions seems odd - below is the problem
+#In case it is of interest, below is the scatterplot with conventional linear models 
 
 ```{r}
 
-
-
-
-
-#in a non-phylogenetically corrected space, we can use the phia package to test for interactions, but quite frankly, these do not make sense based on the plot - the green group ("saltatorial") should have significant interactions with them all but doesn't, whereas some others are clearly 
-
-TB_lm <- lm(Tl_mm~Bl_mm*Locomotor_use, data=data)
-testInteractions(TB_lm, adjustment="holm")
-
-
 #First, a plot to show that the below does not match my expectation
-
 
 plot(data$Tl_mm~data$Bl_mm, col=colsLoco[data$Locomotor_use], pch=19,xlab="log Body length (mm)", ylab="log Tail length",asp=1 ,bty="L");
 abline(lm (Terr$Tl_mm~Terr$Bl_mm), col=colsLoco[5]);
@@ -875,8 +865,6 @@ abline(lm (Arb$Tl_mm~Arb$Bl_mm), col=colsLoco[1]);
 
 legend("bottomright",inset=0.15,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter+0.1, text.width = textwidth, bty="n");
 
-TB_lm <- lm(Tl_mm~Bl_mm*Locomotor_use, data=data)
-testInteractions(TB_lm, adjustment="holm")
 
 ```
 

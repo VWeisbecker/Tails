@@ -112,15 +112,17 @@ legend("bottomright",inset=0.15,levels(data$Locomotor_use) , pch=19, col=colsLoc
 ```{r}
 p.cov<-vcv.phylo(tree)
 
-
+#needs a data frame
 gdd.1<-rrpp.data.frame(tail=data$Tl_mm,body=data$Bl_mm,covi=p.cov,loco=data$Locomotor_use)
 
+
+# this is a pgls
 lmi<-lm.rrpp(tail~body*loco,SS.type = c("I"),Cov=p.cov,data=gdd.1)
 lmi.1<-lm.rrpp(tail~body*loco,SS.type = c("I"),data=gdd.1)
 summary(lmi)
 
 pari<-pairwise(lmi,covariate=data$Bl_mm,groups=data$Locomotor_use)
-pari.1<-pairwise(lmi.1,covariate=body,groups=loco)
+pari.1<-pairwise(lmi.1,covariate=data$Bl_mm,groups=data$Locomotor_use)
 
 summary(pari,confidence=0.95,test.type="dist",show.vectors=T)
 summary(pari.1,confidence=0.95,test.type="dist",show.vectors=T)
