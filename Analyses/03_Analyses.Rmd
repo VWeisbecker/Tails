@@ -472,9 +472,24 @@ TB=find.best.model(Tl_mm~Bl_mm*Locomotor_use,tree,data);TB$AIC_Weights
 ###look at the model summary of the most likely model: there are significant interactions 
 anova(TB$Models$Brownian)
 
+
+# same for body weight
+
+#The relationship of tail length and locomotor use changes at different weights
+
+TW=find.best.model(Tl_mm~Wt_g*Locomotor_use,tree,data);TW$AIC_Weights
+
+#check if the residuals of the model are OK; the fit is quite good
+qqnorm (TW$Models$Brownian)
+
+###look at the model summary of the most likely model: there are also significant interactions here
+anova(TW$Models$Brownian, type="marginal")
+
+
+
 ```
 
-#In the plot, Peremelemorphs and the genus _Macropus_ are suggestive of different intercept and slope, respectively. Checking if the significant interaction is driven by these two
+#In the plot of tail length against body length, Peremelemorphs and the genus _Macropus_ are suggestive of different intercept and slope, respectively. Checking if the significant interaction is driven by these two
 ```{r}
 
 #Removing peramelemorphs by classifier and Macropus species from looking at the first and last Macropus in the dataset
@@ -499,24 +514,37 @@ anova(TBNPR$Models$Brownian, type="marginal")
 
 ```
 
-#Since the two most different groups (Peramelemorphs and Macropus) do not change the significance  of body length and locomotor use interaction, running a post-hoc analysis on the entire dataset. It is not possible to do post-hoc test in the pgls framework, so instead looking for interactions in the non-phylogenetically corrected lm analysis and using testInteractions from the phia package. 
+#Since the two most different groups (Peramelemorphs and Macropus) do not change the significance  of body length and locomotor use interaction, running a post-hoc analysis on the entire dataset. It is not possible to do post-hoc test in the pgls framework, so instead looking for interactions in the non-phylogenetically corrected lm analysis and using a permutation-based interaction test using the pairwise function of the RRPP package. 
 
 ```{r}
 
-#First, a plot to show that the below does not match my expectation
+
+#RRPP requires an rrpp data frame
+interaction_frame <- rrpp.data.frame(tail=data$Tl_mm,body=data$Bl_mm, weight=data$Wt_g,  loco=data$Locomotor_use)
+
+#For Tail ~ body lengths
+
+lm_inter_bl<-lm.rrpp(tail~body*loco,SS.type = c("I"),data=interaction_frame)
+
+Interactions_bl <- pairwise(lm_inter,covariate=interaction_frame$body,groups=interaction_frame$loco)
+
+summary(Interactions_bl, test.type="dist")
 
 
+#For Tail ~ body weights
 
 
+lm_inter_wt<-lm.rrpp(tail~weight*loco,SS.type = c("I"),data=interaction_frame)
 
+Interactions_wt <- pairwise(lm_inter,covariate=interaction_frame$weight,groups=interaction_frame$loco)
 
-TB_lm <- lm(Tl_mm~Bl_mm*Locomotor_use, data=data)
-testInteractions(TB_lm, adjustment="holm")
+summary(Interactions_wt, test.type="dist")
+
 
 ```
 
 
-#The interaction results are consistent with the expectation that pentapedal and arboreal species use their tail heavily in locomotion and would thus reflect a difference to the more generalist terrestrial modes. However, despite the use of pgls, locomotor modes and orders/diprotodontian families are highly confounded. The possibility that these specific phylogenetic levels make a difference possibility is excluded by analysing a model that uses phylogenetic distinctions these. This does not reveal significant interactions between major clade (order or diprotodontian family):
+#Despite the use of pgls, locomotor modes and orders/diprotodontian families are highly confounded. The possibility that these specific phylogenetic levels make a difference possibility is excluded by analysing a model that uses phylogenetic distinctions these. This does not reveal significant interactions between major clade (order or diprotodontian family):
 
 ```{r}
 
@@ -537,6 +565,28 @@ anova(TBNoInter$Models$Brownian)
 
 anova(TB_lm <- lm(Tl_mm~Bl_mm*Clade, data=data))
 
+
+# The same for body weight:
+
+TW=find.best.model(Tl_mm~Wt_g*Clade,tree,data);TW$AIC_Weights
+
+#check if the residuals of the model are OK; the fit is quite good here, too
+#qqnorm (TW$Models$Brownian)
+
+###look at the model summary of the most likely model: there are no significant interactions 
+anova(TW$Models$Brownian)
+
+
+TWNoInter=find.best.model(Tl_mm~Wt_g+Clade,tree,data);TW$AIC_Weights
+anova(TWNoInter$Models$Brownian)
+
+
+#a test of the uncorrected lm model also suggests no differences in scaling slope:
+
+anova(TW_lm <- lm(Tl_mm~Wt_g*Clade, data=data))
+
+
+
 ```
 
 #To look for differences in means, which may also contribute to differences in relative tail length between locomotor modes, we separate the dataset to test only intercept means in those locomotor modes that show no significant interaction in the analyses above. This gives an indication of intercept differences in a phylogenetic context. Note, however, that the confidence of significances in such a carved-up dataset is not very high.
@@ -545,152 +595,33 @@ anova(TB_lm <- lm(Tl_mm~Bl_mm*Clade, data=data))
 
 #Prepare trees
 
-#Terrestrial-saltatorial
-TerrSalt=data[c( which ( data$Locomotor_use =="Saltatorial"), which(data$Locomotor_use =="Terrestrial")),]
-TerrSaltTree=drop.tip(tree, name.check(tree,TerrSalt)$tree_not_data )
+#For body length, only arboreal, pentapedal, and scansorial locomotor modes did not show significant interactions; so testing means
 
-#Arboreal-pentapedal - scansorial
 ArbPentScan=data[-c(which(data$Locomotor_use =="Terrestrial"), which ( data$Locomotor_use =="Scansorial"), which(data$Locomotor_use =="Saltatorial")),]
 ArbPentScanTree=drop.tip(tree, name.check(tree,ArbPentScan)$tree_not_data )
 
-#Scansorial - saltatorial
-ScanSalt=data[c( which ( data$Locomotor_use =="Scansorial"), which(data$Locomotor_use =="Saltatorial")),]
-ScanSaltTree=drop.tip(tree, name.check(tree,ScanSalt)$tree_not_data )
 
-#Scansorial - saltatorial
-ArbSalt=data[c( which ( data$Locomotor_use =="Arboreal"), which(data$Locomotor_use =="Saltatorial")),]
-ArbSaltTree=drop.tip(tree, name.check(tree,ArbSalt)$tree_not_data )
+#For body weight, we also need to compare pentapedal and terrestrial means
 
-
-
-#Finding the  models for testing intercept differences, then testing using the find.best.model function as above; none of these are significant
-ArbPentScanModel=find.best.model(Tl_mm~Bl_mm+Locomotor_use,ArbPentScanTree,ArbPentScan);ArbPentScanModel$AIC_Weights
-anova(ArbPentScanModel$Models$Grafen, type="marginal")
-
-#Is scaling in this group isometric?
-ArbPentScanScaling=find.best.model(Tl_mm~Bl_mm,ArbPentScanTree,ArbPentScan);ArbPentScanScaling$AIC_Weights
-summary(ArbPentScanScaling$Models$Brownian, type="marginal")
-
-#The inspiration for this code comes from a researchgate entry by Pedro Jose Aphalo
-slope <-ArbPentScanScaling$Model_summaries$Brownian$coefficients[2]
-#I found the use of this in http://esapubs.org/archive/ecol/e088/020/pgls.R; this returns the standard error for the scaling coefficient
-se <- as.numeric(sqrt(diag(ArbPentScanScaling$Models$Brownian$varBeta))[2])
-df <- ArbPentScanScaling$Models$Grafen$dims$N
-t_value_one <- (slope-1)/se
-dt(t_value_one, df=df) / 2 # two sided test
-
-
-
-
-ScanSaltModel=find.best.model(Tl_mm~Bl_mm+Locomotor_use,ScanSaltTree,ScanSalt);ScanSaltModel$AIC_Weights
-anova(ScanSaltModel$Models$Brownian, type="marginal")
-
-ScanSaltScaling <- find.best.model(Tl_mm~Bl_mm,ScanSaltTree,ScanSalt);ScanSaltModel$AIC_Weights
-
-slope <-ScanSaltScaling$Model_summaries$Brownian$coefficients[2]
-se <- as.numeric(sqrt(diag(ScanSaltScaling$Models$Brownian$varBeta))[2])
-df <- ScanSaltScaling$Models$Grafen$dims$N
-t_value_one <- (slope-1)/se
-dt(t_value_one, df=df) / 2 
-
-
-
-
-TerrSaltModel=find.best.model(Tl_mm~Bl_mm+Locomotor_use,TerrSaltTree,TerrSalt);TerrSaltModel$AIC_Weights
-anova(TerrSaltModel$Models$Brownian, type="marginal")
-
-TerrSaltScaling=find.best.model(Tl_mm~Bl_mm,TerrSaltTree,TerrSalt);TerrSaltModel$AIC_Weights
-
-slope <-TerrSaltScaling$Model_summaries$Brownian$coefficients[2]
-se <- as.numeric(sqrt(diag(TerrSaltScaling$Models$Brownian$varBeta))[2])
-df <- TerrSaltScaling$Models$Grafen$dims$N
-t_value_one <- (slope-1)/se
-dt(t_value_one, df=df) / 2 
-
-
-
-
-
-ArbSaltModel=find.best.model(Tl_mm~Bl_mm+Locomotor_use,ArbSaltTree,ArbSalt);ArbSaltModel$AIC_Weights
-anova(ArbSaltModel$Models$Brownian, type="marginal")
-
-ArbSaltScaling=find.best.model(Tl_mm~Bl_mm,ArbSaltTree,ArbSalt);ArbSaltModel$AIC_Weights
-
-slope <-ArbSaltScaling$Model_summaries$Brownian$coefficients[2]
-se <- as.numeric(sqrt(diag(ArbSaltScaling$Models$Brownian$varBeta))[2])
-df <- ArbSaltScaling$Models$Grafen$dims$N
-t_value_one <- (slope-1)/se
-dt(t_value_one, df=df) / 2 
-
-
-
-```
-
-
-#The same analysis with body weight:
-
-```{r}
-#The relationship of tail length and locomotor use changes at different weights
-
-TW=find.best.model(Tl_mm~Wt_g*Locomotor_use,tree,data);TW$AIC_Weights
-
-#check if the residuals of the model are OK; the fit is quite good
-qqnorm (TW$Models$Brownian)
-
-###look at the model summary of the most likely model: there are also significant interactions here
-anova(TW$Models$Brownian, type="marginal")
-
-#again, use non-phylogenetic interaction test; with weight, only arboreal species seem different though
-
-TW_lm <- lm(Tl_mm~Wt_g*Locomotor_use, data=data)
-testInteractions(TW_lm, adjustment="holm")
-
-```
-
-
-
-# Again, testing for differences of intercept between locomotor mode that have no interaction differences 
-
-```{r}
-
-#Prepare additional trees
-#Arboreal-pentapedal - scansorial
-PentSalt=data[-c(which(data$Locomotor_use =="Pentapedal"), which(data$Locomotor_use =="Saltatorial")),]
-PentSaltTree=drop.tip(tree, name.check(tree,PentSalt)$tree_not_data )
-
-#Pentapedal-Saltatorial
-PentSalt=data[c( which ( data$Locomotor_use =="Pentapedal"), which(data$Locomotor_use =="Saltatorial")),]
-PentSaltTree=drop.tip(tree, name.check(tree,PentSalt)$tree_not_data )
-
-##Pentapedal-Terrestrial
 PentTerr=data[c( which ( data$Locomotor_use =="Pentapedal"), which(data$Locomotor_use =="Terrestrial")),]
 PentTerrTree=drop.tip(tree, name.check(tree,PentTerr)$tree_not_data )
 
-#Terrestrial - saltatorial
-SaltTerr=data[c( which ( data$Locomotor_use =="Terrestrial"), which(data$Locomotor_use =="Saltatorial")),]
-SaltTerrTree=drop.tip(tree, name.check(tree,SaltTerr)$tree_not_data )
 
-#in no case is there a significant difference in intercept
 
-ArbPentScanModel_Wt=find.best.model(Tl_mm~Wt_g+Locomotor_use,ArbPentScanTree,ArbPentScan);ArbPentScanModel$AIC_Weights
+#Finding the  models for testing slope differences, then testing using the find.best.model function as above; none of these are significant
+
+ArbPentScanModel_Bl <- find.best.model(Tl_mm~Bl_mm+Locomotor_use,ArbPentScanTree,ArbPentScan);ArbPentScanModel$AIC_Weights
+anova(ArbPentScanModel_Bl$Models$Grafen, type="marginal")
+
+ArbPentScanModel_Wt <- find.best.model(Tl_mm~Wt_g+Locomotor_use,ArbPentScanTree,ArbPentScan);ArbPentScanModel$AIC_Weights
 anova(ArbPentScanModel_Wt$Models$Grafen, type="marginal")
 
-PentSaltModel_Wt=find.best.model(Tl_mm~Wt_g+Locomotor_use,PentSaltTree,PentSalt);PentSaltModel_Wt$AIC_Weights
-anova(PentSaltModel_Wt$Models$Brownian, type="marginal")
+PentTerrModel_Wt <- find.best.model(Tl_mm~Wt_g+Locomotor_use,PentTerrTree,PentTerr);PentTerrModel_Wt$AIC_Weights
+anova(PentTerrModel_Wt$Models$Pagel, type="marginal")
 
-PentTerrModel_Wt=find.best.model(Tl_mm~Wt_g+Locomotor_use,PentTerrTree,PentTerr);PentTerrModel_Wt$AIC_Weights
-anova(PentTerrModel_Wt$Models$Brownian, type="marginal")
-
-ScanSaltModel_Wt=find.best.model(Tl_mm~Wt_g+Locomotor_use,ScanSaltTree,ScanSalt);ScanSaltModel_Wt$AIC_Weights
-anova(ScanSaltModel_Wt$Models$Brownian, type="marginal")
-
-SaltTerrModel_Wt=find.best.model(Tl_mm~Wt_g+Locomotor_use,SaltTerrTree,SaltTerr);SaltTerrModel_Wt$AIC_Weights
-anova(SaltTerrModel_Wt$Models$Brownian, type="marginal")
 
 ```
 
- 
- 
 #Plotting according to tail use, locomotor mode, and phylogeny; setting up line code, colours, etc.
 
 ```{r}
