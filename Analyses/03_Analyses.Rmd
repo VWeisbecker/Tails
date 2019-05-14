@@ -561,11 +561,6 @@ TBNoInter=find.best.model(Tl_mm~Bl_mm+Clade,tree,data);TB$AIC_Weights
 anova(TBNoInter$Models$Brownian)
 
 
-#a test of the uncorrected lm model also suggests no differences in scaling slope:
-
-anova(TB_lm <- lm(Tl_mm~Bl_mm*Clade, data=data))
-
-
 # The same for body weight:
 
 TW=find.best.model(Tl_mm~Wt_g*Clade,tree,data);TW$AIC_Weights
@@ -580,10 +575,6 @@ anova(TW$Models$Brownian)
 TWNoInter=find.best.model(Tl_mm~Wt_g+Clade,tree,data);TW$AIC_Weights
 anova(TWNoInter$Models$Brownian)
 
-
-#a test of the uncorrected lm model also suggests no differences in scaling slope:
-
-anova(TW_lm <- lm(Tl_mm~Wt_g*Clade, data=data))
 
 
 
@@ -626,7 +617,7 @@ anova(PentTerrModel_Wt$Models$Pagel, type="marginal")
 
 ```{r}
 
-#determine the regression line coefficients from all the different pgls analyses conducted above, with separate lines whfor the locomotor modes. 
+#determine the regression line coefficients from apgls analyses for each locomotor group, with separate lines for the locomotor modes. 
 
 Arb=data[c(which(data$Locomotor_use =="Arboreal")),]
 Arb_Tree=drop.tip(tree, name.check(tree,Arb)$tree_not_data )
