@@ -264,12 +264,49 @@ dev.off()
   rangesArbPent<-ranges[ c (which (data$Locomotor_use == "Arboreal") , (which (data$Locomotor_use =="Pentapedal" ))),]
   
   rangesNonArbPent<-ranges[- c (which (data$Locomotor_use == "Arboreal") , (which (data$Locomotor_use =="Pentapedal" ))),]
+```
+
+# Phylogenetic testing - do arboreal/pentapedal species have significantly lower ranges than others?
+
+```{r}
+  
+#Prepping range data for phylogenetic analysis - this sets up present range comparison and also range correlation analyses below
+
+#First, remove NAs
+rangesphy <- ranges[-c(which(is.na(ranges$Tl_ratio)), which (is.na(ranges$Bl_ratio)), which (is.na(ranges$Wt_ratio))),]
+
+#Then drop tips for which NAs are present
+namecheck=name.check(tree,rangesphy)
+treeranges=drop.tip(tree,namecheck$tree_not_data)
+name.check(treeranges,rangesphy)
+  
+# There seems to be no easy way of replacing a multi-level factor with a two-level factor, so doing it the long way here by making a new column
+
+ArbPent <- c(which (data$Locomotor_use=="Arboreal"), which (data$Locomotor_use=="Pentapedal"))
+Rest <- c(which (data$Locomotor_use=="Terrestrial"), which (data$Locomotor_use=="Saltatorial"), which (data$Locomotor_use=="Scansorial") )
+
+NewLoco <- rbind( cbind (ArbPent, rep(1, length(ArbPent)) ), cbind (Rest, rep(2, length(Rest)) ))
+NewLoco <- NewLoco[order( NewLoco[,1]),]
+
+ranges_ArbPent <- cbind(ranges, NewLoco[,2])
+ranges_ArbPent <- ranges_ArbPent[-c(which(is.na(ranges_ArbPent$Tl_ratio)), which (is.na(ranges_ArbPent$Bl_ratio)), which (is.na(ranges_ArbPent$Wt_ratio))),]
+
+#just checking that species labels line up
+name.check(treeranges,ranges_ArbPent)
+
+ phylANOVA(tree = treeranges,  ranges_ArbPent [,4], ranges_ArbPent$Tl_ratio, posthoc = FALSE )
+ phylANOVA(tree = treeranges,  ranges_ArbPent [,4], ranges_ArbPent$Bl_ratio, posthoc = FALSE )
+ phylANOVA(tree = treeranges,  ranges_ArbPent [,4], ranges_ArbPent$Wt_ratio, posthoc = FALSE )
+  
  
+#Also no significant differences in a non-phylogenetic context  (not reported in the manuscript)
+  
   ratiosArbPent_Tl=c(rangesArbPent$Tl_ratio, rangesNonArbPent$Tl_ratio)
   ratiosArbPent_Bl=c(rangesArbPent$Bl_ratio, rangesNonArbPent$Bl_ratio)
   ratiosArbPent_Wt=c(rangesArbPent$Wt_ratio, rangesNonArbPent$Wt_ratio)
   
 
+  
   #no significant differences in tail ranges
   MinMaxtest(ratiosArbPent_Tl,2)
   #No sig. differences
@@ -283,9 +320,6 @@ dev.off()
 ```{r}   
 # Double-checking tip labels and data row names are in the same order
 
-rangesphy <- ranges[-c(which(is.na(ranges$Tl_ratio)), which (is.na(ranges$Bl_ratio)), which (is.na(ranges$Wt_ratio))),]
-namecheck=name.check(tree,rangesphy)
-treeranges=drop.tip(tree,namecheck$tree_not_data)
 name.check(treeranges,rangesphy)
 
 VarTlBl=find.best.model(Tl_ratio~Bl_ratio,treeranges,rangesphy);VarTlBl$AIC_Weights
