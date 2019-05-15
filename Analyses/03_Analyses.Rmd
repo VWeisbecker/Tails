@@ -159,7 +159,7 @@ dev.off()
 #plot male-only, female-only, and averaged datasets together
 
 lwd=2
-pdf("../Figures/Supp3_MF_plot.pdf")
+pdf("../Figures/Supp4_MF_plot.pdf")
 par(mfrow=c(2,1))
 
 plot(data$Bl_Av_M,data$Tl_Av_M, col="red", pch=19, xlab="log Body length (mm)", ylab="log Tail length (mm)", bty="L");
@@ -246,7 +246,7 @@ arrows(x0=1,x1=2, y0=3, y1=3, length = 0.1, angle = 90, code=3, lwd=lwd );
   
   MinMaxtest(ForVarDist_Band,2)
   
-pdf("../Figures/Supp4_Ranges.pdf") 
+pdf("../Figures/Supp5_Ranges.pdf") 
  
 boxplot(ranges_Band$Tl_ratio , ranges_Band$Bl_ratio,ranges_Band$Wt_ratio, names=c("Tl ratio", "Bl ratio", "Wt ratio"), xlab="Ratios without Peramelemorpha", col=c("hotpink1","hotpink1","cadetblue2"),frame=F);
 
@@ -841,11 +841,11 @@ dev.off()
 ```
  
  
- #Plotting the tree
+#Plotting the tree; this is here because that is where the colour schemes are set up above.
 
 ```{r}
 
-pdf("../Figures/SuppFig1_phylog.pdf", height = 11, width = 6)
+pdf("../Figures/Supp3_phylog.pdf", height = 11, width = 6)
 
 plot(tree, type="phylogram", cex=0.5, tip.color = colsLoco[data$Locomotor_use]); legend("right",inset=0.1,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=0.5, x.intersp = 0.9, y.intersp = 0.9, text.width = textwidth, ,bty="n");
 
@@ -865,7 +865,7 @@ abline(lm (Salt$Tl_mm~Salt$Bl_mm), col=colsLoco[3]);
 abline(lm (Pent$Tl_mm~Pent$Bl_mm), col=colsLoco[2]);
 abline(lm (Arb$Tl_mm~Arb$Bl_mm), col=colsLoco[1]);
 
-legend("bottomright",inset=0.15,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter+0.1, text.width = textwidth, bty="n");
+legend("bottomright",inset=0.15,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=cexes, x.intersp = xinter, y.intersp = yInter+0.1, text.width = textwidth, bty="n")
 
 
 ```
