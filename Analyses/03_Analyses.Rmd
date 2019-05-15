@@ -266,7 +266,7 @@ dev.off()
   rangesNonArbPent<-ranges[- c (which (data$Locomotor_use == "Arboreal") , (which (data$Locomotor_use =="Pentapedal" ))),]
 ```
 
-# Phylogenetic testing - do arboreal/pentapedal species have significantly lower ranges than others?
+# phylANOVA - do arboreal/pentapedal species have significantly lower ranges than others?
 
 ```{r}
   
@@ -852,7 +852,7 @@ plot(tree, type="phylogram", cex=0.5, tip.color = colsLoco[data$Locomotor_use]);
 ```
 
 
-#In case it is of interest, below is the scatterplot with conventional linear models 
+#In case it is of interest (but not reported in the manuscript), below is the scatterplot with conventional linear models - just showing that the lm slopes do not look all that different to the pgls coefficents
 
 ```{r}
 
