@@ -80,9 +80,9 @@ pdf("../Figures/Supp1_Midpoint_dist.pdf")
 
 par(mfrow= c(1,3),oma = c(0, 0, 2, 0))
 
-hist(abs(mean_range_data$Bl_mm-mean_range_data$range_mid_Bl)*100/mean_range_data$Bl_mm, xlab = paste("Body length;", "mean",round(MeanBl, 2), sep=" ") , main = "")
-hist(abs( mean_range_data$Tl_mm-mean_range_data$range_mid_Tl)*100/mean_range_data$Tl_mm,xlab = paste("Tail length;", "mean",round(MeanTl, 2), sep=" "), main = "")
-hist(abs(mean_range_data$Wt_g-mean_range_data$range_mid_Wt)*100/mean_range_data$Wt_g, xlab = paste("Weight;", "mean",round(MeanWt, 2), sep=" "), main = "")
+hist(abs(mean_range_data$Bl_mm-mean_range_data$range_mid_Bl)*100/mean_range_data$Bl_mm, xlab = paste("Body length;", "mean",round(MeanBl, 2), "%",sep=" ") , main = "")
+hist(abs( mean_range_data$Tl_mm-mean_range_data$range_mid_Tl)*100/mean_range_data$Tl_mm,xlab = paste("Tail length;", "mean",round(MeanTl, 2),"%", sep=" "), main = "")
+hist(abs(mean_range_data$Wt_g-mean_range_data$range_mid_Wt)*100/mean_range_data$Wt_g, xlab = paste("Weight;", "mean",round(MeanWt, 2),"%", sep=" "), main = "")
 
 mtext("Absolute difference of range midpoint from species mean in %" , outer = TRUE, cex = 1)
 
@@ -652,7 +652,7 @@ anova(PentTerrModel_Wt$Models$Pagel, type="marginal")
 
 ```{r}
 
-#determine the regression line coefficients from apgls analyses for each locomotor group, with separate lines for the locomotor modes. 
+#determine the regression line coefficients from a pgls analyses for each locomotor group, with separate lines for the locomotor modes. 
 
 Arb=data[c(which(data$Locomotor_use =="Arboreal")),]
 Arb_Tree=drop.tip(tree, name.check(tree,Arb)$tree_not_data )
@@ -735,7 +735,7 @@ legend("topleft", "A", bty="n", cex=1.5, inset=-0.05);
 
 lines(x=c(1.8,2.7),y=c(1.8776347281739,2.67921326346783),col=colsLoco[1], lwd=2)
 lines(x=c(2.6,3.2),y=c(2.60573488742311,2.93380010371888),col=colsLoco[2], lwd=2)
-lines(x=c(2.3,2.83),y=c(2.10594027781454,2.78581969836552), col=colsLoco[3], lwd=2)
+lines(x=c(2.3,2.83),y=c(2.12835900403023,2.8139649267985), col=colsLoco[3], lwd=2)
 lines(x=c(1.9,2.7),y=c(1.9958300045442,2.62692913039759), col=colsLoco[4], lwd=2)
 lines(x=c(1.7,3.1),y=c(1.66433210725893,2.63480806919339), col=colsLoco[5], lwd=2)
 #If species names are desired: text(data$Tl_mm~data$Bl_mm, labels=data$Species, cex=0.5)
@@ -751,7 +751,7 @@ legend("topleft", "B", bty="n", cex=1.5,inset=-0.05);
 
 lines(x=c(0.9,3.7),y=c(1.88268754185602,2.71799513332411), col=colsLoco[1], lwd=2)
 lines(x=c(3.6,4.6),y=c(2.61375492837646,2.92719940106734), col=colsLoco[2], lwd=2)
-lines(x=c(2.7,4),y=c(2.24843315317741,2.796370076799), col=colsLoco[3], lwd=2)
+lines(x=c(2.7,4),y=c(2.2596532115985,2.8099730946047), col=colsLoco[3], lwd=2)
 lines(x=c(1.2,3.4),y=c(2.01091510547401,2.61107885348291), col=colsLoco[4], lwd=2)
 lines(x=c(0.6,4.5),y=c(1.72181183623882,2.53888038204326), col=colsLoco[5], lwd=2)
 
@@ -795,14 +795,14 @@ legend("topleft", "A", bty="n", cex=1.5)
 
 lines(x=c(1.8,2.7),y=c(1.8776347281739,2.67921326346783),col="Black", lwd=lwd_bl)
 lines(x=c(2.6,3.2),y=c(2.60573488742311,2.93380010371888),col="Black", lwd=lwd_bl)
-lines(x=c(2.3,2.83),y=c(2.10594027781454,2.78581969836552), col="Black", lwd=lwd_bl)
+lines(x=c(2.3,2.83),y=c(2.12835900403023,2.81396492679852), col="Black", lwd=lwd_bl)
 lines(x=c(1.9,2.7),y=c(1.99094065810105,2.62786824555291), col="Black", lwd=lwd_bl)
 lines(x=c(1.7,3.1),y=c(1.64141993621454,2.66363472373482), col="Black", lwd=lwd_bl)
 
 #then the coloured lines for filling in
 lines(x=c(1.8,2.7),y=c(1.8776347281739,2.67921326346783),col=colsLoco[1], lwd=lwd_bl-1)
 lines(x=c(2.6,3.2),y=c(2.60573488742311,2.93380010371888),col=colsLoco[2], lwd=lwd_bl-1)
-lines(x=c(2.3,2.83),y=c(2.10594027781454,2.78581969836552), col=colsLoco[3], lwd=lwd_bl-1)
+lines(x=c(2.3,2.83),y=c(2.12835900403023,2.8139649267985), col=colsLoco[3], lwd=lwd_bl-1)
 lines(x=c(1.9,2.7),y=c(1.99094065810105,2.62786824555291), col=colsLoco[4], lwd=lwd_bl-1)
 lines(x=c(1.7,3.1),y=c(1.64141993621454,2.66363472373482), col=colsLoco[5], lwd=lwd_bl-1)
 
@@ -824,7 +824,7 @@ legend("topleft", "B", bty="n", cex=1.5,)
 #first draw wider lines to give a black "frame"
 lines(x=c(0.9,3.7),y=c(1.88268754185602,2.71799513332411), col="Black", lwd=lwd_bl)
 lines(x=c(3.6,4.6),y=c(2.61375492837646,2.92719940106734), col="Black", lwd=lwd_bl)
-lines(x=c(2.7,4),y=c(2.24843315317741,2.796370076799), col="Black", lwd=lwd_bl)
+lines(x=c(2.7,4),y=c(2.2596532115985,2.8099730946047), col="Black", lwd=lwd_bl)
 lines(x=c(1.2,3.4),y=c(2.00997499587214,2.60906055556869), col="Black", lwd=lwd_bl)
 lines(x=c(0.6,4.5),y=c(1.69836821022779,2.56642013396235), col="Black", lwd=lwd_bl)
 
@@ -832,7 +832,7 @@ lines(x=c(0.6,4.5),y=c(1.69836821022779,2.56642013396235), col="Black", lwd=lwd_
 
 lines(x=c(0.9,3.7),y=c(1.88268754185602,2.71799513332411), col=colsLoco[1], lwd=lwd_bl-1)
 lines(x=c(3.6,4.6),y=c(2.61375492837646,2.92719940106734), col=colsLoco[2], lwd=lwd_bl-1)
-lines(x=c(2.7,4),y=c(2.24843315317741,2.796370076799), col=colsLoco[3], lwd=lwd_bl-1)
+lines(x=c(2.7,4),y=c(2.2596532115985,2.8099730946047), col=colsLoco[3], lwd=lwd_bl-1)
 lines(x=c(1.2,3.4),y=c(2.00997499587214,2.60906055556869), col=colsLoco[4], lwd=lwd_bl-1)
 lines(x=c(0.6,4.5),y=c(1.69836821022779,2.56642013396235), col=colsLoco[5], lwd=lwd_bl-1)
 
@@ -845,7 +845,9 @@ dev.off()
 
 ```{r}
 
-plot(tree, type="phylogram", cex=0.8, tip.color = colsLoco[data$Locomotor_use])
+pdf("../Figures/SuppFig1_phylog.pdf", height = 11, width = 6)
+
+plot(tree, type="phylogram", cex=0.5, tip.color = colsLoco[data$Locomotor_use]); legend("right",inset=0.1,levels(data$Locomotor_use) , pch=19, col=colsLoco, cex=0.5, x.intersp = 0.9, y.intersp = 0.9, text.width = textwidth, ,bty="n");
 
 ```
 
