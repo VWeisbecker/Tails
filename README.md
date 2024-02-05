@@ -1,0 +1,1 @@
+Code to accompany the publication: Weisbecker, Vera, Cruise Speck, and Andrew M. Baker. "A tail of evolution: evaluating body length, weight and locomotion as potential drivers of tail length scaling in Australian marsupial mammals." Zoological Journal of the Linnean Society 188, no. 1 (2020): 242-254.
